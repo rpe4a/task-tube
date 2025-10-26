@@ -11,6 +11,8 @@
 
     <modules>
         <module>server</module>
+        <module>server/core</module>
+        <module>server/persistance</module>
     </modules>
 
     <properties>
@@ -18,11 +20,20 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <!--        versions-->
         <versions.guava>33.5.0-jre</versions.guava>
         <versions.common-lang3>3.19.0</versions.common-lang3>
+        <versions.lombok>1.18.42</versions.lombok>
+        <versions.jackson>2.17.2</versions.jackson>
 
+        <!--        logging-->
         <logging.level>INFO</logging.level>
         <logging.pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%thread] %replace(T:%X{traceId}){^T:$,''} %cyan(%logger{36}) - %msg%n</logging.pattern>
+
+        <!--        persistence-->
+        <postgresql.url>jdbc:postgresql://localhost:5432/task_tube</postgresql.url>
+        <postgresql.admin>admin</postgresql.admin>
+        <postgresql.password>12345</postgresql.password>
     </properties>
 
     <dependencyManagement>
@@ -36,6 +47,16 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>${versions.common-lang3}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${versions.lombok}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${versions.jackson}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -58,7 +79,7 @@
                         <path>
                             <groupId>org.projectlombok</groupId>
                             <artifactId>lombok</artifactId>
-                            <version>1.18.42</version>
+                            <version>${versions.lombok}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
