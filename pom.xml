@@ -14,14 +14,15 @@
     </modules>
 
     <properties>
-        <java.version>25</java.version>
-
-        <maven.compiler.source>25</maven.compiler.source>
-        <maven.compiler.target>25</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <versions.guava>33.5.0-jre</versions.guava>
         <versions.common-lang3>3.19.0</versions.common-lang3>
+
+        <logging.level>INFO</logging.level>
+        <logging.pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%thread] %replace(T:%X{traceId}){^T:$,''} %cyan(%logger{36}) - %msg%n</logging.pattern>
     </properties>
 
     <dependencyManagement>
@@ -43,6 +44,11 @@
         <pluginManagement>
         </pluginManagement>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
