@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: server-api
+
+  profiles:
+    default: local
+
+  datasource:
+    url: ${postgresql.url}
+    username: ${postgresql.admin}
+    password: ${postgresql.password}

@@ -11,8 +11,6 @@
 
     <modules>
         <module>server</module>
-        <module>server/core</module>
-        <module>server/persistance</module>
     </modules>
 
     <properties>
@@ -21,13 +19,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!--        versions-->
-        <versions.guava>33.5.0-jre</versions.guava>
         <versions.common-lang3>3.19.0</versions.common-lang3>
+        <versions.guava>33.5.0-jre</versions.guava>
         <versions.lombok>1.18.42</versions.lombok>
         <versions.jackson>2.17.2</versions.jackson>
 
         <!--        logging-->
-        <logging.level>INFO</logging.level>
+        <logging.level>DEBUG</logging.level>
         <logging.pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%thread] %replace(T:%X{traceId}){^T:$,''} %cyan(%logger{36}) - %msg%n</logging.pattern>
 
         <!--        persistence-->

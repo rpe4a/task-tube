@@ -1,10 +1,10 @@
 package com.example.tasktube.server.api.controllers;
 
-import com.example.tasktube.server.api.controllers.dtos.RunningTaskDto;
-import com.example.tasktube.server.core.enties.Task;
-import com.example.tasktube.server.core.services.RunTaskService;
-import com.example.tasktube.server.core.services.TaskService;
+import com.example.tasktube.server.api.controllers.requests.RunningTaskRequest;
+import com.example.tasktube.server.application.port.in.ITaskService;
+import com.example.tasktube.server.domain.enties.Task;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -12,38 +12,36 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController()
 @RequestMapping(path = "/api/v1/task")
 public final class TaskController {
 
-    private final RunTaskService runTaskService;
-    private final TaskService taskService;
+    private final ITaskService taskService;
 
     public TaskController(
-            final RunTaskService runTaskService,
-            final TaskService taskService
+            final ITaskService taskService
     ) {
-        this.runTaskService = runTaskService;
-        this.taskService = taskService;
+        this.taskService = Objects.requireNonNull(taskService);
     }
 
     @RequestMapping(
             value = "",
             method = RequestMethod.POST
     )
-    public UUID create(@RequestBody final RunningTaskDto runningTaskDto) {
-        Preconditions.checkNotNull(runningTaskDto);
-        return runTaskService.runTask(
-                        Task.getRunningTask(
-                                runningTaskDto.name(),
-                                runningTaskDto.queueName(),
-                                runningTaskDto.input(),
-                                runningTaskDto.createdAt()
-                        )
-                )
-                .getId();
+    public ResponseEntity<UUID> create(@RequestBody final RunningTaskRequest request) {
+        if (Objects.isNull(request)
+                || Strings.isNullOrEmpty(request.getName())
+                || Strings.isNullOrEmpty(request.getQueueName())
+        ) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(
+                taskService.runTask(request.toRunningTaskDto())
+        );
     }
 
     @RequestMapping(

@@ -17,12 +17,7 @@
     <dependencies>
         <dependency>
             <groupId>com.example.task-tube</groupId>
-            <artifactId>core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.example.task-tube</groupId>
-            <artifactId>postgresql</artifactId>
+            <artifactId>infrastructure</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
@@ -63,7 +58,7 @@
                 <filtering>true</filtering>
                 <directory>src/main/resources</directory>
                 <includes>
-                    <include>application.properties</include>
+                    <include>application.yml</include>
                     <include>logback-spring.xml</include>
                 </includes>
             </resource>
