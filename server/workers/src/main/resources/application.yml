@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: server-workers
+    jobs:
+      scheduling:
+        delay: "5000"
+
+  profiles:
+    default: local
+
+  datasource:
+    url: ${postgresql.url}
+    username: ${postgresql.admin}
+    password: ${postgresql.password}

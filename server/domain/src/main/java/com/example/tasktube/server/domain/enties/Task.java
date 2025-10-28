@@ -1,5 +1,6 @@
 package com.example.tasktube.server.domain.enties;
 
+import com.example.tasktube.server.domain.values.Lock;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,9 +17,7 @@ public class Task {
     private boolean isRoot;
     private Instant createAt;
     private Instant updateAt;
-    private Instant lockedAt;
-    private boolean locked;
-    private String lockedBy;
+    private Lock lock;
 
     public Task(final UUID id,
                 final String name,
@@ -28,9 +27,7 @@ public class Task {
                 final boolean isRoot,
                 final Instant createAt,
                 final Instant updateAt,
-                final Instant lockedAt,
-                final boolean locked,
-                final String lockedBy
+                final Lock lock
     ) {
         this.id = id;
         this.name = name;
@@ -40,9 +37,7 @@ public class Task {
         this.isRoot = isRoot;
         this.createAt = createAt;
         this.updateAt = updateAt;
-        this.lockedAt = lockedAt;
-        this.locked = locked;
-        this.lockedBy = lockedBy;
+        this.lock = lock;
     }
 
     public Task() {
@@ -68,9 +63,7 @@ public class Task {
                 true,
                 createdAt,
                 Instant.now(),
-                null,
-                false,
-                null
+                new Lock()
         );
     }
 
@@ -138,31 +131,19 @@ public class Task {
         this.updateAt = updateAt;
     }
 
-    public Instant getLockedAt() {
-        return lockedAt;
+    public void schedule() {
+        setStatus(Status.SCHEDULED);
     }
 
-    public void setLockedAt(final Instant lockedAt) {
-        this.lockedAt = lockedAt;
+    public Lock getLock() {
+        return lock;
     }
 
-    public boolean isLocked() {
-        return locked;
-    }
-
-    public void setLocked(final boolean locked) {
-        this.locked = locked;
-    }
-
-    public String getLockedBy() {
-        return lockedBy;
-    }
-
-    public void setLockedBy(final String lockedBy) {
-        this.lockedBy = lockedBy;
+    public void setLock(final Lock lock) {
+        this.lock = lock;
     }
 
     public enum Status {
-        CREATED
+        SCHEDULED, CREATED
     }
 }

@@ -23,6 +23,7 @@
         <versions.guava>33.5.0-jre</versions.guava>
         <versions.lombok>1.18.42</versions.lombok>
         <versions.jackson>2.17.2</versions.jackson>
+        <versions.maven-compiler-plugin>3.14.1</versions.maven-compiler-plugin>
 
         <!--        logging-->
         <logging.level>DEBUG</logging.level>
