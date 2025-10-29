@@ -4,6 +4,7 @@ spring:
     jobs:
       scheduling:
         delay: "5000"
+        count: 10
 
   profiles:
     default: local

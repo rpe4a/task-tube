@@ -1,5 +1,6 @@
 package com.example.tasktube.server.application.services;
 
+import com.example.tasktube.server.application.models.SchedulingDto;
 import com.example.tasktube.server.application.port.in.IJobService;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
@@ -23,8 +24,12 @@ public class JobService implements IJobService {
 
     @Override
     @Transactional
-    public void scheduleTask() {
-        final List<Task> tasks = repository.getTasksForScheduling("worker", 10);
+    public void scheduleTask(final SchedulingDto schedulingDto) {
+        final List<Task> tasks = repository.getTasksForScheduling(
+                schedulingDto.worker(),
+                schedulingDto.count()
+        );
+        
         if (tasks.isEmpty()) {
             LOGGER.info("There aren't any tasks to schedule.");
             return;

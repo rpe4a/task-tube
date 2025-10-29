@@ -7,11 +7,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ITaskRepository {
-    Task create(Task task);
-
     Optional<Task> getById(UUID id);
 
-    List<Task> getTasksForScheduling(String worker, int count);
+    List<Task> getTasksForScheduling(String client, int count);
 
     void schedule(List<Task> tasks);
 }

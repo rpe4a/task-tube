@@ -1,6 +1,5 @@
 package com.example.tasktube.server.application.services;
 
-import com.example.tasktube.server.application.models.RunningTaskDto;
 import com.example.tasktube.server.application.port.in.ITaskService;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
@@ -30,22 +29,5 @@ public class TaskService implements ITaskService {
 
         LOGGER.debug("Get task by id: {}.", taskId);
         return repository.getById(taskId);
-    }
-
-    @Transactional
-    public UUID runTask(final RunningTaskDto task) {
-        Preconditions.checkNotNull(task);
-
-        LOGGER.debug("Run task: {}.", task);
-        return repository
-                .create(
-                        Task.getRunningTask(
-                                task.name(),
-                                task.queue(),
-                                task.input(),
-                                task.createAt()
-                        )
-                )
-                .getId();
     }
 }

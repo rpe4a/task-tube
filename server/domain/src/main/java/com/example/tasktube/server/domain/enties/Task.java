@@ -1,8 +1,6 @@
 package com.example.tasktube.server.domain.enties;
 
 import com.example.tasktube.server.domain.values.Lock;
-import com.google.common.base.Preconditions;
-import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
 import java.util.Map;
@@ -11,60 +9,48 @@ import java.util.UUID;
 public class Task {
     private UUID id;
     private String name;
-    private String queue;
+    private String tube;
     private Status status;
     private Map<String, Object> input;
     private boolean isRoot;
-    private Instant createAt;
-    private Instant updateAt;
+    private Instant updatedAt;
+    private Instant createdAt;
+    private Instant scheduledAt;
+    private Instant startedAt;
+    private Instant heartbeatAt;
+    private Instant finishedAt;
     private Lock lock;
 
     public Task(final UUID id,
                 final String name,
-                final String queue,
+                final String tube,
                 final Status status,
                 final Map<String, Object> input,
                 final boolean isRoot,
-                final Instant createAt,
-                final Instant updateAt,
+                final Instant updatedAt,
+                final Instant createdAt,
+                final Instant scheduledAt,
+                final Instant startedAt,
+                final Instant heartbeatAt,
+                final Instant finishedAt,
                 final Lock lock
     ) {
         this.id = id;
         this.name = name;
-        this.queue = queue;
+        this.tube = tube;
         this.status = status;
         this.input = input;
         this.isRoot = isRoot;
-        this.createAt = createAt;
-        this.updateAt = updateAt;
+        this.updatedAt = updatedAt;
+        this.createdAt = createdAt;
+        this.scheduledAt = scheduledAt;
+        this.startedAt = startedAt;
+        this.heartbeatAt = heartbeatAt;
+        this.finishedAt = finishedAt;
         this.lock = lock;
     }
 
     public Task() {
-    }
-
-    public static Task getRunningTask(
-            final String name,
-            final String queue,
-            final Map<String, Object> input,
-            final Instant createdAt
-    ) {
-        Preconditions.checkArgument(StringUtils.isNotEmpty(name));
-        Preconditions.checkArgument(StringUtils.isNotEmpty(queue));
-        Preconditions.checkNotNull(input);
-        Preconditions.checkNotNull(createdAt);
-
-        return new Task(
-                UUID.randomUUID(),
-                name,
-                queue,
-                Status.CREATED,
-                input,
-                true,
-                createdAt,
-                Instant.now(),
-                new Lock()
-        );
     }
 
     public UUID getId() {
@@ -83,12 +69,12 @@ public class Task {
         this.name = name;
     }
 
-    public String getQueue() {
-        return queue;
+    public String getTube() {
+        return tube;
     }
 
-    public void setQueue(final String queue) {
-        this.queue = queue;
+    public void setTube(final String tube) {
+        this.tube = tube;
     }
 
     public Status getStatus() {
@@ -115,24 +101,25 @@ public class Task {
         isRoot = root;
     }
 
-    public Instant getCreateAt() {
-        return createAt;
+    public Instant getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreateAt(final Instant createAt) {
-        this.createAt = createAt;
+    public void setCreatedAt(final Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
-    public Instant getUpdateAt() {
-        return updateAt;
+    public Instant getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setUpdateAt(final Instant updateAt) {
-        this.updateAt = updateAt;
+    public void setUpdatedAt(final Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public void schedule() {
         setStatus(Status.SCHEDULED);
+        setScheduledAt(Instant.now());
     }
 
     public Lock getLock() {
@@ -141,6 +128,38 @@ public class Task {
 
     public void setLock(final Lock lock) {
         this.lock = lock;
+    }
+
+    public Instant getScheduledAt() {
+        return scheduledAt;
+    }
+
+    public void setScheduledAt(final Instant scheduledAt) {
+        this.scheduledAt = scheduledAt;
+    }
+
+    public Instant getStartedAt() {
+        return startedAt;
+    }
+
+    public void setStartedAt(final Instant startedAt) {
+        this.startedAt = startedAt;
+    }
+
+    public Instant getHeartbeatAt() {
+        return heartbeatAt;
+    }
+
+    public void setHeartbeatAt(final Instant heartbeatAt) {
+        this.heartbeatAt = heartbeatAt;
+    }
+
+    public Instant getFinishedAt() {
+        return finishedAt;
+    }
+
+    public void setFinishedAt(final Instant finishedAt) {
+        this.finishedAt = finishedAt;
     }
 
     public enum Status {
