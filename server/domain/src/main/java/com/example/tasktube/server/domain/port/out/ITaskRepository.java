@@ -12,4 +12,11 @@ public interface ITaskRepository {
     List<Task> getTasksForScheduling(String client, int count);
 
     void schedule(List<Task> tasks);
+
+    void start(Task task);
+
+    void process(Task task);
+
+    void finish(Task task);
+
 }

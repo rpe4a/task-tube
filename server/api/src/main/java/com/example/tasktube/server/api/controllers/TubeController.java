@@ -1,8 +1,8 @@
 package com.example.tasktube.server.api.controllers;
 
-import com.example.tasktube.server.api.controllers.requests.PopTaskRequest;
-import com.example.tasktube.server.api.controllers.requests.PushTaskRequest;
-import com.example.tasktube.server.application.models.TaskDto;
+import com.example.tasktube.server.api.requests.PopTaskRequest;
+import com.example.tasktube.server.api.requests.TaskRequest;
+import com.example.tasktube.server.application.models.PopTaskDto;
 import com.example.tasktube.server.application.port.in.ITubeService;
 import com.google.common.base.Strings;
 import org.slf4j.Logger;
@@ -37,15 +37,15 @@ public final class TubeController {
     )
     public ResponseEntity<UUID> push(
             @PathVariable("name") final String tube,
-            @RequestBody final PushTaskRequest request
+            @RequestBody final TaskRequest request
     ) {
-        if (Objects.isNull(request) || Strings.isNullOrEmpty(request.getName())) {
+        if (Objects.isNull(request)) {
             LOGGER.info("Parameter request is invalid.");
             return ResponseEntity.badRequest().build();
         }
 
         return ResponseEntity.ok(
-                tubeService.push(request.toPushTaskDto(tube))
+                tubeService.push(request.to())
         );
     }
 
@@ -53,7 +53,7 @@ public final class TubeController {
             value = "/{name}/pop",
             method = RequestMethod.POST
     )
-    public ResponseEntity<TaskDto> pop(
+    public ResponseEntity<PopTaskDto> pop(
             @PathVariable("name") final String tube,
             @RequestBody final PopTaskRequest request
     ) {

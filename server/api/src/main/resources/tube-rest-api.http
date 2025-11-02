@@ -1,0 +1,28 @@
+@tube = tube1
+
+### PUSH TASK
+POST http://localhost:8080/api/v1/tube/{{tube}}/push
+Content-Type: application/json
+
+{
+  "id": "{{$random.uuid}}",
+  "name": "task-{{$random.alphabetic(7)}}",
+  "tube": "{{tube}}",
+  "input": {
+    "arg0": "{{$random.chuckNorris.fact}}",
+    "arg0Type": "String.class"
+  },
+  "createdAt": {{$timestamp}}
+}
+
+
+### POP TASK
+@client = client1
+
+POST http://localhost:8080/api/v1/tube/{{tube}}/pop
+Content-Type: application/json
+
+{
+  "client": "{{client}}"
+}
+

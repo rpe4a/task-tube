@@ -1,0 +1,44 @@
+@client = client1
+@task = 26b0ca2f-cbc2-4d9f-a882-9b7a8d2a6cfd
+@tube = tube1
+
+### START TASK
+POST http://localhost:8080/api/v1/task/{{task}}/start
+Content-Type: application/json
+
+{
+  "client": "{{client}}",
+  "startedAt": {{$timestamp}}
+}
+
+### PROCESS TASK
+POST http://localhost:8080/api/v1/task/{{task}}/process
+Content-Type: application/json
+
+{
+  "client": "{{client}}",
+  "processedAt": {{$timestamp}}
+}
+
+### FINISHED TASK
+POST http://localhost:8080/api/v1/task/{{task}}/finish
+Content-Type: application/json
+
+{
+    "client": "{{client}}",
+    "finishedAt": {{$timestamp}},
+    "output": {
+      "arg0": "{{$random.chuckNorris.fact}}",
+      "arg0Type": "String.class"
+    },
+     "children": [{
+          "id": "{{$random.uuid}}",
+          "name": "task-{{$random.alphabetic(7)}}",
+          "tube": "{{tube}}",
+          "input": {
+            "arg0": "{{$random.chuckNorris.fact}}",
+            "arg0Type": "String.class"
+          },
+          "createdAt": {{$timestamp}}
+        }]
+}

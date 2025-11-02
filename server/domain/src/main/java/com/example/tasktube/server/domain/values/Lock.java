@@ -1,36 +1,22 @@
 package com.example.tasktube.server.domain.values;
 
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
+
 import java.time.Instant;
 
-public class Lock {
-    private final Instant lockedAt;
-    private final boolean locked;
-    private final String lockedBy;
-
+public record Lock(Instant lockedAt, boolean locked, String lockedBy) {
     public Lock() {
-        this.lockedAt = null;
-        this.locked = false;
-        this.lockedBy = null;
-    }
-    public Lock(final Instant lockedAt, final boolean locked, final String lockedBy) {
-        this.lockedAt = lockedAt;
-        this.locked = locked;
-        this.lockedBy = lockedBy;
-    }
-
-    public Instant getLockedAt() {
-        return lockedAt;
-    }
-
-    public boolean isLocked() {
-        return locked;
-    }
-
-    public String getLockedBy() {
-        return lockedBy;
+        this(null, false, null);
     }
 
     public Lock unlock() {
         return new Lock(null, false, null);
+    }
+
+    public boolean isLockedBy(final String who) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(who));
+
+        return locked && who.equals(lockedBy());
     }
 }

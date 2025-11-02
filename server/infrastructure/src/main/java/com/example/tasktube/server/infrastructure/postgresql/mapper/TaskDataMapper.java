@@ -5,14 +5,14 @@ import com.example.tasktube.server.domain.values.Lock;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -24,24 +24,35 @@ public class TaskDataMapper {
         this.jackson = Objects.requireNonNull(jackson);
     }
 
-    public List<Object> getArgs(final Task task) {
-        return Lists.newArrayList(
-                task.getId(),
-                task.getName(),
-                task.getTube(),
-                task.getStatus().name(),
-                toJson(task.getInput()),
-                task.isRoot(),
-                Timestamp.from(task.getUpdatedAt()),
-                Timestamp.from(task.getCreatedAt()),
-                task.getScheduledAt() != null ? Timestamp.from(task.getScheduledAt()) : null,
-                task.getStartedAt() != null ? Timestamp.from(task.getStartedAt()) : null,
-                task.getHeartbeatAt() != null ? Timestamp.from(task.getHeartbeatAt()) : null,
-                task.getFinishedAt() != null ? Timestamp.from(task.getFinishedAt()) : null,
-                task.getLock().getLockedAt() != null ? Timestamp.from(task.getLock().getLockedAt()) : null,
-                task.getLock().isLocked(),
-                task.getLock().getLockedBy()
-        );
+    public Map<String, ?> getDataDto(final Task task) {
+        final Map<String, Object> map = new HashMap<>();
+        map.put("id", task.getId());
+        map.put("name", task.getName());
+        map.put("tube", task.getTube());
+        map.put("status", task.getStatus().name());
+        map.put("parent_id", task.getParentId());
+        map.put("input", task.getInput() != null ? toJson(task.getInput()) : null);
+        map.put("output", task.getOutput() != null ? toJson(task.getOutput()) : null);
+        map.put("is_root", task.isRoot());
+        map.put("start_barrier", task.getStartBarrier());
+        map.put("finish_barrier", task.getFinishBarrier());
+        map.put("updated_at", task.getUpdatedAt() != null ? Timestamp.from(task.getUpdatedAt()) : null);
+        map.put("created_at", task.getCreatedAt() != null ? Timestamp.from(task.getCreatedAt()) : null);
+        map.put("scheduled_at", task.getScheduledAt() != null ? Timestamp.from(task.getScheduledAt()) : null);
+        map.put("started_at", task.getStartedAt() != null ? Timestamp.from(task.getStartedAt()) : null);
+        map.put("heartbeat_at", task.getHeartbeatAt() != null ? Timestamp.from(task.getHeartbeatAt()) : null);
+        map.put("finished_at", task.getFinishedAt() != null ? Timestamp.from(task.getFinishedAt()) : null);
+        if (task.getLock() != null) {
+            map.put("locked_at", task.getLock().lockedAt() != null ? Timestamp.from(task.getLock().lockedAt()) : null);
+            map.put("locked", task.getLock().locked());
+            map.put("locked_by", task.getLock().lockedBy());
+        } else {
+            map.put("locked_at", null);
+            map.put("locked", false);
+            map.put("locked_by", null);
+        }
+
+        return map;
     }
 
     public Task getTask(final ResultSet rs) throws SQLException, JsonProcessingException {
@@ -50,12 +61,16 @@ public class TaskDataMapper {
         task.setName(rs.getString("name"));
         task.setTube(rs.getString("tube"));
         task.setStatus(Task.Status.valueOf(rs.getString("status")));
-        task.setInput(fromJson(rs.getString("input"), new TypeReference<>() { }));
+        task.setInput(fromJson(rs.getString("input"), new TypeReference<>() {
+        }));
         task.setRoot(rs.getBoolean("is_root"));
         task.setUpdatedAt(Instant.ofEpochMilli(rs.getTimestamp("updated_at").getTime()));
         task.setCreatedAt(Instant.ofEpochMilli(rs.getTimestamp("created_at").getTime()));
         task.setScheduledAt(rs.getTimestamp("scheduled_at") != null
                 ? Instant.ofEpochMilli(rs.getTimestamp("scheduled_at").getTime())
+                : null);
+        task.setScheduledAt(rs.getTimestamp("started_at") != null
+                ? Instant.ofEpochMilli(rs.getTimestamp("started_at").getTime())
                 : null);
         task.setHeartbeatAt(rs.getTimestamp("heartbeat_at") != null
                 ? Instant.ofEpochMilli(rs.getTimestamp("heartbeat_at").getTime())
@@ -78,7 +93,7 @@ public class TaskDataMapper {
     private String toJson(final Object obj) {
         try {
             return jackson.writeValueAsString(obj);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }
@@ -86,7 +101,7 @@ public class TaskDataMapper {
     private <T> T fromJson(final String value, final TypeReference<T> clazz) {
         try {
             return jackson.readValue(value, clazz);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             throw new RuntimeException(e);
         }
     }

@@ -1,8 +1,10 @@
 package com.example.tasktube.server.domain.enties;
 
 import com.example.tasktube.server.domain.values.Lock;
+import com.google.common.base.Preconditions;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -11,8 +13,12 @@ public class Task {
     private String name;
     private String tube;
     private Status status;
+    private UUID parentId;
     private Map<String, Object> input;
+    private Map<String, Object> output;
     private boolean isRoot;
+    private UUID startBarrier;
+    private UUID finishBarrier;
     private Instant updatedAt;
     private Instant createdAt;
     private Instant scheduledAt;
@@ -25,8 +31,12 @@ public class Task {
                 final String name,
                 final String tube,
                 final Status status,
+                final UUID parentId,
                 final Map<String, Object> input,
+                final Map<String, Object> output,
                 final boolean isRoot,
+                final UUID startBarrier,
+                final UUID finishBarrier,
                 final Instant updatedAt,
                 final Instant createdAt,
                 final Instant scheduledAt,
@@ -39,8 +49,12 @@ public class Task {
         this.name = name;
         this.tube = tube;
         this.status = status;
+        this.parentId = parentId;
         this.input = input;
+        this.output = output;
         this.isRoot = isRoot;
+        this.startBarrier = startBarrier;
+        this.finishBarrier = finishBarrier;
         this.updatedAt = updatedAt;
         this.createdAt = createdAt;
         this.scheduledAt = scheduledAt;
@@ -117,11 +131,6 @@ public class Task {
         this.updatedAt = updatedAt;
     }
 
-    public void schedule() {
-        setStatus(Status.SCHEDULED);
-        setScheduledAt(Instant.now());
-    }
-
     public Lock getLock() {
         return lock;
     }
@@ -162,7 +171,140 @@ public class Task {
         this.finishedAt = finishedAt;
     }
 
+    public void schedule() {
+        setStatus(Status.SCHEDULED);
+        setScheduledAt(Instant.now());
+    }
+
+    private boolean canStart(final String client) {
+        canHandleBy(client, Status.SCHEDULED);
+        return true;
+    }
+
+    private boolean canProcess(final String client) {
+        canHandleBy(client, Status.PROCESSING);
+        return true;
+    }
+
+    private void canHandleBy(final String client, final Status status) {
+        // TODO: need to use DOMAIN Exception
+        Preconditions.checkNotNull(client);
+        Preconditions.checkNotNull(status);
+        Preconditions.checkState(getLock().isLockedBy(client), "The client '%s' can't start task.".formatted(client));
+        Preconditions.checkState(getStatus().equals(status), "Status must be %s.".formatted(status));
+    }
+
+    public void start(final String client, final Instant startedAt) {
+        if (canStart(client)) {
+            setStartedAt(startedAt);
+            setStatus(Status.PROCESSING);
+        }
+    }
+
+    public void process(final String client, final Instant heartbeatAt) {
+        if (canProcess(client)) {
+            setHeartbeatAt(heartbeatAt);
+            setStatus(Status.PROCESSING);
+        }
+    }
+
+    public void finish(final String client, final Instant finishedAt, final Map<String, Object> output) {
+        if (canFinish(client, output)) {
+            setFinishedAt(finishedAt);
+            setStatus(Status.FINISHED);
+            setOutput(output);
+        }
+    }
+
+    private boolean canFinish(final String client, final Map<String, Object> output) {
+        Preconditions.checkNotNull(output);
+        canHandleBy(client, Status.PROCESSING);
+        return true;
+    }
+
+    public Task attachParent(final Task task) {
+        Preconditions.checkNotNull(task);
+        setParentId(task.getId());
+        return this;
+    }
+
+    public UUID getParentId() {
+        return parentId;
+    }
+
+    public void setParentId(final UUID parentId) {
+        this.parentId = parentId;
+    }
+    public Barrier addStartBarrier(final List<UUID> waitForTaskIds) {
+        Preconditions.checkNotNull(waitForTaskIds);
+        Preconditions.checkArgument(!waitForTaskIds.isEmpty());
+
+        final Barrier barrier = new Barrier(
+                UUID.randomUUID(),
+                getId(),
+                waitForTaskIds,
+                Barrier.Type.START,
+                false,
+                Instant.now(),
+                Instant.now(),
+                null,
+                null
+        );
+
+        setStartBarrier(barrier.getId());
+        return barrier;
+    }
+
+    public Barrier addFinishBarrier(final List<UUID> waitForTaskIds) {
+        Preconditions.checkNotNull(waitForTaskIds);
+        Preconditions.checkArgument(!waitForTaskIds.isEmpty());
+
+        final Barrier barrier = new Barrier(
+                UUID.randomUUID(),
+                getId(),
+                waitForTaskIds,
+                Barrier.Type.FINISH,
+                false,
+                Instant.now(),
+                Instant.now(),
+                null,
+                null
+        );
+
+        setFinishBarrier(barrier.getId());
+        return barrier;
+    }
+
+    public UUID getStartBarrier() {
+        return startBarrier;
+    }
+
+    public void setStartBarrier(final UUID startBarrier) {
+        this.startBarrier = startBarrier;
+    }
+
+    public UUID getFinishBarrier() {
+        return finishBarrier;
+    }
+
+    public void setFinishBarrier(final UUID finishBarrier) {
+        this.finishBarrier = finishBarrier;
+    }
+
+    public Map<String, Object> getOutput() {
+        return output;
+    }
+
+    public void setOutput(final Map<String, Object> output) {
+        this.output = output;
+    }
+
+
+
     public enum Status {
-        SCHEDULED, CREATED
+        CREATED,
+        SCHEDULED,
+        PROCESSING,
+        FINISHED
     }
 }
