@@ -19,4 +19,5 @@ public interface ITaskRepository {
 
     void finish(Task task);
 
+    void fail(Task task);
 }

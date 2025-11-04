@@ -51,9 +51,14 @@ public class TubeRepository implements ITubeRepository {
                         started_at,
                         heartbeat_at,
                         finished_at,
+                        failed_at,
+                        finalized_at,
+                        failures,
+                        failed_reason,
                         locked_at,
                         locked,
-                        locked_by
+                        locked_by,
+                        settings
                     ) VALUES (
                         :id,
                         :name,
@@ -71,9 +76,14 @@ public class TubeRepository implements ITubeRepository {
                         :started_at,
                         :heartbeat_at,
                         :finished_at,
+                        :failed_at,
+                        :finalized_at,
+                        :failures,
+                        :failed_reason,
                         :locked_at,
                         :locked,
-                        :locked_by
+                        :locked_by,
+                        :settings::jsonb
                     )
                 """;
     }

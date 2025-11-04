@@ -1,5 +1,6 @@
 package com.example.tasktube.server.api.controllers;
 
+import com.example.tasktube.server.api.requests.FailTaskRequest;
 import com.example.tasktube.server.api.requests.FinishTaskRequest;
 import com.example.tasktube.server.api.requests.ProcessTaskRequest;
 import com.example.tasktube.server.api.requests.StartTaskRequest;
@@ -115,6 +116,29 @@ public final class TaskController {
         }
 
         taskService.finishTask(request.to(taskId));
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @RequestMapping(
+            value = "/{id}/fail",
+            method = RequestMethod.POST
+    )
+    public ResponseEntity<Void> fail(
+            @PathVariable("id") final UUID taskId,
+            @RequestBody final FailTaskRequest request
+    ) {
+        if (Objects.isNull(taskId)) {
+            LOGGER.info("Parameter taskId is invalid.");
+            return ResponseEntity.badRequest().build();
+        }
+
+        if (Objects.isNull(request)) {
+            LOGGER.info("Parameter request is invalid.");
+            return ResponseEntity.badRequest().build();
+        }
+
+        taskService.failTask(taskId, request.client(), request.failedAt(), request.failedReason());
 
         return ResponseEntity.noContent().build();
     }

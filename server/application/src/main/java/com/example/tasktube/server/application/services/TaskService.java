@@ -117,4 +117,20 @@ public class TaskService implements ITaskService {
 
         taskRepository.finish(task);
     }
+
+    @Override
+    @Transactional
+    public void failTask(final UUID taskId, final String client, final Instant failedAt, final String failedReason) {
+        Preconditions.checkNotNull(taskId);
+        Preconditions.checkNotNull(failedAt);
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(failedReason));
+        LOGGER.debug("Fail task id: '{}'.", taskId);
+
+        final Task task = taskRepository.getById(taskId).orElseThrow();
+
+        task.fail(client, failedAt, failedReason);
+
+        taskRepository.fail(task);
+    }
 }

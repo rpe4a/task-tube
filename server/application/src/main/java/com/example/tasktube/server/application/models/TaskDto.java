@@ -1,6 +1,7 @@
 package com.example.tasktube.server.application.models;
 
 import com.example.tasktube.server.domain.enties.Task;
+import com.example.tasktube.server.domain.values.TaskSettings;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -36,7 +37,12 @@ public record TaskDto(
                 null,
                 null,
                 null,
-                null
+                null,
+                null,
+                0,
+                null,
+                null,
+                TaskSettings.getDefault()
         );
     }
 }

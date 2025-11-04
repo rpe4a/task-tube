@@ -31,7 +31,12 @@ CREATE TABLE tasks
     started_at     TIMESTAMPTZ,                         -- время начала обработки клиентом
     heartbeat_at   TIMESTAMPTZ,                         -- время последнего хэлс чека
     finished_at    TIMESTAMPTZ,                         -- время конца обработки клиентом
+    failed_at       TIMESTAMPTZ,                         -- время последней ошибки
+    finalized_at    TIMESTAMPTZ,                         -- время финализации
+    failures       INT,                                 -- количество отказов
+    failed_reason   VARCHAR,                             -- причина последнего отказа
     locked_at      TIMESTAMPTZ,                         -- когда задача была заблокирована
     locked         BOOLEAN      NULL,                   -- заблокирована ли
-    locked_by      varchar(256)                         -- кем заблокирована
+    locked_by      varchar(256),                        -- кем заблокирована
+    settings       JSONB                                -- настройки
 );

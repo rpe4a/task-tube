@@ -1,6 +1,7 @@
 package com.example.tasktube.server.domain.enties;
 
 import com.example.tasktube.server.domain.values.Lock;
+import com.example.tasktube.server.domain.values.TaskSettings;
 import com.google.common.base.Preconditions;
 
 import java.time.Instant;
@@ -25,7 +26,12 @@ public class Task {
     private Instant startedAt;
     private Instant heartbeatAt;
     private Instant finishedAt;
+    private Instant failedAt;
+    private Instant finalizedAt;
+    private int failures;
+    private String failedReason;
     private Lock lock;
+    private TaskSettings settings;
 
     public Task(final UUID id,
                 final String name,
@@ -43,7 +49,12 @@ public class Task {
                 final Instant startedAt,
                 final Instant heartbeatAt,
                 final Instant finishedAt,
-                final Lock lock
+                final Instant failedAt,
+                final Instant finalizedAt,
+                final int failures,
+                final String failedReason,
+                final Lock lock,
+                final TaskSettings settings
     ) {
         this.id = id;
         this.name = name;
@@ -61,7 +72,12 @@ public class Task {
         this.startedAt = startedAt;
         this.heartbeatAt = heartbeatAt;
         this.finishedAt = finishedAt;
+        this.failedAt = failedAt;
+        this.finalizedAt = finalizedAt;
+        this.failures = failures;
+        this.failedReason = failedReason;
         this.lock = lock;
+        this.settings = settings;
     }
 
     public Task() {
@@ -186,6 +202,17 @@ public class Task {
         return true;
     }
 
+    private boolean canFinish(final String client, final Map<String, Object> output) {
+        Preconditions.checkNotNull(output);
+        canHandleBy(client, Status.PROCESSING);
+        return true;
+    }
+
+    private boolean canFail(final String client) {
+        canHandleBy(client, Status.PROCESSING);
+        return true;
+    }
+
     private void canHandleBy(final String client, final Status status) {
         // TODO: need to use DOMAIN Exception
         Preconditions.checkNotNull(client);
@@ -213,13 +240,35 @@ public class Task {
             setFinishedAt(finishedAt);
             setStatus(Status.FINISHED);
             setOutput(output);
+            setLock(getLock().unlock());
         }
     }
 
-    private boolean canFinish(final String client, final Map<String, Object> output) {
-        Preconditions.checkNotNull(output);
-        canHandleBy(client, Status.PROCESSING);
-        return true;
+    public void fail(final String client, final Instant failedAt, final String failedReason) {
+        if (canFail(client)) {
+            if (getFailures() < getSettings().maxFailures()) {
+                setStatus(Status.SCHEDULED);
+                setScheduledAt(Instant.now().plusSeconds(getSettings().failureRetryTimeoutSeconds()));
+                setStartedAt(null);
+                setHeartbeatAt(null);
+                setFinishedAt(null);
+                setFailedAt(failedAt);
+                setFailures(getFailures() + 1);
+                setFailedReason(failedReason);
+                setFinishBarrier(null);
+                setOutput(null);
+                setLock(getLock().unlock());
+            } else {
+                setStatus(Status.FINALIZED);
+                setFinalizedAt(Instant.now());
+                setFinishedAt(null);
+                setFailedAt(failedAt);
+                setFailedReason(failedReason);
+                setFinishBarrier(null);
+                setOutput(null);
+                setLock(getLock().unlock());
+            }
+        }
     }
 
     public Task attachParent(final Task task) {
@@ -235,6 +284,7 @@ public class Task {
     public void setParentId(final UUID parentId) {
         this.parentId = parentId;
     }
+
     public Barrier addStartBarrier(final List<UUID> waitForTaskIds) {
         Preconditions.checkNotNull(waitForTaskIds);
         Preconditions.checkArgument(!waitForTaskIds.isEmpty());
@@ -299,12 +349,53 @@ public class Task {
         this.output = output;
     }
 
+    public Instant getFailedAt() {
+        return failedAt;
+    }
 
+    public void setFailedAt(final Instant failedAt) {
+        this.failedAt = failedAt;
+    }
+
+    public Instant getFinalizedAt() {
+        return finalizedAt;
+    }
+
+    public void setFinalizedAt(final Instant finalizedAt) {
+        this.finalizedAt = finalizedAt;
+    }
+
+    public int getFailures() {
+        return failures;
+    }
+
+    public void setFailures(final int failures) {
+        this.failures = failures;
+    }
+
+    public TaskSettings getSettings() {
+        return settings;
+    }
+
+    public void setSettings(final TaskSettings settings) {
+        this.settings = settings;
+    }
+
+    public String getFailedReason() {
+        return failedReason;
+    }
+
+    public void setFailedReason(final String failedReason) {
+        this.failedReason = failedReason;
+    }
 
     public enum Status {
         CREATED,
+        //        WAITING_SCHEDULED,
         SCHEDULED,
         PROCESSING,
-        FINISHED
+        FINISHED,
+        WAITING_FINALIZED,
+        FINALIZED
     }
 }

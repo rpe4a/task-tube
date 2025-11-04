@@ -42,6 +42,10 @@ public class TaskDataMapper {
         map.put("started_at", task.getStartedAt() != null ? Timestamp.from(task.getStartedAt()) : null);
         map.put("heartbeat_at", task.getHeartbeatAt() != null ? Timestamp.from(task.getHeartbeatAt()) : null);
         map.put("finished_at", task.getFinishedAt() != null ? Timestamp.from(task.getFinishedAt()) : null);
+        map.put("failed_at", task.getFailedAt() != null ? Timestamp.from(task.getFailedAt()) : null);
+        map.put("finalized_at", task.getFinalizedAt() != null ? Timestamp.from(task.getFinalizedAt()) : null);
+        map.put("failures", task.getFailures());
+        map.put("failed_reason", task.getFailedReason());
         if (task.getLock() != null) {
             map.put("locked_at", task.getLock().lockedAt() != null ? Timestamp.from(task.getLock().lockedAt()) : null);
             map.put("locked", task.getLock().locked());
@@ -51,6 +55,7 @@ public class TaskDataMapper {
             map.put("locked", false);
             map.put("locked_by", null);
         }
+        map.put("settings", task.getSettings() != null ? toJson(task.getSettings()) : null);
 
         return map;
     }
@@ -69,7 +74,7 @@ public class TaskDataMapper {
         task.setScheduledAt(rs.getTimestamp("scheduled_at") != null
                 ? Instant.ofEpochMilli(rs.getTimestamp("scheduled_at").getTime())
                 : null);
-        task.setScheduledAt(rs.getTimestamp("started_at") != null
+        task.setStartedAt(rs.getTimestamp("started_at") != null
                 ? Instant.ofEpochMilli(rs.getTimestamp("started_at").getTime())
                 : null);
         task.setHeartbeatAt(rs.getTimestamp("heartbeat_at") != null
@@ -78,6 +83,14 @@ public class TaskDataMapper {
         task.setFinishedAt(rs.getTimestamp("finished_at") != null
                 ? Instant.ofEpochMilli(rs.getTimestamp("finished_at").getTime())
                 : null);
+        task.setFailedAt(rs.getTimestamp("failed_at") != null
+                ? Instant.ofEpochMilli(rs.getTimestamp("failed_at").getTime())
+                : null);
+        task.setFinalizedAt(rs.getTimestamp("finalized_at") != null
+                ? Instant.ofEpochMilli(rs.getTimestamp("finalized_at").getTime())
+                : null);
+        task.setFailures(rs.getInt("failures"));
+        task.setFailedReason(rs.getString("failed_reason"));
         task.setLock(
                 new Lock(
                         rs.getTimestamp("locked_at") != null
@@ -87,6 +100,8 @@ public class TaskDataMapper {
                         rs.getString("locked_by")
                 )
         );
+        task.setSettings(fromJson(rs.getString("settings"), new TypeReference<>() {
+        }));
         return task;
     }
 

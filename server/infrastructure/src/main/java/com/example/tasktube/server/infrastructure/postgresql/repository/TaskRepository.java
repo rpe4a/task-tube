@@ -164,12 +164,36 @@ public class TaskRepository implements ITaskRepository {
                         finished_at = :finished_at,
                         finish_barrier = :finish_barrier,
                         output = :output::jsonb,
-                        locked = false,
-                        locked_at = null,
-                        locked_by = null
+                        locked = :locked,
+                        locked_at = :locked_at,
+                        locked_by = :locked_by
                     WHERE id = :id
-                        AND locked_by = :locked_by
-                        AND locked = true
+                """;
+
+        db.update(updateCommand, mapper.getDataDto(task));
+    }
+
+    @Override
+    public void fail(final Task task) {
+        Preconditions.checkNotNull(task);
+
+        final String updateCommand = """
+                    UPDATE tasks
+                    SET status = :status,
+                        scheduled_at = :scheduled_at,
+                        started_at = :started_at,
+                        heartbeat_at = :heartbeat_at,
+                        finished_at = :finished_at,
+                        failed_at = :failed_at,
+                        failures = :failures,
+                        failed_reason = :failed_reason,
+                        finalized_at = :finalized_at,
+                        finish_barrier = :finish_barrier,
+                        output = :output::jsonb,
+                        locked = :locked,
+                        locked_at = :locked_at,
+                        locked_by = :locked_by
+                    WHERE id = :id
                 """;
 
         db.update(updateCommand, mapper.getDataDto(task));
