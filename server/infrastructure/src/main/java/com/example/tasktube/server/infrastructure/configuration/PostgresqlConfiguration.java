@@ -46,7 +46,7 @@ public class PostgresqlConfiguration {
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public IBarrierRepository registerBarrierRepository(final JdbcTemplate db, final BarrierDataMapper mapper) {
+    public IBarrierRepository registerBarrierRepository(final NamedParameterJdbcTemplate db, final BarrierDataMapper mapper) {
         return new BarrierRepository(db, mapper);
     }
 }

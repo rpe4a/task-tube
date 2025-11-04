@@ -43,6 +43,7 @@ public class TaskDataMapper {
         map.put("heartbeat_at", task.getHeartbeatAt() != null ? Timestamp.from(task.getHeartbeatAt()) : null);
         map.put("finished_at", task.getFinishedAt() != null ? Timestamp.from(task.getFinishedAt()) : null);
         map.put("failed_at", task.getFailedAt() != null ? Timestamp.from(task.getFailedAt()) : null);
+        map.put("aborted_at", task.getAbortedAt() != null ? Timestamp.from(task.getAbortedAt()) : null);
         map.put("finalized_at", task.getFinalizedAt() != null ? Timestamp.from(task.getFinalizedAt()) : null);
         map.put("failures", task.getFailures());
         map.put("failed_reason", task.getFailedReason());
@@ -85,6 +86,9 @@ public class TaskDataMapper {
                 : null);
         task.setFailedAt(rs.getTimestamp("failed_at") != null
                 ? Instant.ofEpochMilli(rs.getTimestamp("failed_at").getTime())
+                : null);
+        task.setAbortedAt(rs.getTimestamp("aborted_at") != null
+                ? Instant.ofEpochMilli(rs.getTimestamp("aborted_at").getTime())
                 : null);
         task.setFinalizedAt(rs.getTimestamp("finalized_at") != null
                 ? Instant.ofEpochMilli(rs.getTimestamp("finalized_at").getTime())

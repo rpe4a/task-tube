@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-@Service
+@Repository
 public class TubeRepository implements ITubeRepository {
     public static final int TASK_PARTITION_SIZE = 1000;
     private static final Logger LOGGER = LoggerFactory.getLogger(TubeRepository.class);
@@ -52,6 +53,7 @@ public class TubeRepository implements ITubeRepository {
                         heartbeat_at,
                         finished_at,
                         failed_at,
+                        aborted_at,
                         finalized_at,
                         failures,
                         failed_reason,
@@ -77,6 +79,7 @@ public class TubeRepository implements ITubeRepository {
                         :heartbeat_at,
                         :finished_at,
                         :failed_at,
+                        :aborted_at,
                         :finalized_at,
                         :failures,
                         :failed_reason,
@@ -112,19 +115,19 @@ public class TubeRepository implements ITubeRepository {
 
         final String insertCommand = getInsertCommand();
 
-        final Function<List<Task>, Map[]> insertBatch = tasks1 ->
-                tasks1
+        final Function<List<Task>, Map[]> getTasksBatch = tasksBatch ->
+                tasksBatch
                         .stream()
                         .map(mapper::getDataDto)
                         .toArray(Map[]::new);
 
         if (tasks.size() <= TASK_PARTITION_SIZE) {
-            db.batchUpdate(insertCommand, insertBatch.apply(tasks));
+            db.batchUpdate(insertCommand, getTasksBatch.apply(tasks));
             return;
         }
 
         final List<List<Task>> partitions = Lists.partition(tasks, TASK_PARTITION_SIZE);
-        partitions.forEach(partition -> db.batchUpdate(insertCommand, insertBatch.apply(partition)));
+        partitions.forEach(partition -> db.batchUpdate(insertCommand, getTasksBatch.apply(partition)));
     }
 
     @Override

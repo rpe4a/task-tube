@@ -12,7 +12,8 @@ Content-Type: application/json
     "arg0": "{{$random.chuckNorris.fact}}",
     "arg0Type": "String.class"
   },
-  "createdAt": {{$timestamp}}
+  "createdAt": {{$timestamp}},
+  "waitTasks": ["{{$random.uuid}}"]
 }
 
 

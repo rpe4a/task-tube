@@ -12,7 +12,6 @@ CREATE TABLE barriers
     locked      BOOLEAN     NULL,                   -- заблокирована ли
     locked_by   varchar(256)                        -- кем заблокирована
 );
-
 CREATE TABLE tasks
 (
     id             UUID PRIMARY KEY,                    -- уникальный идентификатор
@@ -31,10 +30,11 @@ CREATE TABLE tasks
     started_at     TIMESTAMPTZ,                         -- время начала обработки клиентом
     heartbeat_at   TIMESTAMPTZ,                         -- время последнего хэлс чека
     finished_at    TIMESTAMPTZ,                         -- время конца обработки клиентом
-    failed_at       TIMESTAMPTZ,                         -- время последней ошибки
-    finalized_at    TIMESTAMPTZ,                         -- время финализации
+    failed_at      TIMESTAMPTZ,                         -- время последней ошибки
+    aborted_at     TIMESTAMPTZ,                         -- время прекращения задачи
+    finalized_at   TIMESTAMPTZ,                         -- время финализации
     failures       INT,                                 -- количество отказов
-    failed_reason   VARCHAR,                             -- причина последнего отказа
+    failed_reason  VARCHAR,                             -- причина последнего отказа
     locked_at      TIMESTAMPTZ,                         -- когда задача была заблокирована
     locked         BOOLEAN      NULL,                   -- заблокирована ли
     locked_by      varchar(256),                        -- кем заблокирована

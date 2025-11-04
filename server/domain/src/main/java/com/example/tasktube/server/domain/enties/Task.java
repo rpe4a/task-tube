@@ -27,6 +27,7 @@ public class Task {
     private Instant heartbeatAt;
     private Instant finishedAt;
     private Instant failedAt;
+    private Instant abortedAt;
     private Instant finalizedAt;
     private int failures;
     private String failedReason;
@@ -50,6 +51,7 @@ public class Task {
                 final Instant heartbeatAt,
                 final Instant finishedAt,
                 final Instant failedAt,
+                final Instant abortedAt,
                 final Instant finalizedAt,
                 final int failures,
                 final String failedReason,
@@ -73,6 +75,7 @@ public class Task {
         this.heartbeatAt = heartbeatAt;
         this.finishedAt = finishedAt;
         this.failedAt = failedAt;
+        this.abortedAt = abortedAt;
         this.finalizedAt = finalizedAt;
         this.failures = failures;
         this.failedReason = failedReason;
@@ -259,8 +262,8 @@ public class Task {
                 setOutput(null);
                 setLock(getLock().unlock());
             } else {
-                setStatus(Status.FINALIZED);
-                setFinalizedAt(Instant.now());
+                setStatus(Status.ABORTED);
+                setAbortedAt(Instant.now());
                 setFinishedAt(null);
                 setFailedAt(failedAt);
                 setFailedReason(failedReason);
@@ -389,12 +392,20 @@ public class Task {
         this.failedReason = failedReason;
     }
 
+    public Instant getAbortedAt() {
+        return abortedAt;
+    }
+
+    public void setAbortedAt(final Instant abortedAt) {
+        this.abortedAt = abortedAt;
+    }
+
     public enum Status {
         CREATED,
-        //        WAITING_SCHEDULED,
         SCHEDULED,
         PROCESSING,
         FINISHED,
+        ABORTED,
         WAITING_FINALIZED,
         FINALIZED
     }

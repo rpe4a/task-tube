@@ -39,6 +39,7 @@ public record TaskDto(
                 null,
                 null,
                 null,
+                null,
                 0,
                 null,
                 null,

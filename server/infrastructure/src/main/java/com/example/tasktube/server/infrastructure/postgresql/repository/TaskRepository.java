@@ -12,6 +12,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -22,7 +23,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-@Service
+@Repository
 public class TaskRepository implements ITaskRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskRepository.class);
 
@@ -187,7 +188,7 @@ public class TaskRepository implements ITaskRepository {
                         failed_at = :failed_at,
                         failures = :failures,
                         failed_reason = :failed_reason,
-                        finalized_at = :finalized_at,
+                        aborted_at = :aborted_at,
                         finish_barrier = :finish_barrier,
                         output = :output::jsonb,
                         locked = :locked,

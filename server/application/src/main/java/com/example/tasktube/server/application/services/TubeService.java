@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -41,7 +42,7 @@ public class TubeService implements ITubeService {
 
         if (taskDto.waitTasks() != null && !taskDto.waitTasks().isEmpty()) {
             final Barrier barrier = task.addStartBarrier(taskDto.waitTasks());
-            barrierRepository.save(barrier);
+            barrierRepository.save(List.of(barrier));
         }
 
         return tubeRepository
