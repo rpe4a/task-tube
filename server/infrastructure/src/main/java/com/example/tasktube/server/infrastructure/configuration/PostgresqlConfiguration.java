@@ -2,11 +2,13 @@ package com.example.tasktube.server.infrastructure.configuration;
 
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
+import com.example.tasktube.server.domain.port.out.IJobRepository;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.BarrierDataMapper;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskDataMapper;
 import com.example.tasktube.server.infrastructure.postgresql.repository.BarrierRepository;
+import com.example.tasktube.server.infrastructure.postgresql.repository.JobRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.TaskRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.TubeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -48,5 +50,11 @@ public class PostgresqlConfiguration {
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public IBarrierRepository registerBarrierRepository(final NamedParameterJdbcTemplate db, final BarrierDataMapper mapper) {
         return new BarrierRepository(db, mapper);
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public IJobRepository registerJobRepository(final NamedParameterJdbcTemplate db, final BarrierDataMapper mapper) {
+        return new JobRepository(db, mapper);
     }
 }

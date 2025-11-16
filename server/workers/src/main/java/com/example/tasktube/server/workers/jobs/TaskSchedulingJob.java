@@ -10,24 +10,24 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SchedulingTaskJob {
+public class TaskSchedulingJob {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SchedulingTaskJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskSchedulingJob.class);
     private final IJobService service;
     private final InstanceIdProvider instanceId;
 
-    @Value("${spring.application.jobs.scheduling.delay}")
+    @Value("${spring.application.jobs.tasks.scheduling.delay}")
     private long delay;
 
-    @Value("${spring.application.jobs.scheduling.count}")
+    @Value("${spring.application.jobs.tasks.scheduling.count}")
     private int count;
 
-    public SchedulingTaskJob(final IJobService service, final InstanceIdProvider instanceId) {
+    public TaskSchedulingJob(final IJobService service, final InstanceIdProvider instanceId) {
         this.service = service;
         this.instanceId = instanceId;
     }
 
-    @Scheduled(fixedDelayString = "${spring.application.jobs.scheduling.delay}")
+    @Scheduled(fixedDelayString = "${spring.application.jobs.tasks.scheduling.delay}")
     public void run() {
         LOGGER.info("Start scheduling tasks.");
         service.scheduleTask(new SchedulingDto(instanceId.get(), count));

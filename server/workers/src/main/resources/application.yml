@@ -2,9 +2,17 @@ spring:
   application:
     name: server-workers
     jobs:
-      scheduling:
-        delay: "5000"
-        count: 10
+      tasks:
+        scheduling:
+          delay: "5000"
+          count: 10
+        finalizing:
+          delay: "5000"
+          count: 10
+      barriers:
+        releasing:
+          delay: "5000"
+          count: 10
 
   profiles:
     default: local

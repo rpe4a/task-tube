@@ -1,0 +1,49 @@
+package com.example.tasktube.server.workers.jobs.barriers;
+
+import com.example.tasktube.server.application.port.in.IBarrierService;
+import com.example.tasktube.server.application.port.in.IJobService;
+import com.example.tasktube.server.application.services.BarrierService;
+import com.example.tasktube.server.infrastructure.services.InstanceIdProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.UUID;
+
+@Component
+public class BarrierReleasingJob {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(BarrierReleasingJob.class);
+    private final IJobService jobService;
+    private final IBarrierService barrierService;
+    private final InstanceIdProvider instanceId;
+
+    @Value("${spring.application.jobs.barriers.releasing.delay}")
+    private long delay;
+
+    @Value("${spring.application.jobs.barriers.releasing.count}")
+    private int count;
+
+    public BarrierReleasingJob(
+            final IJobService jobService,
+            final IBarrierService barrierService,
+            final InstanceIdProvider instanceId) {
+        this.jobService = jobService;
+        this.barrierService = barrierService;
+        this.instanceId = instanceId;
+    }
+
+    @Scheduled(fixedDelayString = "${spring.application.jobs.barriers.releasing.delay}")
+    public void run() {
+        LOGGER.info("Start releasing barriers.");
+        final List<UUID> barrierIdList = jobService.getBarrierIdList(count, instanceId.get());
+
+        LOGGER.debug("List of barriers: '{}'.", barrierIdList);
+        for (final UUID barrierId : barrierIdList) {
+            barrierService.releaseBarrier(barrierId, instanceId.get());
+        }
+    }
+}

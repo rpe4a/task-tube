@@ -196,27 +196,37 @@ public class Task {
     }
 
     private boolean canStart(final String client) {
-        canHandleBy(client, Status.SCHEDULED);
+        canHandleBy(Status.SCHEDULED, client);
         return true;
     }
 
     private boolean canProcess(final String client) {
-        canHandleBy(client, Status.PROCESSING);
+        canHandleBy(Status.PROCESSING, client);
         return true;
     }
 
-    private boolean canFinish(final String client, final Map<String, Object> output) {
+    private boolean canFinish(final Map<String, Object> output, final String client) {
         Preconditions.checkNotNull(output);
-        canHandleBy(client, Status.PROCESSING);
+        canHandleBy(Status.PROCESSING, client);
         return true;
     }
 
     private boolean canFail(final String client) {
-        canHandleBy(client, Status.PROCESSING);
+        canHandleBy(Status.PROCESSING, client);
         return true;
     }
 
-    private void canHandleBy(final String client, final Status status) {
+    private boolean canAbort(final String client) {
+        canHandleBy(Status.FINISHED, client);
+        return true;
+    }
+
+    private boolean canFinalize(final String client) {
+        canHandleBy(Status.FINISHED, client);
+        return true;
+    }
+
+    private void canHandleBy(final Status status, final String client) {
         // TODO: need to use DOMAIN Exception
         Preconditions.checkNotNull(client);
         Preconditions.checkNotNull(status);
@@ -224,22 +234,26 @@ public class Task {
         Preconditions.checkState(getStatus().equals(status), "Status must be %s.".formatted(status));
     }
 
-    public void start(final String client, final Instant startedAt) {
+    public void start(final Instant startedAt, final String client) {
+//        Preconditions.checkNotNull(client);
+//        Preconditions.checkNotNull(startedAt);
+//        Preconditions.checkState(getLock().isFree(), "The client '%s' can't start locked task '{}'.".formatted(client, getLock()));
+//        Preconditions.checkState(Status.SCHEDULED.equals(getStatus()), "Status must be %s.".formatted(getStatus()));
         if (canStart(client)) {
             setStartedAt(startedAt);
             setStatus(Status.PROCESSING);
         }
     }
 
-    public void process(final String client, final Instant heartbeatAt) {
+    public void process(final Instant heartbeatAt, final String client) {
         if (canProcess(client)) {
             setHeartbeatAt(heartbeatAt);
             setStatus(Status.PROCESSING);
         }
     }
 
-    public void finish(final String client, final Instant finishedAt, final Map<String, Object> output) {
-        if (canFinish(client, output)) {
+    public void finish(final Instant finishedAt, final Map<String, Object> output, final String client) {
+        if (canFinish(output, client)) {
             setFinishedAt(finishedAt);
             setStatus(Status.FINISHED);
             setOutput(output);
@@ -247,7 +261,7 @@ public class Task {
         }
     }
 
-    public void fail(final String client, final Instant failedAt, final String failedReason) {
+    public void fail(final Instant failedAt, final String failedReason, final String client) {
         if (canFail(client)) {
             if (getFailures() < getSettings().maxFailures()) {
                 setStatus(Status.SCHEDULED);
@@ -273,6 +287,21 @@ public class Task {
             }
         }
     }
+
+    public void abort(final Instant abortedAt, final String client) {
+        if (canAbort(client)) {
+            setStatus(Status.ABORTED);
+            setAbortedAt(abortedAt);
+        }
+    }
+
+    public void complete(final Instant finalizedAt, final String client) {
+        if (canFinalize(client)) {
+            setStatus(Status.FINALIZED);
+            setFinalizedAt(finalizedAt);
+        }
+    }
+
 
     public Task attachParent(final Task task) {
         Preconditions.checkNotNull(task);
@@ -400,13 +429,32 @@ public class Task {
         this.abortedAt = abortedAt;
     }
 
+    public boolean isTerminated() {
+        return Status.FINALIZED == getStatus()
+                || Status.ABORTED == getStatus()
+                || Status.CANCELED == getStatus();
+    }
+
+    public boolean hasFinishBarrier() {
+        return getFinishBarrier() != null;
+    }
+
+    public boolean isAborted() {
+        return Status.ABORTED.equals(getStatus());
+    }
+
+    public boolean isFinalized() {
+        return Status.FINALIZED.equals(getStatus());
+    }
+
     public enum Status {
         CREATED,
         SCHEDULED,
         PROCESSING,
         FINISHED,
         ABORTED,
-        WAITING_FINALIZED,
-        FINALIZED
+        CANCELED,
+        //  WAITING_FINALIZED,
+        FINALIZED,
     }
 }

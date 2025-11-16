@@ -7,7 +7,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ITaskRepository {
-    Optional<Task> getById(UUID id);
+    Optional<Task> get(UUID id);
+
+    List<Task> get(List<UUID> taskIdList);
 
     List<Task> getTasksForScheduling(String client, int count);
 
@@ -20,4 +22,6 @@ public interface ITaskRepository {
     void finish(Task task);
 
     void fail(Task task);
+
+    void finalize(Task task);
 }

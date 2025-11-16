@@ -1,7 +1,6 @@
 package com.example.tasktube.server.domain.port.out;
 
 import com.example.tasktube.server.domain.enties.Barrier;
-import com.example.tasktube.server.domain.enties.Task;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,4 +10,8 @@ public interface IBarrierRepository {
     void save(List<Barrier> barriers);
 
     void save(Barrier barrier);
+
+    Optional<Barrier> get(UUID barrierId);
+
+    void release(Barrier barrier);
 }

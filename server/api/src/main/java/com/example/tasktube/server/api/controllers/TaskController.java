@@ -69,7 +69,7 @@ public final class TaskController {
             return ResponseEntity.badRequest().build();
         }
 
-        taskService.startTask(taskId, request.client(), request.startedAt());
+        taskService.startTask(taskId, request.startedAt(), request.client());
 
         return ResponseEntity.noContent().build();
     }
@@ -92,7 +92,7 @@ public final class TaskController {
             return ResponseEntity.badRequest().build();
         }
 
-        taskService.processTask(taskId, request.client(), request.processedAt());
+        taskService.processTask(taskId, request.processedAt(), request.client());
 
         return ResponseEntity.noContent().build();
     }
@@ -138,7 +138,7 @@ public final class TaskController {
             return ResponseEntity.badRequest().build();
         }
 
-        taskService.failTask(taskId, request.client(), request.failedAt(), request.failedReason());
+        taskService.failTask(taskId, request.failedAt(), request.failedReason(), request.client());
 
         return ResponseEntity.noContent().build();
     }

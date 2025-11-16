@@ -5,18 +5,13 @@ import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskDataMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
-import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +34,9 @@ public class TaskRepository implements ITaskRepository {
     }
 
     @Override
-    public Optional<Task> getById(final UUID id) {
+    public Optional<Task> get(final UUID id) {
+        Preconditions.checkNotNull(id);
+
         final String queryCommand = """
                     SELECT * FROM tasks
                     WHERE id = :id
@@ -58,6 +55,27 @@ public class TaskRepository implements ITaskRepository {
         };
 
         return db.query(queryCommand, Map.of("id", id), rsExtractor);
+    }
+
+    @Override
+    public List<Task> get(final List<UUID> taskIdList) {
+        Preconditions.checkNotNull(taskIdList);
+        Preconditions.checkArgument(!taskIdList.isEmpty());
+
+        final String queryCommand = """
+                    SELECT * FROM tasks
+                    WHERE id in (:ids)
+                """;
+
+        final RowMapper<Task> rsMapper = (rs, rowNum) -> {
+            try {
+                return mapper.getTask(rs);
+            } catch (final JsonProcessingException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        return db.query(queryCommand, Map.of("ids", taskIdList), rsMapper);
     }
 
     @Override
@@ -195,6 +213,26 @@ public class TaskRepository implements ITaskRepository {
                         locked_at = :locked_at,
                         locked_by = :locked_by
                     WHERE id = :id
+                """;
+
+        db.update(updateCommand, mapper.getDataDto(task));
+    }
+
+    @Override
+    public void finalize(final Task task) {
+        Preconditions.checkNotNull(task);
+
+        final String updateCommand = """
+                    UPDATE tasks
+                    SET status = :status,
+                        finalized_at = :finalized_at,
+                        aborted_at = :aborted_at,
+                        locked = false,
+                        locked_at = null,
+                        locked_by = null
+                    WHERE id = :id
+                        AND locked_by = :locked_by
+                        AND locked = true
                 """;
 
         db.update(updateCommand, mapper.getDataDto(task));

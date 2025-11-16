@@ -7,12 +7,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 
 @Repository
@@ -67,6 +69,46 @@ public class BarrierRepository implements IBarrierRepository {
         final String insertCommand = getInsertCommand();
 
         db.update(insertCommand, mapper.getDataDto(barrier, db.getJdbcOperations()));
+    }
+
+    @Override
+    public Optional<Barrier> get(final UUID barrierId) {
+        Preconditions.checkNotNull(barrierId);
+
+        final String queryCommand = """
+                    SELECT * FROM barriers
+                    WHERE id = :id
+                """;
+
+        final ResultSetExtractor<Optional<Barrier>> rsExtractor = rs -> {
+            if (rs.next()) {
+                return Optional.of(mapper.getBarrier(rs));
+            } else {
+                return Optional.empty();
+            }
+        };
+
+        return db.query(queryCommand, Map.of("id", barrierId), rsExtractor);
+    }
+
+    @Override
+    public void release(final Barrier barrier) {
+        Preconditions.checkNotNull(barrier);
+
+        final String updateCommand = """
+                    UPDATE barriers
+                    SET released = :released,
+                        released_at = :released_at,
+                        updated_at = current_timestamp,
+                        locked = false,
+                        locked_by = null,
+                        locked_at = null
+                    WHERE id = :id
+                        AND locked = :locked
+                        AND locked_by = :locked_by
+                """;
+
+        db.update(updateCommand, mapper.getDataDto(barrier, db.getJdbcOperations()));
     }
 
     @Override

@@ -67,9 +67,17 @@ public class TaskDataMapper {
         task.setName(rs.getString("name"));
         task.setTube(rs.getString("tube"));
         task.setStatus(Task.Status.valueOf(rs.getString("status")));
-        task.setInput(fromJson(rs.getString("input"), new TypeReference<>() {
-        }));
+        task.setInput(rs.getString("input") != null
+                ? fromJson(rs.getString("input"), new TypeReference<>() {
+        })
+                : null);
+        task.setOutput(rs.getString("output") != null
+                ? fromJson(rs.getString("output"), new TypeReference<>() {
+        })
+                : null);
         task.setRoot(rs.getBoolean("is_root"));
+        task.setStartBarrier(rs.getObject("start_barrier", UUID.class));
+        task.setFinishBarrier(rs.getObject("finish_barrier", UUID.class));
         task.setUpdatedAt(Instant.ofEpochMilli(rs.getTimestamp("updated_at").getTime()));
         task.setCreatedAt(Instant.ofEpochMilli(rs.getTimestamp("created_at").getTime()));
         task.setScheduledAt(rs.getTimestamp("scheduled_at") != null

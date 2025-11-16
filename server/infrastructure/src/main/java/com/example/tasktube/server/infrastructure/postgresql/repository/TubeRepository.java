@@ -6,6 +6,7 @@ import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskDataMapp
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -132,6 +133,9 @@ public class TubeRepository implements ITubeRepository {
 
     @Override
     public Optional<Task> pop(final String tube, final String lockedBy) {
+        Preconditions.checkArgument(Strings.isNotEmpty(tube));
+        Preconditions.checkArgument(Strings.isNotEmpty(lockedBy));
+
         final String queryCommand = """
                     WITH locked_task
                     AS (

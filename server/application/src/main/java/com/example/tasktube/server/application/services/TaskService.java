@@ -43,37 +43,37 @@ public class TaskService implements ITaskService {
     @Transactional
     public Optional<Task> getTaskById(final UUID taskId) {
         Preconditions.checkNotNull(taskId);
-        LOGGER.debug("Get task by id: '{}'.", taskId);
+        LOGGER.info("Get task by id: '{}'.", taskId);
 
-        return taskRepository.getById(taskId);
+        return taskRepository.get(taskId);
     }
 
     @Override
     @Transactional
-    public void startTask(final UUID taskId, final String client, final Instant startedAt) {
+    public void startTask(final UUID taskId, final Instant startedAt, final String client) {
         Preconditions.checkNotNull(taskId);
         Preconditions.checkNotNull(startedAt);
         Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
-        LOGGER.debug("Start task id: '{}'.", taskId);
+        LOGGER.info("Start task id: '{}'.", taskId);
 
-        final Task task = taskRepository.getById(taskId).orElseThrow();
+        final Task task = taskRepository.get(taskId).orElseThrow();
 
-        task.start(client, startedAt);
+        task.start(startedAt, client);
 
         taskRepository.start(task);
     }
 
     @Override
     @Transactional
-    public void processTask(final UUID taskId, final String client, final Instant processedAt) {
+    public void processTask(final UUID taskId, final Instant processedAt, final String client) {
         Preconditions.checkNotNull(taskId);
         Preconditions.checkNotNull(processedAt);
         Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
-        LOGGER.debug("Process task id: '{}'.", taskId);
+        LOGGER.info("Process task id: '{}'.", taskId);
 
-        final Task task = taskRepository.getById(taskId).orElseThrow();
+        final Task task = taskRepository.get(taskId).orElseThrow();
 
-        task.process(client, processedAt);
+        task.process(processedAt, client);
 
         taskRepository.process(task);
     }
@@ -82,19 +82,23 @@ public class TaskService implements ITaskService {
     @Transactional
     public void finishTask(final FinishTaskDto taskDto) {
         Preconditions.checkNotNull(taskDto);
-        LOGGER.debug("Finish task id: '{}'.", taskDto.taskId());
+        LOGGER.info("Finish task id: '{}'.", taskDto.taskId());
 
-        final Task task = taskRepository.getById(taskDto.taskId()).orElseThrow();
+        final Task task = taskRepository.get(taskDto.taskId()).orElseThrow();
 
         final List<Task> children = new ArrayList<>();
         final List<Barrier> barriers = new ArrayList<>();
         if (taskDto.children() != null && !taskDto.children().isEmpty()) {
+            LOGGER.debug("Task has '{}' children.", taskDto.children().size());
+
             taskDto.children().forEach(childDto -> {
                 final Task child = childDto.to(false);
 
                 child.attachParent(task);
 
                 if (childDto.waitTasks() != null && !childDto.waitTasks().isEmpty()) {
+                    LOGGER.debug("Child task id '{}' has '{}' waiting tasks.", child.getId(), childDto.waitTasks().size());
+
                     barriers.add(child.addStartBarrier(childDto.waitTasks()));
                 }
 
@@ -113,23 +117,62 @@ public class TaskService implements ITaskService {
             tubeRepository.push(children);
         }
 
-        task.finish(taskDto.client(), taskDto.finishedAt(), taskDto.output());
+        task.finish(taskDto.finishedAt(), taskDto.output(), taskDto.client());
 
         taskRepository.finish(task);
     }
 
     @Override
     @Transactional
-    public void failTask(final UUID taskId, final String client, final Instant failedAt, final String failedReason) {
+    public void finalizeTask(final UUID taskId, final Instant finalizedAt, final String client) {
+        Preconditions.checkNotNull(taskId);
+        Preconditions.checkNotNull(finalizedAt);
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
+        LOGGER.info("Finalize task id: '{}'.", taskId);
+
+        final Task task = taskRepository.get(taskId).orElseThrow();
+        if (task.hasFinishBarrier()) {
+            LOGGER.debug("Finish barrier id: '{}'.", task.getFinishBarrier());
+
+            final Barrier finishBarrier = barrierRepository.get(task.getFinishBarrier()).orElseThrow();
+            if (finishBarrier.isNotReleased()) {
+                LOGGER.debug("Finish barrier is not released.");
+            } else {
+                LOGGER.debug("Finish barrier is released.");
+
+                final List<Task> childrenTasks = taskRepository.get(finishBarrier.getWaitFor());
+                if (childrenTasks.stream().anyMatch(Task::isAborted)) {
+                    LOGGER.debug("Task is aborted.");
+
+                    task.abort(finalizedAt, client);
+                }
+                if (childrenTasks.stream().allMatch(Task::isFinalized)) {
+                    LOGGER.debug("Task is finalized.");
+
+                    task.complete(finalizedAt, client);
+                }
+            }
+        } else {
+            LOGGER.debug("Finish barrier is empty. Task is finalized.");
+
+            task.complete(finalizedAt, client);
+        }
+
+        taskRepository.finalize(task);
+    }
+
+    @Override
+    @Transactional
+    public void failTask(final UUID taskId, final Instant failedAt, final String failedReason, final String client) {
         Preconditions.checkNotNull(taskId);
         Preconditions.checkNotNull(failedAt);
         Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
         Preconditions.checkArgument(!Strings.isNullOrEmpty(failedReason));
-        LOGGER.debug("Fail task id: '{}'.", taskId);
+        LOGGER.info("Fail task id: '{}'.", taskId);
 
-        final Task task = taskRepository.getById(taskId).orElseThrow();
+        final Task task = taskRepository.get(taskId).orElseThrow();
 
-        task.fail(client, failedAt, failedReason);
+        task.fail(failedAt, failedReason, client);
 
         taskRepository.fail(task);
     }

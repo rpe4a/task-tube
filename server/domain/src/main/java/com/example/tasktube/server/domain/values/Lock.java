@@ -19,4 +19,8 @@ public record Lock(Instant lockedAt, boolean locked, String lockedBy) {
 
         return locked && who.equals(lockedBy());
     }
+
+    public boolean isFree() {
+        return !locked && Strings.isNullOrEmpty(lockedBy);
+    }
 }

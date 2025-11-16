@@ -34,13 +34,16 @@ public class TubeService implements ITubeService {
         this.barrierRepository = Objects.requireNonNull(barrierRepository);
     }
 
+    @Override
     @Transactional
     public UUID push(final TaskDto taskDto) {
         Preconditions.checkNotNull(taskDto);
-        LOGGER.debug("Push task: '{}'.", taskDto);
+        LOGGER.info("Push task: '{}'.", taskDto);
         final Task task = taskDto.to(true);
 
         if (taskDto.waitTasks() != null && !taskDto.waitTasks().isEmpty()) {
+            LOGGER.debug("Task has '{}' waiting tasks.", taskDto.waitTasks().size());
+
             final Barrier barrier = task.addStartBarrier(taskDto.waitTasks());
             barrierRepository.save(List.of(barrier));
         }
@@ -51,10 +54,11 @@ public class TubeService implements ITubeService {
     }
 
     @Override
+    @Transactional
     public Optional<PopTaskDto> pop(final String tube, final String client) {
         Preconditions.checkArgument(Strings.isNotEmpty(tube));
         Preconditions.checkArgument(Strings.isNotEmpty(client));
-        LOGGER.debug("Pop task from '{}' by '{}' client.", tube, client);
+        LOGGER.info("Pop task from '{}' by '{}' client.", tube, client);
 
         return tubeRepository
                 .pop(tube, client)

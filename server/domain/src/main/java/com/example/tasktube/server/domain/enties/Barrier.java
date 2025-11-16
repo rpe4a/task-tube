@@ -1,6 +1,7 @@
 package com.example.tasktube.server.domain.enties;
 
 import com.example.tasktube.server.domain.values.Lock;
+import com.google.common.base.Preconditions;
 
 import java.time.Instant;
 import java.util.List;
@@ -16,6 +17,9 @@ public class Barrier {
     private Instant createdAt;
     private Instant releasedAt;
     private Lock lock;
+
+    public Barrier() {
+    }
 
     public Barrier(
             final UUID id,
@@ -75,6 +79,10 @@ public class Barrier {
         return released;
     }
 
+    public boolean isNotReleased() {
+        return !isReleased();
+    }
+
     public void setReleased(final boolean released) {
         this.released = released;
     }
@@ -109,6 +117,15 @@ public class Barrier {
 
     public void setLock(final Lock lock) {
         this.lock = lock;
+    }
+
+    public void release(final String client) {
+        Preconditions.checkNotNull(client);
+        Preconditions.checkState(getLock().isLockedBy(client), "The client '%s' can't release barrier.".formatted(client));
+        Preconditions.checkState(!isReleased(), "Barrier is already released.");
+
+        setReleased(true);
+        setReleasedAt(Instant.now());
     }
 
     public enum Type {

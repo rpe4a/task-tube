@@ -1,5 +1,5 @@
 @client = client1
-@task = b224d8b2-136d-44b5-822b-1a2b468e26d5
+@task = 0932708d-1f4a-43cb-8f33-2cc11d8a790a
 @tube = tube1
 
 ### START TASK
@@ -41,6 +41,20 @@ Content-Type: application/json
           },
           "createdAt": {{$timestamp}}
         }]
+}
+
+### FINISHED TASK WITHOUT CHILDREN
+POST http://localhost:8080/api/v1/task/{{task}}/finish
+Content-Type: application/json
+
+{
+    "client": "{{client}}",
+    "finishedAt": {{$timestamp}},
+    "output": {
+      "arg0": "{{$random.chuckNorris.fact}}",
+      "arg0Type": "String.class"
+    },
+     "children": []
 }
 
 ### FAIL TASK
