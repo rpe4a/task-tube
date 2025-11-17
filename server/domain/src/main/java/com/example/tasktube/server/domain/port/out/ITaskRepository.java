@@ -13,7 +13,7 @@ public interface ITaskRepository {
 
     List<Task> getTasksForScheduling(String client, int count);
 
-    void schedule(List<Task> tasks);
+    void schedule(Task task);
 
     void start(Task task);
 
@@ -23,5 +23,5 @@ public interface ITaskRepository {
 
     void fail(Task task);
 
-    void finalize(Task task);
+    void complete(Task task);
 }

@@ -22,13 +22,14 @@ public class Task {
     private UUID finishBarrier;
     private Instant updatedAt;
     private Instant createdAt;
+    private Instant canceledAt;
     private Instant scheduledAt;
     private Instant startedAt;
     private Instant heartbeatAt;
     private Instant finishedAt;
     private Instant failedAt;
     private Instant abortedAt;
-    private Instant finalizedAt;
+    private Instant completedAt;
     private int failures;
     private String failedReason;
     private Lock lock;
@@ -46,13 +47,14 @@ public class Task {
                 final UUID finishBarrier,
                 final Instant updatedAt,
                 final Instant createdAt,
+                final Instant canceledAt,
                 final Instant scheduledAt,
                 final Instant startedAt,
                 final Instant heartbeatAt,
                 final Instant finishedAt,
                 final Instant failedAt,
                 final Instant abortedAt,
-                final Instant finalizedAt,
+                final Instant completedAt,
                 final int failures,
                 final String failedReason,
                 final Lock lock,
@@ -70,13 +72,14 @@ public class Task {
         this.finishBarrier = finishBarrier;
         this.updatedAt = updatedAt;
         this.createdAt = createdAt;
+        this.canceledAt = canceledAt;
         this.scheduledAt = scheduledAt;
         this.startedAt = startedAt;
         this.heartbeatAt = heartbeatAt;
         this.finishedAt = finishedAt;
         this.failedAt = failedAt;
         this.abortedAt = abortedAt;
-        this.finalizedAt = finalizedAt;
+        this.completedAt = completedAt;
         this.failures = failures;
         this.failedReason = failedReason;
         this.lock = lock;
@@ -190,9 +193,14 @@ public class Task {
         this.finishedAt = finishedAt;
     }
 
-    public void schedule() {
-        setStatus(Status.SCHEDULED);
-        setScheduledAt(Instant.now());
+    private boolean canSchedule(final String client) {
+        canHandleBy(Status.CREATED, client);
+        return true;
+    }
+
+    private boolean canCancel(final String client) {
+        canHandleBy(Status.CREATED, client);
+        return true;
     }
 
     private boolean canStart(final String client) {
@@ -221,7 +229,7 @@ public class Task {
         return true;
     }
 
-    private boolean canFinalize(final String client) {
+    private boolean canComplete(final String client) {
         canHandleBy(Status.FINISHED, client);
         return true;
     }
@@ -232,6 +240,20 @@ public class Task {
         Preconditions.checkNotNull(status);
         Preconditions.checkState(getLock().isLockedBy(client), "The client '%s' can't start task.".formatted(client));
         Preconditions.checkState(getStatus().equals(status), "Status must be %s.".formatted(status));
+    }
+
+    public void schedule(final Instant scheduledAt, final String client) {
+        if (canSchedule(client)) {
+            setStatus(Status.SCHEDULED);
+            setScheduledAt(scheduledAt);
+        }
+    }
+
+    public void cancel(final Instant canceledAt, final String client) {
+        if (canCancel(client)) {
+            setCanceledAt(canceledAt);
+            setStatus(Status.CANCELED);
+        }
     }
 
     public void start(final Instant startedAt, final String client) {
@@ -295,13 +317,12 @@ public class Task {
         }
     }
 
-    public void complete(final Instant finalizedAt, final String client) {
-        if (canFinalize(client)) {
-            setStatus(Status.FINALIZED);
-            setFinalizedAt(finalizedAt);
+    public void complete(final Instant completedAt, final String client) {
+        if (canComplete(client)) {
+            setStatus(Status.COMPLETED);
+            setCompletedAt(completedAt);
         }
     }
-
 
     public Task attachParent(final Task task) {
         Preconditions.checkNotNull(task);
@@ -389,12 +410,12 @@ public class Task {
         this.failedAt = failedAt;
     }
 
-    public Instant getFinalizedAt() {
-        return finalizedAt;
+    public Instant getCompletedAt() {
+        return completedAt;
     }
 
-    public void setFinalizedAt(final Instant finalizedAt) {
-        this.finalizedAt = finalizedAt;
+    public void setCompletedAt(final Instant completedAt) {
+        this.completedAt = completedAt;
     }
 
     public int getFailures() {
@@ -430,7 +451,7 @@ public class Task {
     }
 
     public boolean isTerminated() {
-        return Status.FINALIZED == getStatus()
+        return Status.COMPLETED == getStatus()
                 || Status.ABORTED == getStatus()
                 || Status.CANCELED == getStatus();
     }
@@ -439,12 +460,24 @@ public class Task {
         return getFinishBarrier() != null;
     }
 
+    public boolean hasStartBarrier() {
+        return getStartBarrier() != null;
+    }
+
     public boolean isAborted() {
         return Status.ABORTED.equals(getStatus());
     }
 
     public boolean isFinalized() {
-        return Status.FINALIZED.equals(getStatus());
+        return Status.COMPLETED.equals(getStatus());
+    }
+
+    public Instant getCanceledAt() {
+        return canceledAt;
+    }
+
+    public void setCanceledAt(final Instant canceledAt) {
+        this.canceledAt = canceledAt;
     }
 
     public enum Status {
@@ -455,6 +488,6 @@ public class Task {
         ABORTED,
         CANCELED,
         //  WAITING_FINALIZED,
-        FINALIZED,
+        COMPLETED,
     }
 }

@@ -10,6 +10,10 @@ public record Lock(Instant lockedAt, boolean locked, String lockedBy) {
         this(null, false, null);
     }
 
+    public static Lock free() {
+        return new Lock();
+    }
+
     public Lock unlock() {
         return new Lock(null, false, null);
     }

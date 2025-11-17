@@ -10,13 +10,16 @@ import java.util.UUID;
 public interface ITaskService {
     Optional<Task> getTaskById(UUID taskId);
 
+    void scheduleTask(UUID taskId, Instant scheduledAt, String client);
+
     void startTask(UUID taskId, Instant startedAt, String client);
 
     void processTask(UUID taskId, Instant processedAt, String client);
 
     void finishTask(FinishTaskDto taskDto);
 
-    void finalizeTask(UUID taskID, Instant finalizedAt, String client);
+    void completeTask(UUID taskID, Instant finalizedAt, String client);
 
     void failTask(UUID taskId, Instant failedAt, String failedReason, String client);
+
 }

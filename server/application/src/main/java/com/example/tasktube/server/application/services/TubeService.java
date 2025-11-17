@@ -45,11 +45,11 @@ public class TubeService implements ITubeService {
             LOGGER.debug("Task has '{}' waiting tasks.", taskDto.waitTasks().size());
 
             final Barrier barrier = task.addStartBarrier(taskDto.waitTasks());
-            barrierRepository.save(List.of(barrier));
+            barrierRepository.save(barrier);
         }
 
         return tubeRepository
-                .push(taskDto.to(true))
+                .push(task)
                 .getId();
     }
 

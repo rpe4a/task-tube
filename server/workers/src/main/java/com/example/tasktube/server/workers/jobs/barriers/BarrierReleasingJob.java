@@ -2,8 +2,7 @@ package com.example.tasktube.server.workers.jobs.barriers;
 
 import com.example.tasktube.server.application.port.in.IBarrierService;
 import com.example.tasktube.server.application.port.in.IJobService;
-import com.example.tasktube.server.application.services.BarrierService;
-import com.example.tasktube.server.infrastructure.services.InstanceIdProvider;
+import com.example.tasktube.server.infrastructure.configuration.InstanceIdProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

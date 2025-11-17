@@ -38,13 +38,14 @@ public class TaskDataMapper {
         map.put("finish_barrier", task.getFinishBarrier());
         map.put("updated_at", task.getUpdatedAt() != null ? Timestamp.from(task.getUpdatedAt()) : null);
         map.put("created_at", task.getCreatedAt() != null ? Timestamp.from(task.getCreatedAt()) : null);
+        map.put("canceled_at", task.getCanceledAt() != null ? Timestamp.from(task.getCanceledAt()) : null);
         map.put("scheduled_at", task.getScheduledAt() != null ? Timestamp.from(task.getScheduledAt()) : null);
         map.put("started_at", task.getStartedAt() != null ? Timestamp.from(task.getStartedAt()) : null);
         map.put("heartbeat_at", task.getHeartbeatAt() != null ? Timestamp.from(task.getHeartbeatAt()) : null);
         map.put("finished_at", task.getFinishedAt() != null ? Timestamp.from(task.getFinishedAt()) : null);
         map.put("failed_at", task.getFailedAt() != null ? Timestamp.from(task.getFailedAt()) : null);
         map.put("aborted_at", task.getAbortedAt() != null ? Timestamp.from(task.getAbortedAt()) : null);
-        map.put("finalized_at", task.getFinalizedAt() != null ? Timestamp.from(task.getFinalizedAt()) : null);
+        map.put("completed_at", task.getCompletedAt() != null ? Timestamp.from(task.getCompletedAt()) : null);
         map.put("failures", task.getFailures());
         map.put("failed_reason", task.getFailedReason());
         if (task.getLock() != null) {
@@ -80,6 +81,9 @@ public class TaskDataMapper {
         task.setFinishBarrier(rs.getObject("finish_barrier", UUID.class));
         task.setUpdatedAt(Instant.ofEpochMilli(rs.getTimestamp("updated_at").getTime()));
         task.setCreatedAt(Instant.ofEpochMilli(rs.getTimestamp("created_at").getTime()));
+        task.setCanceledAt(rs.getTimestamp("canceled_at") != null
+                ? Instant.ofEpochMilli(rs.getTimestamp("canceled_at").getTime())
+                : null);
         task.setScheduledAt(rs.getTimestamp("scheduled_at") != null
                 ? Instant.ofEpochMilli(rs.getTimestamp("scheduled_at").getTime())
                 : null);
@@ -98,8 +102,8 @@ public class TaskDataMapper {
         task.setAbortedAt(rs.getTimestamp("aborted_at") != null
                 ? Instant.ofEpochMilli(rs.getTimestamp("aborted_at").getTime())
                 : null);
-        task.setFinalizedAt(rs.getTimestamp("finalized_at") != null
-                ? Instant.ofEpochMilli(rs.getTimestamp("finalized_at").getTime())
+        task.setCompletedAt(rs.getTimestamp("completed_at") != null
+                ? Instant.ofEpochMilli(rs.getTimestamp("completed_at").getTime())
                 : null);
         task.setFailures(rs.getInt("failures"));
         task.setFailedReason(rs.getString("failed_reason"));

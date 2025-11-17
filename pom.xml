@@ -19,11 +19,14 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!--        versions-->
+        <versions.maven-compiler-plugin>3.14.1</versions.maven-compiler-plugin>
         <versions.common-lang3>3.19.0</versions.common-lang3>
         <versions.guava>33.5.0-jre</versions.guava>
         <versions.lombok>1.18.42</versions.lombok>
         <versions.jackson>2.17.2</versions.jackson>
-        <versions.maven-compiler-plugin>3.14.1</versions.maven-compiler-plugin>
+        <versions.junit>5.13.4</versions.junit>
+        <versions.mockito>5.20.0</versions.mockito>
+        <versions.assertj>3.27.6</versions.assertj>
 
         <!--        logging-->
         <logging.level>DEBUG</logging.level>
@@ -56,6 +59,21 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${versions.jackson}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${versions.junit}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${versions.assertj}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>${versions.mockito}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

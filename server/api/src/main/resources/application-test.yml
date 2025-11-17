@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: server-api-test
+
+  datasource:
+    url: ${postgresql.url}
+    username: ${postgresql.admin}
+    password: ${postgresql.password}

@@ -5,7 +5,7 @@ select * from tasks order by heartbeat_at;
 
 select * from barriers
 
-                  delete from tasks;
+delete from tasks;
 delete from barriers;
 
 UPDATE barriers

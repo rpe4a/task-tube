@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IJobService {
-    void scheduleTask(SchedulingDto schedulingDto);
     List<UUID> getTaskIdList(Task.Status status, int count, String client);
 
     List<UUID> getBarrierIdList(int count, String client);

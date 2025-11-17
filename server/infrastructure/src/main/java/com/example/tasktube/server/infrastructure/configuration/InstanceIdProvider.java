@@ -1,4 +1,4 @@
-package com.example.tasktube.server.infrastructure.services;
+package com.example.tasktube.server.infrastructure.configuration;
 
 import java.util.UUID;
 

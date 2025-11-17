@@ -36,7 +36,7 @@ public class BarrierService implements IBarrierService {
         LOGGER.info("Release barrier id: '{}'.", barrierId);
 
         final Optional<Barrier> barrier = barrierRepository.get(barrierId);
-        if (barrier.isEmpty()){
+        if (barrier.isEmpty()) {
             LOGGER.debug("No barrier found for id: '{}'.", barrierId);
             return;
         }
@@ -59,6 +59,6 @@ public class BarrierService implements IBarrierService {
             }
         }
 
-        barrierRepository.release(barrier.orElse(null));
+        barrierRepository.release(barrier.get());
     }
 }

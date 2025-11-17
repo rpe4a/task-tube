@@ -14,7 +14,7 @@ public class TubeConfiguration {
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public ITubeService registerTubeService(final ITubeRepository repository, final IBarrierRepository barrierRepository) {
-        return new TubeService(repository, barrierRepository);
+    public ITubeService registerTubeService(final ITubeRepository tubeRepository, final IBarrierRepository barrierRepository) {
+        return new TubeService(tubeRepository, barrierRepository);
     }
 }

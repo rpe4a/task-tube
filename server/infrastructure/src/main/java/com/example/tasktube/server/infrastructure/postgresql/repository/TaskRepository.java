@@ -114,31 +114,23 @@ public class TaskRepository implements ITaskRepository {
     }
 
     @Override
-    public void schedule(final List<Task> tasks) {
-        Preconditions.checkNotNull(tasks);
-        if (tasks.isEmpty()) {
-            return;
-        }
+    public void schedule(final Task task) {
+        Preconditions.checkNotNull(task);
 
         final String updateCommand = """
-                            UPDATE tasks
-                            SET locked = false,
-                                locked_by = null,
-                                locked_at = null,
-                                updated_at = current_timestamp,
-                                scheduled_at = current_timestamp,
-                                status = :status
-                            WHERE id  = :id
-                                AND locked = :locked
-                                AND locked_by = :locked_by
+                    UPDATE tasks
+                    SET locked = false,
+                        locked_by = null,
+                        locked_at = null,
+                        status = :status,
+                        scheduled_at = :scheduled_at,
+                        canceled_at = :canceled_at
+                    WHERE id = :id
+                        AND locked_by = :locked_by
+                        AND locked = true
                 """;
 
-        final List<Map<String, ?>> batch = new ArrayList<>();
-        for (final Task task : tasks) {
-            batch.add(mapper.getDataDto(task));
-        }
-
-        db.batchUpdate(updateCommand, batch.toArray(new Map[0]));
+        db.update(updateCommand, mapper.getDataDto(task));
     }
 
     @Override
@@ -219,13 +211,13 @@ public class TaskRepository implements ITaskRepository {
     }
 
     @Override
-    public void finalize(final Task task) {
+    public void complete(final Task task) {
         Preconditions.checkNotNull(task);
 
         final String updateCommand = """
                     UPDATE tasks
                     SET status = :status,
-                        finalized_at = :finalized_at,
+                        completed_at = :completed_at,
                         aborted_at = :aborted_at,
                         locked = false,
                         locked_at = null,

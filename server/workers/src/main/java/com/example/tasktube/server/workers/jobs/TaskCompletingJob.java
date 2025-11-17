@@ -3,7 +3,7 @@ package com.example.tasktube.server.workers.jobs;
 import com.example.tasktube.server.application.port.in.IJobService;
 import com.example.tasktube.server.application.port.in.ITaskService;
 import com.example.tasktube.server.domain.enties.Task;
-import com.example.tasktube.server.infrastructure.services.InstanceIdProvider;
+import com.example.tasktube.server.infrastructure.configuration.InstanceIdProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.UUID;
 
 @Component
-public class TaskFinalizingJob {
+public class TaskCompletingJob {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskFinalizingJob.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskCompletingJob.class);
     private final IJobService jobService;
     private final ITaskService taskService;
     private final InstanceIdProvider instanceId;
@@ -28,7 +28,7 @@ public class TaskFinalizingJob {
     @Value("${spring.application.jobs.tasks.finalizing.count}")
     private int count;
 
-    public TaskFinalizingJob(
+    public TaskCompletingJob(
             final IJobService jobService,
             final ITaskService taskService,
             final InstanceIdProvider instanceId) {
@@ -44,7 +44,7 @@ public class TaskFinalizingJob {
 
         LOGGER.debug("List of tasks: '{}'.", taskIdList);
         for (final UUID taskId : taskIdList) {
-            taskService.finalizeTask(taskId, Instant.now(), instanceId.get());
+            taskService.completeTask(taskId, Instant.now(), instanceId.get());
         }
     }
 }

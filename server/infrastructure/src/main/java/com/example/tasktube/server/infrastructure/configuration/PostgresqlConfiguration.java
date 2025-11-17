@@ -1,6 +1,5 @@
 package com.example.tasktube.server.infrastructure.configuration;
 
-import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.IJobRepository;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
@@ -16,7 +15,6 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 @Configuration()

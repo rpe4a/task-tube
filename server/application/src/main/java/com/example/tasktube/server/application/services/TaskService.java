@@ -50,6 +50,45 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
+    public void scheduleTask(final UUID taskId, final Instant scheduledAt, final String client) {
+        Preconditions.checkNotNull(taskId);
+        Preconditions.checkNotNull(scheduledAt);
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
+        LOGGER.info("Schedule task id: '{}'.", taskId);
+
+        final Task task = taskRepository.get(taskId).orElseThrow();
+        if (task.hasStartBarrier()) {
+            LOGGER.debug("Start barrier id: '{}'.", task.getFinishBarrier());
+
+            final Barrier startBarrier = barrierRepository.get(task.getStartBarrier()).orElseThrow();
+            if (startBarrier.isNotReleased()) {
+                LOGGER.debug("Start barrier is not released.");
+            } else {
+                LOGGER.debug("Start barrier is released.");
+
+                final List<Task> waitingTasks = taskRepository.get(startBarrier.getWaitFor());
+                if (waitingTasks.stream().anyMatch(Task::isAborted)) {
+                    LOGGER.debug("Task is canceled.");
+
+                    task.cancel(scheduledAt, client);
+                }
+                if (waitingTasks.stream().allMatch(Task::isFinalized)) {
+                    LOGGER.debug("Task is scheduled.");
+
+                    task.schedule(scheduledAt, client);
+                }
+            }
+        } else {
+            LOGGER.debug("Start barrier is empty. Task is scheduled.");
+
+            task.schedule(scheduledAt, client);
+        }
+
+        taskRepository.schedule(task);
+    }
+
+    @Override
+    @Transactional
     public void startTask(final UUID taskId, final Instant startedAt, final String client) {
         Preconditions.checkNotNull(taskId);
         Preconditions.checkNotNull(startedAt);
@@ -124,9 +163,9 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public void finalizeTask(final UUID taskId, final Instant finalizedAt, final String client) {
+    public void completeTask(final UUID taskId, final Instant completedAt, final String client) {
         Preconditions.checkNotNull(taskId);
-        Preconditions.checkNotNull(finalizedAt);
+        Preconditions.checkNotNull(completedAt);
         Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
         LOGGER.info("Finalize task id: '{}'.", taskId);
 
@@ -144,21 +183,21 @@ public class TaskService implements ITaskService {
                 if (childrenTasks.stream().anyMatch(Task::isAborted)) {
                     LOGGER.debug("Task is aborted.");
 
-                    task.abort(finalizedAt, client);
+                    task.abort(completedAt, client);
                 }
                 if (childrenTasks.stream().allMatch(Task::isFinalized)) {
-                    LOGGER.debug("Task is finalized.");
+                    LOGGER.debug("Task is completed.");
 
-                    task.complete(finalizedAt, client);
+                    task.complete(completedAt, client);
                 }
             }
         } else {
-            LOGGER.debug("Finish barrier is empty. Task is finalized.");
+            LOGGER.debug("Finish barrier is empty. Task is completed.");
 
-            task.complete(finalizedAt, client);
+            task.complete(completedAt, client);
         }
 
-        taskRepository.finalize(task);
+        taskRepository.complete(task);
     }
 
     @Override
