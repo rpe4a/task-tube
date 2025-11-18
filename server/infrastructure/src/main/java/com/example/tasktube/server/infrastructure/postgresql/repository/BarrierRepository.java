@@ -97,12 +97,12 @@ public class BarrierRepository implements IBarrierRepository {
 
         final String updateCommand = """
                     UPDATE barriers
-                    SET released = :released,
-                        released_at = :released_at,
-                        updated_at = current_timestamp,
-                        locked = false,
+                    SET locked = false,
                         locked_by = null,
-                        locked_at = null
+                        locked_at = null,
+                        released = :released,
+                        released_at = :released_at,
+                        updated_at = current_timestamp
                     WHERE id = :id
                         AND locked = :locked
                         AND locked_by = :locked_by

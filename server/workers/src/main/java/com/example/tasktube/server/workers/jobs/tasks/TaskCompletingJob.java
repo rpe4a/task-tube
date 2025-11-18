@@ -1,4 +1,4 @@
-package com.example.tasktube.server.workers.jobs;
+package com.example.tasktube.server.workers.jobs.tasks;
 
 import com.example.tasktube.server.application.port.in.IJobService;
 import com.example.tasktube.server.application.port.in.ITaskService;

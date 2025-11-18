@@ -58,7 +58,7 @@ public class TaskService implements ITaskService {
 
         final Task task = taskRepository.get(taskId).orElseThrow();
         if (task.hasStartBarrier()) {
-            LOGGER.debug("Start barrier id: '{}'.", task.getFinishBarrier());
+            LOGGER.debug("Start barrier id: '{}'.", task.getStartBarrier());
 
             final Barrier startBarrier = barrierRepository.get(task.getStartBarrier()).orElseThrow();
             if (startBarrier.isNotReleased()) {

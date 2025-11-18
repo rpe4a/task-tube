@@ -79,41 +79,6 @@ public class TaskRepository implements ITaskRepository {
     }
 
     @Override
-    public List<Task> getTasksForScheduling(final String client, final int count) {
-        final String queryCommand = """
-                    WITH locked_task
-                    AS (
-                        SELECT id
-                        FROM tasks
-                        WHERE locked = false
-                          AND locked_by is NULL
-                          AND locked_at is NULL
-                          AND status = 'CREATED'
-                        ORDER BY created_at
-                            FOR UPDATE SKIP LOCKED
-                        LIMIT :count
-                    )
-                    UPDATE tasks
-                    SET locked = true,
-                        locked_by = :locked_by,
-                        locked_at = current_timestamp,
-                        updated_at = current_timestamp
-                    WHERE id IN (SELECT id FROM locked_task)
-                    RETURNING *
-                """;
-
-        final RowMapper<Task> rsMapper = (rs, rowNum) -> {
-            try {
-                return mapper.getTask(rs);
-            } catch (final JsonProcessingException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        return db.query(queryCommand, Map.of("locked_by", client, "count", count), rsMapper);
-    }
-
-    @Override
     public void schedule(final Task task) {
         Preconditions.checkNotNull(task);
 
@@ -124,7 +89,8 @@ public class TaskRepository implements ITaskRepository {
                         locked_at = null,
                         status = :status,
                         scheduled_at = :scheduled_at,
-                        canceled_at = :canceled_at
+                        canceled_at = :canceled_at,
+                        updated_at = current_timestamp
                     WHERE id = :id
                         AND locked_by = :locked_by
                         AND locked = true

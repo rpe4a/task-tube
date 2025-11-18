@@ -11,8 +11,6 @@ public interface ITaskRepository {
 
     List<Task> get(List<UUID> taskIdList);
 
-    List<Task> getTasksForScheduling(String client, int count);
-
     void schedule(Task task);
 
     void start(Task task);
