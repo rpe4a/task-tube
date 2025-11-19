@@ -557,4 +557,77 @@ class RegressApplicationTests {
         assertThat(startBarrier.get().getReleasedAt()).isNull();
         assertThat(startBarrier.get().getLock()).isEqualTo(Lock.free());
     }
+
+    @Test
+    void shouldFinishedTaskWithTwoChildrenWithWaitingTasksSuccessfully() {
+        final TaskDto taskDto = TestUtils.createTaskDto();
+
+        final UUID taskId = tubeService.push(taskDto);
+
+        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
+
+        final UUID createdTaskId = taskIdList.get(0);
+        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+
+        final Optional<PopTaskDto> popTask = tubeService.pop(taskDto.tube(), CLIENT);
+
+        final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
+
+        taskService.startTask(taskPopped.get().getId(), Instant.now(), CLIENT);
+
+        final Optional<Task> taskProcessing = taskRepository.get(popTask.get().id());
+
+        taskService.processTask(taskProcessing.get().getId(), Instant.now(), CLIENT);
+
+        final Optional<Task> taskHeartbeat = taskRepository.get(taskProcessing.get().getId());
+
+        final UUID waitTaskId1 = UUID.randomUUID();
+        final UUID waitTaskId2 = UUID.randomUUID();
+        final TaskDto child1 = TestUtils.createTaskDto(List.of(waitTaskId1));
+        final TaskDto child2 = TestUtils.createTaskDto(List.of(waitTaskId2));
+        final List<TaskDto> children = List.of(child1, child2);
+        final FinishTaskDto finishTask = TestUtils.createFinishTaskDto(
+                taskHeartbeat.get().getId(),
+                CLIENT,
+                children
+        );
+        taskService.finishTask(finishTask);
+
+        final Optional<Task> taskFinished = taskRepository.get(finishTask.taskId());
+        assertThat(taskFinished.get().getFinishBarrier()).isNotNull();
+
+        final Optional<Barrier> finishBarrier = barrierRepository.get(taskFinished.get().getFinishBarrier());
+        assertThat(finishBarrier.isPresent()).isTrue();
+        assertThat(finishBarrier.get().getWaitFor()).isEqualTo(List.of(child1.id(), child2.id()));
+
+        final Optional<Task> taskChild1 = taskRepository.get(child1.id());
+        assertThat(taskChild1.get().getStartBarrier()).isNotNull();
+
+        final Optional<Barrier> startBarrier1 = barrierRepository.get(taskChild1.get().getStartBarrier());
+        assertThat(startBarrier1.isPresent()).isTrue();
+        assertThat(startBarrier1.get().getId()).isEqualTo(taskChild1.get().getStartBarrier());
+        assertThat(startBarrier1.get().getTaskId()).isEqualTo(taskChild1.get().getId());
+        assertThat(startBarrier1.get().getWaitFor()).isEqualTo(List.of(waitTaskId1));
+        assertThat(startBarrier1.get().getType()).isEqualTo(Barrier.Type.START);
+        assertThat(startBarrier1.get().isReleased()).isFalse();
+        assertThat(startBarrier1.get().getUpdatedAt()).isNotNull();
+        assertThat(startBarrier1.get().getCreatedAt()).isNotNull();
+        assertThat(startBarrier1.get().getReleasedAt()).isNull();
+        assertThat(startBarrier1.get().getLock()).isEqualTo(Lock.free());
+
+        final Optional<Task> taskChild2 = taskRepository.get(child2.id());
+        assertThat(taskChild2.get().getStartBarrier()).isNotNull();
+
+        final Optional<Barrier> startBarrier2 = barrierRepository.get(taskChild2.get().getStartBarrier());
+        assertThat(startBarrier2.isPresent()).isTrue();
+        assertThat(startBarrier2.get().getId()).isEqualTo(taskChild2.get().getStartBarrier());
+        assertThat(startBarrier2.get().getTaskId()).isEqualTo(taskChild2.get().getId());
+        assertThat(startBarrier2.get().getWaitFor()).isEqualTo(List.of(waitTaskId2));
+        assertThat(startBarrier2.get().getType()).isEqualTo(Barrier.Type.START);
+        assertThat(startBarrier2.get().isReleased()).isFalse();
+        assertThat(startBarrier2.get().getUpdatedAt()).isNotNull();
+        assertThat(startBarrier2.get().getCreatedAt()).isNotNull();
+        assertThat(startBarrier2.get().getReleasedAt()).isNull();
+        assertThat(startBarrier2.get().getLock()).isEqualTo(Lock.free());
+    }
 }
