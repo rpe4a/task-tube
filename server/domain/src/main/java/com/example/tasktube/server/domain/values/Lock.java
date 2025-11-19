@@ -27,4 +27,8 @@ public record Lock(Instant lockedAt, boolean locked, String lockedBy) {
     public boolean isFree() {
         return !locked && Strings.isNullOrEmpty(lockedBy);
     }
+
+    public Lock prolong() {
+        return new Lock(Instant.now(), true, lockedBy());
+    }
 }

@@ -246,6 +246,7 @@ public class Task {
         if (canSchedule(client)) {
             setStatus(Status.SCHEDULED);
             setScheduledAt(scheduledAt);
+            unlock();
         }
     }
 
@@ -253,6 +254,7 @@ public class Task {
         if (canCancel(client)) {
             setCanceledAt(canceledAt);
             setStatus(Status.CANCELED);
+            unlock();
         }
     }
 
@@ -264,6 +266,7 @@ public class Task {
         if (canStart(client)) {
             setStartedAt(startedAt);
             setStatus(Status.PROCESSING);
+            setLock(getLock().prolong());
         }
     }
 
@@ -271,6 +274,7 @@ public class Task {
         if (canProcess(client)) {
             setHeartbeatAt(heartbeatAt);
             setStatus(Status.PROCESSING);
+            setLock(getLock().prolong());
         }
     }
 
@@ -279,7 +283,7 @@ public class Task {
             setFinishedAt(finishedAt);
             setStatus(Status.FINISHED);
             setOutput(output);
-            setLock(getLock().unlock());
+            unlock();
         }
     }
 
@@ -296,7 +300,7 @@ public class Task {
                 setFailedReason(failedReason);
                 setFinishBarrier(null);
                 setOutput(null);
-                setLock(getLock().unlock());
+                unlock();
             } else {
                 setStatus(Status.ABORTED);
                 setAbortedAt(Instant.now());
@@ -305,7 +309,7 @@ public class Task {
                 setFailedReason(failedReason);
                 setFinishBarrier(null);
                 setOutput(null);
-                setLock(getLock().unlock());
+                unlock();
             }
         }
     }
@@ -478,6 +482,10 @@ public class Task {
 
     public void setCanceledAt(final Instant canceledAt) {
         this.canceledAt = canceledAt;
+    }
+
+    public void unlock() {
+        setLock(getLock().unlock());
     }
 
     public enum Status {

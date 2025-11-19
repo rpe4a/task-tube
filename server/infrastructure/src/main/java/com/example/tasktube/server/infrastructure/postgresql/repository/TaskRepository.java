@@ -12,7 +12,6 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -84,16 +83,14 @@ public class TaskRepository implements ITaskRepository {
 
         final String updateCommand = """
                     UPDATE tasks
-                    SET locked = false,
-                        locked_by = null,
-                        locked_at = null,
+                    SET locked = :locked,
+                        locked_by = :locked_by,
+                        locked_at = :locked_at,
                         status = :status,
                         scheduled_at = :scheduled_at,
                         canceled_at = :canceled_at,
                         updated_at = current_timestamp
                     WHERE id = :id
-                        AND locked_by = :locked_by
-                        AND locked = true
                 """;
 
         db.update(updateCommand, mapper.getDataDto(task));
@@ -105,11 +102,13 @@ public class TaskRepository implements ITaskRepository {
 
         final String updateCommand = """
                     UPDATE tasks
-                    SET status = 'PROCESSING',
-                        started_at = :started_at
+                    SET locked = :locked,
+                        locked_by = :locked_by,
+                        locked_at = :locked_at,
+                        status = :status,
+                        started_at = :started_at,
+                        updated_at = current_timestamp
                     WHERE id = :id
-                        AND locked_by = :locked_by
-                        AND locked = true
                 """;
 
         db.update(updateCommand, mapper.getDataDto(task));
@@ -121,11 +120,13 @@ public class TaskRepository implements ITaskRepository {
 
         final String updateCommand = """
                     UPDATE tasks
-                    SET status = 'PROCESSING',
-                        heartbeat_at = :heartbeat_at
+                    SET locked = :locked,
+                        locked_by = :locked_by,
+                        locked_at = :locked_at,
+                        status = :status,
+                        heartbeat_at = :heartbeat_at,
+                        updated_at = current_timestamp
                     WHERE id = :id
-                        AND locked_by = :locked_by
-                        AND locked = true
                 """;
 
         db.update(updateCommand, mapper.getDataDto(task));
@@ -137,13 +138,14 @@ public class TaskRepository implements ITaskRepository {
 
         final String updateCommand = """
                     UPDATE tasks
-                    SET status = 'FINISHED',
+                    SET locked = :locked,
+                        locked_at = :locked_at,
+                        locked_by = :locked_by,
+                        status = :status,
                         finished_at = :finished_at,
                         finish_barrier = :finish_barrier,
                         output = :output::jsonb,
-                        locked = :locked,
-                        locked_at = :locked_at,
-                        locked_by = :locked_by
+                        updated_at = current_timestamp
                     WHERE id = :id
                 """;
 

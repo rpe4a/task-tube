@@ -68,6 +68,7 @@ public class TaskDataMapper {
         task.setName(rs.getString("name"));
         task.setTube(rs.getString("tube"));
         task.setStatus(Task.Status.valueOf(rs.getString("status")));
+        task.setParentId(rs.getObject("parent_id", UUID.class));
         task.setInput(rs.getString("input") != null
                 ? fromJson(rs.getString("input"), new TypeReference<>() {
         })
