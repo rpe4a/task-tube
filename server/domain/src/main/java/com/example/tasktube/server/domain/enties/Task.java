@@ -7,6 +7,7 @@ import com.google.common.base.Preconditions;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class Task {
@@ -83,7 +84,9 @@ public class Task {
         this.failures = failures;
         this.failedReason = failedReason;
         this.lock = lock;
-        this.settings = settings;
+        this.settings = Optional
+                .ofNullable(settings)
+                .orElse(TaskSettings.getDefault());
     }
 
     public Task() {
@@ -291,7 +294,7 @@ public class Task {
         if (canFail(client)) {
             if (getFailures() < getSettings().maxFailures()) {
                 setStatus(Status.SCHEDULED);
-                setScheduledAt(Instant.now().plusSeconds(getSettings().failureRetryTimeoutSeconds()));
+                setScheduledAt(failedAt.plusSeconds(getSettings().failureRetryTimeoutSeconds()));
                 setStartedAt(null);
                 setHeartbeatAt(null);
                 setFinishedAt(null);

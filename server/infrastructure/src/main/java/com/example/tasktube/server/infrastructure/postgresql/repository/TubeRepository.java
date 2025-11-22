@@ -148,6 +148,7 @@ public class TubeRepository implements ITubeRepository {
                           AND locked_at is NULL
                           AND status = 'SCHEDULED'
                           AND tube = :tube
+                          AND scheduled_at <= current_timestamp
                         ORDER BY scheduled_at
                             FOR UPDATE SKIP LOCKED
                         LIMIT 1

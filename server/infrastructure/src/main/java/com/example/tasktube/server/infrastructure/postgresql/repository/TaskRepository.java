@@ -159,6 +159,7 @@ public class TaskRepository implements ITaskRepository {
         final String updateCommand = """
                     UPDATE tasks
                     SET status = :status,
+                        updated_at = current_timestamp,
                         scheduled_at = :scheduled_at,
                         started_at = :started_at,
                         heartbeat_at = :heartbeat_at,
@@ -167,6 +168,7 @@ public class TaskRepository implements ITaskRepository {
                         failures = :failures,
                         failed_reason = :failed_reason,
                         aborted_at = :aborted_at,
+                        completed_at = :completed_at,
                         finish_barrier = :finish_barrier,
                         output = :output::jsonb,
                         locked = :locked,
