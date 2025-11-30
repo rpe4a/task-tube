@@ -17,7 +17,7 @@ public record TaskDto(
         @NonNull Map<String, Object> input,
         @Nullable List<UUID> waitTasks,
         @NonNull Instant createdAt,
-        TaskSettingsDto settings
+        @Nullable TaskSettingsDto settings
 ) {
 
     public Task to(final boolean isRoot) {

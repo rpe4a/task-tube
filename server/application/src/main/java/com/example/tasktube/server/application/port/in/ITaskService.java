@@ -18,8 +18,7 @@ public interface ITaskService {
 
     void finishTask(FinishTaskDto taskDto);
 
-    void completeTask(UUID taskID, Instant finalizedAt, String client);
-
     void failTask(UUID taskId, Instant failedAt, String failedReason, String client);
 
+    void completeTask(UUID taskID, Instant completedAt, String client);
 }

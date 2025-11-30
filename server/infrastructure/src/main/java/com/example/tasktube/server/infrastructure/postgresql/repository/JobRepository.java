@@ -30,7 +30,7 @@ public class JobRepository implements IJobRepository {
     }
 
     @Override
-    public List<UUID> getBarrierIdList(final int count, final String client) {
+    public List<UUID> lockBarrierIdList(final int count, final String client) {
         Preconditions.checkArgument(count > 0);
         Preconditions.checkArgument(Strings.isNotEmpty(client));
 
@@ -63,7 +63,7 @@ public class JobRepository implements IJobRepository {
     }
 
     @Override
-    public List<UUID> getTaskIdList(final Task.Status status, final int count, final String client) {
+    public List<UUID> lockTaskIdList(final Task.Status status, final int count, final String client) {
         Preconditions.checkArgument(count > 0);
         Preconditions.checkArgument(Strings.isNotEmpty(client));
 

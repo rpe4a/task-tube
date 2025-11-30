@@ -87,6 +87,7 @@ public class TaskRepository implements ITaskRepository {
                         locked_by = :locked_by,
                         locked_at = :locked_at,
                         status = :status,
+                        failed_reason = :failed_reason,
                         scheduled_at = :scheduled_at,
                         canceled_at = :canceled_at,
                         updated_at = current_timestamp
@@ -187,14 +188,14 @@ public class TaskRepository implements ITaskRepository {
         final String updateCommand = """
                     UPDATE tasks
                     SET status = :status,
+                        updated_at = current_timestamp,
                         completed_at = :completed_at,
                         aborted_at = :aborted_at,
-                        locked = false,
-                        locked_at = null,
-                        locked_by = null
+                        failed_reason = :failed_reason,
+                        locked = :locked,
+                        locked_at = :locked_at,
+                        locked_by = :locked_by
                     WHERE id = :id
-                        AND locked_by = :locked_by
-                        AND locked = true
                 """;
 
         db.update(updateCommand, mapper.getDataDto(task));

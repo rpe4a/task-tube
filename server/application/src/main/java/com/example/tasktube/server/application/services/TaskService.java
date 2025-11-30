@@ -24,6 +24,8 @@ import java.util.UUID;
 @Service
 public class TaskService implements ITaskService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskService.class);
+    public static final String CHILDREN_ARE_FINALIZED = "Some children are finalized.";
+    public static final String WAITING_TASKS_ARE_FINALIZED = "Some waiting tasks are finalized.";
 
     private final ITubeRepository tubeRepository;
     private final ITaskRepository taskRepository;
@@ -69,12 +71,12 @@ public class TaskService implements ITaskService {
                 LOGGER.debug("Start barrier is released.");
 
                 final List<Task> waitingTasks = taskRepository.get(startBarrier.getWaitFor());
-                if (waitingTasks.stream().anyMatch(Task::isAborted)) {
+                if (waitingTasks.stream().anyMatch(Task::isFinalized)) {
                     LOGGER.debug("Task is canceled.");
 
-                    task.cancel(scheduledAt, client);
+                    task.cancel(scheduledAt, WAITING_TASKS_ARE_FINALIZED, client);
                 }
-                if (waitingTasks.stream().allMatch(Task::isFinalized)) {
+                if (waitingTasks.stream().allMatch(Task::isCompleted)) {
                     LOGGER.debug("Task is scheduled.");
 
                     task.schedule(scheduledAt, client);
@@ -169,7 +171,7 @@ public class TaskService implements ITaskService {
         Preconditions.checkNotNull(taskId);
         Preconditions.checkNotNull(completedAt);
         Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
-        LOGGER.info("Finalize task id: '{}'.", taskId);
+        LOGGER.info("Complete task id: '{}'.", taskId);
 
         final Task task = taskRepository.get(taskId).orElseThrow();
         if (task.hasFinishBarrier()) {
@@ -178,16 +180,18 @@ public class TaskService implements ITaskService {
             final Barrier finishBarrier = barrierRepository.get(task.getFinishBarrier()).orElseThrow();
             if (finishBarrier.isNotReleased()) {
                 LOGGER.debug("Finish barrier is not released.");
+
+                task.unlock();
             } else {
                 LOGGER.debug("Finish barrier is released.");
 
                 final List<Task> childrenTasks = taskRepository.get(finishBarrier.getWaitFor());
-                if (childrenTasks.stream().anyMatch(Task::isAborted)) {
+                if (childrenTasks.stream().anyMatch(Task::isFinalized)) {
                     LOGGER.debug("Task is aborted.");
 
-                    task.abort(completedAt, client);
+                    task.abort(completedAt, CHILDREN_ARE_FINALIZED, client);
                 }
-                if (childrenTasks.stream().allMatch(Task::isFinalized)) {
+                if (childrenTasks.stream().allMatch(Task::isCompleted)) {
                     LOGGER.debug("Task is completed.");
 
                     task.complete(completedAt, client);

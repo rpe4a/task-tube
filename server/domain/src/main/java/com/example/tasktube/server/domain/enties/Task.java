@@ -241,8 +241,8 @@ public class Task {
         // TODO: need to use DOMAIN Exception
         Preconditions.checkNotNull(client);
         Preconditions.checkNotNull(status);
-        Preconditions.checkState(getLock().isLockedBy(client), "The client '%s' can't start task.".formatted(client));
         Preconditions.checkState(getStatus().equals(status), "Status must be %s.".formatted(status));
+        Preconditions.checkState(getLock().isLockedBy(client), "The client '%s' can't start task.".formatted(client));
     }
 
     public void schedule(final Instant scheduledAt, final String client) {
@@ -253,10 +253,11 @@ public class Task {
         }
     }
 
-    public void cancel(final Instant canceledAt, final String client) {
+    public void cancel(final Instant canceledAt, final String failedReason, final String client) {
         if (canCancel(client)) {
             setCanceledAt(canceledAt);
             setStatus(Status.CANCELED);
+            setFailedReason(failedReason);
             unlock();
         }
     }
@@ -317,10 +318,12 @@ public class Task {
         }
     }
 
-    public void abort(final Instant abortedAt, final String client) {
+    public void abort(final Instant abortedAt, final String failedReason, final String client) {
         if (canAbort(client)) {
             setStatus(Status.ABORTED);
             setAbortedAt(abortedAt);
+            setFailedReason(failedReason);
+            unlock();
         }
     }
 
@@ -328,6 +331,7 @@ public class Task {
         if (canComplete(client)) {
             setStatus(Status.COMPLETED);
             setCompletedAt(completedAt);
+            unlock();
         }
     }
 
@@ -358,7 +362,7 @@ public class Task {
                 Instant.now(),
                 Instant.now(),
                 null,
-                null
+                Lock.free()
         );
 
         setStartBarrier(barrier.getId());
@@ -378,7 +382,7 @@ public class Task {
                 Instant.now(),
                 Instant.now(),
                 null,
-                null
+                Lock.free()
         );
 
         setFinishBarrier(barrier.getId());
@@ -457,12 +461,6 @@ public class Task {
         this.abortedAt = abortedAt;
     }
 
-    public boolean isTerminated() {
-        return Status.COMPLETED == getStatus()
-                || Status.ABORTED == getStatus()
-                || Status.CANCELED == getStatus();
-    }
-
     public boolean hasFinishBarrier() {
         return getFinishBarrier() != null;
     }
@@ -471,12 +469,16 @@ public class Task {
         return getStartBarrier() != null;
     }
 
-    public boolean isAborted() {
-        return Status.ABORTED.equals(getStatus());
+    public boolean isCompleted() {
+        return Status.COMPLETED.equals(getStatus());
     }
 
     public boolean isFinalized() {
-        return Status.COMPLETED.equals(getStatus());
+        return Status.ABORTED.equals(getStatus()) || Status.CANCELED.equals(getStatus());
+    }
+
+    public boolean isTerminated() {
+        return isCompleted() || isFinalized();
     }
 
     public Instant getCanceledAt() {

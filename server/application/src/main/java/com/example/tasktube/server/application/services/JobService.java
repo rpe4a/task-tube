@@ -32,7 +32,7 @@ public class JobService implements IJobService {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
         Preconditions.checkNotNull(status);
 
-        return jobRepository.getTaskIdList(status, count, client);
+        return jobRepository.lockTaskIdList(status, count, client);
 
     }
 
@@ -42,6 +42,6 @@ public class JobService implements IJobService {
         Preconditions.checkArgument(count > 0);
         Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
 
-        return jobRepository.getBarrierIdList(count, client);
+        return jobRepository.lockBarrierIdList(count, client);
     }
 }

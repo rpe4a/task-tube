@@ -3,9 +3,7 @@ package com.example.tasktube.server.api;
 import com.example.tasktube.server.application.models.FinishTaskDto;
 import com.example.tasktube.server.application.models.TaskDto;
 import com.example.tasktube.server.application.models.TaskSettingsDto;
-import org.apache.commons.lang3.ThreadUtils;
 
-import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -30,7 +28,7 @@ public class TestUtils {
         return new TaskDto(
                 UUID.randomUUID(),
                 "task" + UUID.randomUUID(),
-                "tube" + UUID.randomUUID(),
+                "tube",
                 Map.of("key", "value"),
                 waitFor,
                 Instant.now(),
