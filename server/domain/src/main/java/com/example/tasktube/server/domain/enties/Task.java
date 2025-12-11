@@ -1,13 +1,14 @@
 package com.example.tasktube.server.domain.enties;
 
+import com.example.tasktube.server.domain.exceptions.ValidationDomainException;
 import com.example.tasktube.server.domain.values.Lock;
 import com.example.tasktube.server.domain.values.TaskSettings;
-import com.google.common.base.Preconditions;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -91,6 +92,12 @@ public class Task {
     }
 
     public Task() {
+    }
+
+    private void checkWaitingTasks(final List<UUID> waitForTaskIds) {
+        if (Objects.isNull(waitForTaskIds) || waitForTaskIds.isEmpty()) {
+            throw new ValidationDomainException("List of waiting tasks cannot be null or empty.");
+        }
     }
 
     public UUID getId() {
@@ -197,148 +204,139 @@ public class Task {
         this.finishedAt = finishedAt;
     }
 
-    private boolean canSchedule(final String client) {
-        canHandleBy(Status.CREATED, client);
-        return true;
+    private void checkSchedule(final String client) {
+        checkHandleBy(Status.CREATED, client);
     }
 
-    private boolean canCancel(final String client) {
-        canHandleBy(Status.CREATED, client);
-        return true;
+    private void checkCancel(final String client) {
+        checkHandleBy(Status.CREATED, client);
     }
 
-    private boolean canStart(final String client) {
-        canHandleBy(Status.SCHEDULED, client);
-        return true;
+    private void checkStart(final String client) {
+        checkHandleBy(Status.SCHEDULED, client);
     }
 
-    private boolean canProcess(final String client) {
-        canHandleBy(Status.PROCESSING, client);
-        return true;
+    private void checkProcess(final String client) {
+        checkHandleBy(Status.PROCESSING, client);
     }
 
-    private boolean canFinish(final Map<String, Object> output, final String client) {
-        Preconditions.checkNotNull(output);
-        canHandleBy(Status.PROCESSING, client);
-        return true;
+    private void checkFinish(final Map<String, Object> output, final String client) {
+        if (Objects.isNull(output)) {
+            throw new ValidationDomainException("Task output cannot be null.");
+        }
+        checkHandleBy(Status.PROCESSING, client);
     }
 
-    private boolean canFail(final String client) {
-        canHandleBy(Status.PROCESSING, client);
-        return true;
+    private void checkFail(final String client) {
+        checkHandleBy(Status.PROCESSING, client);
     }
 
-    private boolean canAbort(final String client) {
-        canHandleBy(Status.FINISHED, client);
-        return true;
+    private void checkAbort(final String client) {
+        checkHandleBy(Status.FINISHED, client);
     }
 
-    private boolean canComplete(final String client) {
-        canHandleBy(Status.FINISHED, client);
-        return true;
+    private void checkComplete(final String client) {
+        checkHandleBy(Status.FINISHED, client);
     }
 
-    private void canHandleBy(final Status status, final String client) {
-        // TODO: need to use DOMAIN Exception
-        Preconditions.checkNotNull(client);
-        Preconditions.checkNotNull(status);
-        Preconditions.checkState(getStatus().equals(status), "Status must be %s.".formatted(status));
-        Preconditions.checkState(getLock().isLockedBy(client), "The client '%s' can't start task.".formatted(client));
+    private void checkHandleBy(final Status expectedStatus, final String client) {
+        if (Objects.isNull(client)) {
+            throw new ValidationDomainException("Client cannot be null.");
+        }
+        if (Objects.isNull(expectedStatus)) {
+            throw new ValidationDomainException("Expected status cannot be null.");
+        }
+        if (getStatus().isNotEqual(expectedStatus)) {
+            throw new ValidationDomainException("Invalid task state. Expected '%s' but was '%s'.".formatted(expectedStatus, getStatus()));
+        }
+        if (!getLock().isLockedBy(client)) {
+            throw new ValidationDomainException("Task is not locked by the client '%s'.".formatted(client));
+        }
     }
 
     public void schedule(final Instant scheduledAt, final String client) {
-        if (canSchedule(client)) {
-            setStatus(Status.SCHEDULED);
-            setScheduledAt(scheduledAt);
-            unlock();
-        }
+        checkSchedule(client);
+        setStatus(Status.SCHEDULED);
+        setScheduledAt(scheduledAt);
+        unlock();
     }
 
     public void cancel(final Instant canceledAt, final String failedReason, final String client) {
-        if (canCancel(client)) {
-            setCanceledAt(canceledAt);
-            setStatus(Status.CANCELED);
-            setFailedReason(failedReason);
-            unlock();
-        }
+        checkCancel(client);
+        setCanceledAt(canceledAt);
+        setStatus(Status.CANCELED);
+        setFailedReason(failedReason);
+        unlock();
     }
 
     public void start(final Instant startedAt, final String client) {
-//        Preconditions.checkNotNull(client);
-//        Preconditions.checkNotNull(startedAt);
-//        Preconditions.checkState(getLock().isFree(), "The client '%s' can't start locked task '{}'.".formatted(client, getLock()));
-//        Preconditions.checkState(Status.SCHEDULED.equals(getStatus()), "Status must be %s.".formatted(getStatus()));
-        if (canStart(client)) {
-            setStartedAt(startedAt);
-            setStatus(Status.PROCESSING);
-            setLock(getLock().prolong());
-        }
+        checkStart(client);
+        setStartedAt(startedAt);
+        setStatus(Status.PROCESSING);
+        setLock(getLock().prolong());
     }
 
     public void process(final Instant heartbeatAt, final String client) {
-        if (canProcess(client)) {
-            setHeartbeatAt(heartbeatAt);
-            setStatus(Status.PROCESSING);
-            setLock(getLock().prolong());
-        }
+        checkProcess(client);
+        setHeartbeatAt(heartbeatAt);
+        setStatus(Status.PROCESSING);
+        setLock(getLock().prolong());
     }
 
     public void finish(final Instant finishedAt, final Map<String, Object> output, final String client) {
-        if (canFinish(output, client)) {
-            setFinishedAt(finishedAt);
-            setStatus(Status.FINISHED);
-            setOutput(output);
-            unlock();
-        }
+        checkFinish(output, client);
+        setFinishedAt(finishedAt);
+        setStatus(Status.FINISHED);
+        setOutput(output);
+        unlock();
     }
 
     public void fail(final Instant failedAt, final String failedReason, final String client) {
-        if (canFail(client)) {
-            if (getFailures() < getSettings().maxFailures()) {
-                setStatus(Status.SCHEDULED);
-                setScheduledAt(failedAt.plusSeconds(getSettings().failureRetryTimeoutSeconds()));
-                setStartedAt(null);
-                setHeartbeatAt(null);
-                setFinishedAt(null);
-                setFailedAt(failedAt);
-                setFailures(getFailures() + 1);
-                setFailedReason(failedReason);
-                setFinishBarrier(null);
-                setOutput(null);
-                unlock();
-            } else {
-                setStatus(Status.ABORTED);
-                setAbortedAt(Instant.now());
-                setFinishedAt(null);
-                setFailedAt(failedAt);
-                setFailedReason(failedReason);
-                setFinishBarrier(null);
-                setOutput(null);
-                unlock();
-            }
+        checkFail(client);
+        if (getFailures() < getSettings().maxFailures()) {
+            setStatus(Status.SCHEDULED);
+            setScheduledAt(failedAt.plusSeconds(getSettings().failureRetryTimeoutSeconds()));
+            setStartedAt(null);
+            setHeartbeatAt(null);
+            setFinishedAt(null);
+            setFailedAt(failedAt);
+            setFailures(getFailures() + 1);
+            setFailedReason(failedReason);
+            setFinishBarrier(null);
+            setOutput(null);
+            unlock();
+        } else {
+            setStatus(Status.ABORTED);
+            setAbortedAt(Instant.now());
+            setFinishedAt(null);
+            setFailedAt(failedAt);
+            setFailedReason(failedReason);
+            setFinishBarrier(null);
+            setOutput(null);
+            unlock();
         }
     }
 
     public void abort(final Instant abortedAt, final String failedReason, final String client) {
-        if (canAbort(client)) {
-            setStatus(Status.ABORTED);
-            setAbortedAt(abortedAt);
-            setFailedReason(failedReason);
-            unlock();
-        }
+        checkAbort(client);
+        setStatus(Status.ABORTED);
+        setAbortedAt(abortedAt);
+        setFailedReason(failedReason);
+        unlock();
     }
 
     public void complete(final Instant completedAt, final String client) {
-        if (canComplete(client)) {
-            setStatus(Status.COMPLETED);
-            setCompletedAt(completedAt);
-            unlock();
-        }
+        checkComplete(client);
+        setStatus(Status.COMPLETED);
+        setCompletedAt(completedAt);
+        unlock();
     }
 
-    public Task attachParent(final Task task) {
-        Preconditions.checkNotNull(task);
-        setParentId(task.getId());
+    public Task attachParent(final Task parent) {
+        if (Objects.isNull(parent)) {
+            throw new ValidationDomainException("Cannot attach a parent task.");
+        }
+        setParentId(parent.getId());
         return this;
     }
 
@@ -351,8 +349,7 @@ public class Task {
     }
 
     public Barrier addStartBarrier(final List<UUID> waitForTaskIds) {
-        Preconditions.checkNotNull(waitForTaskIds);
-        Preconditions.checkArgument(!waitForTaskIds.isEmpty());
+        checkWaitingTasks(waitForTaskIds);
 
         final Barrier barrier = new Barrier(
                 UUID.randomUUID(),
@@ -371,8 +368,7 @@ public class Task {
     }
 
     public Barrier addFinishBarrier(final List<UUID> waitForTaskIds) {
-        Preconditions.checkNotNull(waitForTaskIds);
-        Preconditions.checkArgument(!waitForTaskIds.isEmpty());
+        checkWaitingTasks(waitForTaskIds);
 
         final Barrier barrier = new Barrier(
                 UUID.randomUUID(),
@@ -496,7 +492,10 @@ public class Task {
     }
 
     public void unblock(final int lockedTimeoutSeconds) {
-        Preconditions.checkArgument(lockedTimeoutSeconds > 0);
+        if (lockedTimeoutSeconds <= 0) {
+            throw new ValidationDomainException("Lock timeout must be more then zero.");
+        }
+
         final Instant lockedTimeout = Instant.now().minus(lockedTimeoutSeconds, ChronoUnit.SECONDS);
 
         if (getLock().isLockedBefore(lockedTimeout)) {
@@ -536,6 +535,10 @@ public class Task {
         FINISHED,
         ABORTED,
         CANCELED,
-        COMPLETED,
+        COMPLETED;
+
+        public boolean isNotEqual(final Status other) {
+            return !this.equals(other);
+        }
     }
 }

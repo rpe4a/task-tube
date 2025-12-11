@@ -1,11 +1,12 @@
 package com.example.tasktube.server.domain.enties;
 
+import com.example.tasktube.server.domain.exceptions.ValidationDomainException;
 import com.example.tasktube.server.domain.values.Lock;
-import com.google.common.base.Preconditions;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class Barrier {
@@ -80,12 +81,12 @@ public class Barrier {
         return released;
     }
 
-    public boolean isNotReleased() {
-        return !isReleased();
-    }
-
     public void setReleased(final boolean released) {
         this.released = released;
+    }
+
+    public boolean isNotReleased() {
+        return !isReleased();
     }
 
     public Instant getUpdatedAt() {
@@ -121,9 +122,15 @@ public class Barrier {
     }
 
     public void release(final String client) {
-        Preconditions.checkNotNull(client);
-        Preconditions.checkState(getLock().isLockedBy(client), "The client '%s' can't release barrier.".formatted(client));
-        Preconditions.checkState(isNotReleased(), "Barrier is already released.");
+        if (Objects.isNull(client)) {
+            throw new ValidationDomainException("Client cannot be null.");
+        }
+        if (!getLock().isLockedBy(client)) {
+            throw new ValidationDomainException("Barrier is not locked by the client '%s'.".formatted(client));
+        }
+        if (isReleased()) {
+            throw new ValidationDomainException("Barrier is already released.".formatted(client));
+        }
 
         setReleased(true);
         setReleasedAt(Instant.now());
@@ -137,7 +144,10 @@ public class Barrier {
     }
 
     public void unblock(final int lockedTimeoutSeconds) {
-        Preconditions.checkArgument(lockedTimeoutSeconds > 0);
+        if (lockedTimeoutSeconds <= 0) {
+            throw new ValidationDomainException("Lock timeout must be more then zero.");
+        }
+
         final Instant lockedTimeout = Instant.now().minus(lockedTimeoutSeconds, ChronoUnit.SECONDS);
 
         if (getLock().isLockedBefore(lockedTimeout)) {
