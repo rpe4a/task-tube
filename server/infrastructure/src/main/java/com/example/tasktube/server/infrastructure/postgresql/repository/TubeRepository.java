@@ -107,7 +107,7 @@ public class TubeRepository implements ITubeRepository {
 
         final int affected = db.update(insertCommand, mapper.getDataDto(task));
         if (affected > 0) {
-            LOGGER.info("Successfully pushed task with ID: '{}' to tube: '{}'.", task.getId(), task.getTube());
+            LOGGER.debug("Successfully pushed task with ID: '{}' to tube: '{}'.", task.getId(), task.getTube());
         }
         return task;
     }

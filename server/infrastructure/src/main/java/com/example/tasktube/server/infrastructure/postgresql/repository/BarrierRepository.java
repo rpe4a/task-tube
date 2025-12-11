@@ -154,14 +154,14 @@ public class BarrierRepository implements IBarrierRepository {
 
         if (barriers.size() <= BARRIER_PARTITION_SIZE) {
             final int[] affected = db.batchUpdate(insertCommand, getBarrierBatch.apply(barriers));
-            LOGGER.info("Batch saved '{}' barriers. Rows affected: '{}'.", barriers.size(), affected.length);
+            LOGGER.debug("Batch saved '{}' barriers. Rows affected: '{}'.", barriers.size(), affected.length);
             return;
         }
 
         final List<List<Barrier>> partitions = Lists.partition(barriers, BARRIER_PARTITION_SIZE);
         partitions.forEach(partition -> {
             final int[] affected = db.batchUpdate(insertCommand, getBarrierBatch.apply(partition));
-            LOGGER.info("Batch saved partition of '{}' barriers. Rows affected: '{}'.", partition.size(), affected.length);
+            LOGGER.debug("Batch saved partition of '{}' barriers. Rows affected: '{}'.", partition.size(), affected.length);
         });
     }
 }

@@ -126,7 +126,7 @@ public class TaskRepository implements ITaskRepository {
 
         final int affected = db.update(updateCommand, mapper.getDataDto(task));
         if (affected > 0) {
-            LOGGER.info("Task with ID: '{}' updated successfully.", task.getId());
+            LOGGER.debug("Task with ID: '{}' updated successfully.", task.getId());
         }
     }
 }
