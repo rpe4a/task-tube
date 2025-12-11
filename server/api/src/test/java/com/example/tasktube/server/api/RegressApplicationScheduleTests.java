@@ -1,7 +1,7 @@
 package com.example.tasktube.server.api;
 
 import com.example.tasktube.server.application.models.FinishTaskDto;
-import com.example.tasktube.server.application.models.TaskDto;
+import com.example.tasktube.server.application.models.PushTaskDto;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.values.Lock;
@@ -27,63 +27,63 @@ class RegressApplicationScheduleTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldCreatedTaskScheduleWithoutLockFailed() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         assertThatThrownBy(() -> taskService.scheduleTask(taskId, Instant.now(), instanceIdProvider.get()));
     }
 
     @Test
     void shouldCreatedTaskStartFailed() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         assertThatThrownBy(() -> taskService.startTask(taskId, Instant.now(), instanceIdProvider.get()));
     }
 
     @Test
     void shouldCreatedTaskProcessFailed() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         assertThatThrownBy(() -> taskService.processTask(taskId, Instant.now(), instanceIdProvider.get()));
     }
 
     @Test
     void shouldCreatedTaskFinishFailed() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         assertThatThrownBy(() -> taskService.finishTask(new FinishTaskDto(taskId, null, new HashMap<>(), CLIENT, Instant.now())));
     }
 
     @Test
     void shouldCreatedTaskFailFailed() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         assertThatThrownBy(() -> taskService.failTask(taskId, Instant.now(), "fail reason", instanceIdProvider.get()));
     }
 
     @Test
     void shouldCreatedTaskCompleteFailed() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         assertThatThrownBy(() -> taskService.completeTask(taskId, Instant.now(), instanceIdProvider.get()));
     }
 
     @Test
     void shouldScheduledTaskWithoutBarrier() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final Optional<Task> pushTask = taskRepository.get(taskId);
         assertThat(pushTask.isPresent()).isTrue();
@@ -113,9 +113,9 @@ class RegressApplicationScheduleTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldScheduledTaskWithBarrierFail() {
-        final TaskDto taskDto = TestUtils.createTaskDto(List.of(UUID.randomUUID()));
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(List.of(UUID.randomUUID()));
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final Optional<Task> pushTask = taskRepository.get(taskId);
         assertThat(pushTask.isPresent()).isTrue();
@@ -145,9 +145,9 @@ class RegressApplicationScheduleTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldScheduledTaskWithBarrier() {
-        final TaskDto taskDto = TestUtils.createTaskDto(List.of(UUID.randomUUID()));
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(List.of(UUID.randomUUID()));
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final Optional<Task> pushTask = taskRepository.get(taskId);
         assertThat(pushTask.isPresent()).isTrue();

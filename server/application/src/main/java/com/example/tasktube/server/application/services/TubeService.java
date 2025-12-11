@@ -1,7 +1,7 @@
 package com.example.tasktube.server.application.services;
 
 import com.example.tasktube.server.application.models.PopTaskDto;
-import com.example.tasktube.server.application.models.TaskDto;
+import com.example.tasktube.server.application.models.PushTaskDto;
 import com.example.tasktube.server.application.port.in.ITubeService;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
@@ -14,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,15 +35,15 @@ public class TubeService implements ITubeService {
 
     @Override
     @Transactional
-    public UUID push(final TaskDto taskDto) {
-        Preconditions.checkNotNull(taskDto);
-        LOGGER.info("Push task: '{}'.", taskDto);
-        final Task task = taskDto.to(true);
+    public UUID push(final PushTaskDto pushTaskDto) {
+        Preconditions.checkNotNull(pushTaskDto);
+        LOGGER.info("Push task: '{}'.", pushTaskDto);
+        final Task task = pushTaskDto.to(true);
 
-        if (taskDto.waitTasks() != null && !taskDto.waitTasks().isEmpty()) {
-            LOGGER.debug("Task has '{}' waiting tasks.", taskDto.waitTasks().size());
+        if (pushTaskDto.waitTasks() != null && !pushTaskDto.waitTasks().isEmpty()) {
+            LOGGER.debug("Task has '{}' waiting tasks.", pushTaskDto.waitTasks().size());
 
-            final Barrier barrier = task.addStartBarrier(taskDto.waitTasks());
+            final Barrier barrier = task.addStartBarrier(pushTaskDto.waitTasks());
             barrierRepository.save(barrier);
         }
 

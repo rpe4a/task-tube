@@ -1,6 +1,6 @@
 package com.example.tasktube.server.api;
 
-import com.example.tasktube.server.application.models.TaskDto;
+import com.example.tasktube.server.application.models.PushTaskDto;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.values.Lock;
@@ -10,7 +10,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,9 +23,9 @@ class RegressApplicationUnlockBarrierTests extends AbstractRegressApplicationTes
 
     @Test
     void shouldNotGetLockedBarriers() {
-        final TaskDto taskDto = TestUtils.createTaskDto(List.of(UUID.randomUUID(), UUID.randomUUID()));
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(List.of(UUID.randomUUID(), UUID.randomUUID()));
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final Task task = taskRepository.get(taskId).orElseThrow();
         assertThat(task.getStartBarrier()).isNotNull();
@@ -44,9 +43,9 @@ class RegressApplicationUnlockBarrierTests extends AbstractRegressApplicationTes
 
     @Test
     void shouldGetLockedBarriers() {
-        final TaskDto taskDto = TestUtils.createTaskDto(List.of(UUID.randomUUID(), UUID.randomUUID()));
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(List.of(UUID.randomUUID(), UUID.randomUUID()));
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final Task task = taskRepository.get(taskId).orElseThrow();
         assertThat(task.getStartBarrier()).isNotNull();
@@ -64,9 +63,9 @@ class RegressApplicationUnlockBarrierTests extends AbstractRegressApplicationTes
 
     @Test
     void shouldUnlockedCreatedTasks() {
-        final TaskDto taskDto = TestUtils.createTaskDto(List.of(UUID.randomUUID(), UUID.randomUUID()));
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(List.of(UUID.randomUUID(), UUID.randomUUID()));
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final Task task = taskRepository.get(taskId).orElseThrow();
         assertThat(task.getStartBarrier()).isNotNull();

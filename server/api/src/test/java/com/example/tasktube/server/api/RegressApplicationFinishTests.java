@@ -2,7 +2,7 @@ package com.example.tasktube.server.api;
 
 import com.example.tasktube.server.application.models.FinishTaskDto;
 import com.example.tasktube.server.application.models.PopTaskDto;
-import com.example.tasktube.server.application.models.TaskDto;
+import com.example.tasktube.server.application.models.PushTaskDto;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.values.Lock;
@@ -28,16 +28,16 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldFinishedTaskSchedule() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
 
         final UUID createdTaskId = taskIdList.get(0);
         taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
 
-        final Optional<PopTaskDto> popTask = tubeService.pop(taskDto.tube(), CLIENT);
+        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
         final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
 
@@ -60,16 +60,16 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldFinishedTaskProcess() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
 
         final UUID createdTaskId = taskIdList.get(0);
         taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
 
-        final Optional<PopTaskDto> popTask = tubeService.pop(taskDto.tube(), CLIENT);
+        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
         final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
 
@@ -92,16 +92,16 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldFinishedTaskFail() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
 
         final UUID createdTaskId = taskIdList.get(0);
         taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
 
-        final Optional<PopTaskDto> popTask = tubeService.pop(taskDto.tube(), CLIENT);
+        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
         final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
 
@@ -124,16 +124,16 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldFinishedTaskTwoTimes() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
 
         final UUID createdTaskId = taskIdList.get(0);
         taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
 
-        final Optional<PopTaskDto> popTask = tubeService.pop(taskDto.tube(), CLIENT);
+        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
         final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
 
@@ -156,16 +156,16 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldFinishedTaskWithoutChildren() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
 
         final UUID createdTaskId = taskIdList.get(0);
         taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
 
-        final Optional<PopTaskDto> popTask = tubeService.pop(taskDto.tube(), CLIENT);
+        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
         final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
 
@@ -192,16 +192,16 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldFinishedTaskWithOneChildrenWithoutWaitingTasks() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
 
         final UUID createdTaskId = taskIdList.get(0);
         taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
 
-        final Optional<PopTaskDto> popTask = tubeService.pop(taskDto.tube(), CLIENT);
+        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
         final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
 
@@ -213,8 +213,8 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
         final Optional<Task> taskHeartbeat = taskRepository.get(taskProcessing.get().getId());
 
-        final TaskDto child = TestUtils.createTaskDto();
-        final List<TaskDto> children = List.of(child);
+        final PushTaskDto child = TestUtils.createPushTaskDto();
+        final List<PushTaskDto> children = List.of(child);
         final FinishTaskDto finishTask = TestUtils.createFinishTaskDto(
                 taskHeartbeat.get().getId(),
                 CLIENT,
@@ -268,16 +268,16 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldFinishedTaskWithOneChildrenWithWaitingTasks() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
 
         final UUID createdTaskId = taskIdList.get(0);
         taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
 
-        final Optional<PopTaskDto> popTask = tubeService.pop(taskDto.tube(), CLIENT);
+        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
         final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
 
@@ -290,8 +290,8 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
         final Optional<Task> taskHeartbeat = taskRepository.get(taskProcessing.get().getId());
 
         final UUID waitTaskId = UUID.randomUUID();
-        final TaskDto child = TestUtils.createTaskDto(List.of(waitTaskId));
-        final List<TaskDto> children = List.of(child);
+        final PushTaskDto child = TestUtils.createPushTaskDto(List.of(waitTaskId));
+        final List<PushTaskDto> children = List.of(child);
         final FinishTaskDto finishTask = TestUtils.createFinishTaskDto(
                 taskHeartbeat.get().getId(),
                 CLIENT,
@@ -323,16 +323,16 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldFinishedTaskWithTwoChildrenWithWaitingTasks() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
 
         final UUID createdTaskId = taskIdList.get(0);
         taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
 
-        final Optional<PopTaskDto> popTask = tubeService.pop(taskDto.tube(), CLIENT);
+        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
         final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
 
@@ -346,9 +346,9 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
         final UUID waitTaskId1 = UUID.randomUUID();
         final UUID waitTaskId2 = UUID.randomUUID();
-        final TaskDto child1 = TestUtils.createTaskDto(List.of(waitTaskId1));
-        final TaskDto child2 = TestUtils.createTaskDto(List.of(waitTaskId2));
-        final List<TaskDto> children = List.of(child1, child2);
+        final PushTaskDto child1 = TestUtils.createPushTaskDto(List.of(waitTaskId1));
+        final PushTaskDto child2 = TestUtils.createPushTaskDto(List.of(waitTaskId2));
+        final List<PushTaskDto> children = List.of(child1, child2);
         final FinishTaskDto finishTask = TestUtils.createFinishTaskDto(
                 taskHeartbeat.get().getId(),
                 CLIENT,

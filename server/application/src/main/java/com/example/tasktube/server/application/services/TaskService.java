@@ -43,15 +43,6 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
-    public Optional<Task> getTaskById(final UUID taskId) {
-        Preconditions.checkNotNull(taskId);
-        LOGGER.info("Get task by id: '{}'.", taskId);
-
-        return taskRepository.get(taskId);
-    }
-
-    @Override
-    @Transactional
     public void scheduleTask(final UUID taskId, final Instant scheduledAt, final String client) {
         Preconditions.checkNotNull(taskId);
         Preconditions.checkNotNull(scheduledAt);

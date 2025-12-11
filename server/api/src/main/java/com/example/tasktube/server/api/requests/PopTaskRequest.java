@@ -1,5 +1,9 @@
 package com.example.tasktube.server.api.requests;
 
-public record PopTaskRequest(String client) {
+import jakarta.validation.constraints.NotBlank;
+
+public record PopTaskRequest(
+        @NotBlank String client
+) {
 }
 

@@ -10,7 +10,7 @@ import java.util.UUID;
 
 public record FinishTaskDto(
         @NonNull UUID taskId,
-        @Nullable List<TaskDto> children,
+        @Nullable List<PushTaskDto> children,
         @NonNull Map<String, Object> output,
         @NonNull String client,
         @NonNull Instant finishedAt

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public record TaskDto(
+public record PushTaskDto(
         @NonNull UUID id,
         @NonNull String name,
         @NonNull String tube,

@@ -5,10 +5,10 @@ import com.example.tasktube.server.api.requests.FinishTaskRequest;
 import com.example.tasktube.server.api.requests.ProcessTaskRequest;
 import com.example.tasktube.server.api.requests.StartTaskRequest;
 import com.example.tasktube.server.application.port.in.ITaskService;
-import com.example.tasktube.server.domain.enties.Task;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -18,13 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Objects;
 import java.util.UUID;
 
-// ADD responseDto
-
 @RestController()
 @RequestMapping(path = "/api/v1/task")
-public final class TaskController {
+public final class TaskController extends AbstractController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskController.class);
     private final ITaskService taskService;
 
     public TaskController(
@@ -34,38 +31,15 @@ public final class TaskController {
     }
 
     @RequestMapping(
-            value = "/{id}",
-            method = RequestMethod.GET
-    )
-    public ResponseEntity<Task> get(
-            @PathVariable("id") final UUID taskId
-    ) {
-        if (Objects.isNull(taskId)) {
-            LOGGER.info("Parameter taskId is invalid.");
-            return ResponseEntity.badRequest().build();
-        }
-
-        return taskService
-                .getTaskById(taskId)
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
-    @RequestMapping(
             value = "/{id}/start",
             method = RequestMethod.POST
     )
     public ResponseEntity<Void> start(
             @PathVariable("id") final UUID taskId,
-            @RequestBody final StartTaskRequest request
+            @NotNull @Valid @RequestBody final StartTaskRequest request,
+            final BindingResult result
     ) {
-        if (Objects.isNull(taskId)) {
-            LOGGER.info("Parameter taskId is invalid.");
-            return ResponseEntity.badRequest().build();
-        }
-
-        if (Objects.isNull(request)) {
-            LOGGER.info("Parameter request is invalid.");
+        if (isNotValid(result)) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -80,15 +54,10 @@ public final class TaskController {
     )
     public ResponseEntity<Void> process(
             @PathVariable("id") final UUID taskId,
-            @RequestBody final ProcessTaskRequest request
+            @NotNull @Valid @RequestBody final ProcessTaskRequest request,
+            final BindingResult result
     ) {
-        if (Objects.isNull(taskId)) {
-            LOGGER.info("Parameter taskId is invalid.");
-            return ResponseEntity.badRequest().build();
-        }
-
-        if (Objects.isNull(request)) {
-            LOGGER.info("Parameter request is invalid.");
+        if (isNotValid(result)) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -103,15 +72,10 @@ public final class TaskController {
     )
     public ResponseEntity<Void> finish(
             @PathVariable("id") final UUID taskId,
-            @RequestBody final FinishTaskRequest request
+            @NotNull @Valid @RequestBody final FinishTaskRequest request,
+            final BindingResult result
     ) {
-        if (Objects.isNull(taskId)) {
-            LOGGER.info("Parameter taskId is invalid.");
-            return ResponseEntity.badRequest().build();
-        }
-
-        if (Objects.isNull(request)) {
-            LOGGER.info("Parameter request is invalid.");
+        if (isNotValid(result)) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -126,15 +90,10 @@ public final class TaskController {
     )
     public ResponseEntity<Void> fail(
             @PathVariable("id") final UUID taskId,
-            @RequestBody final FailTaskRequest request
+            @NotNull @Valid @RequestBody final FailTaskRequest request,
+            final BindingResult result
     ) {
-        if (Objects.isNull(taskId)) {
-            LOGGER.info("Parameter taskId is invalid.");
-            return ResponseEntity.badRequest().build();
-        }
-
-        if (Objects.isNull(request)) {
-            LOGGER.info("Parameter request is invalid.");
+        if (isNotValid(result)) {
             return ResponseEntity.badRequest().build();
         }
 

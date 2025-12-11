@@ -1,7 +1,7 @@
 package com.example.tasktube.server.api;
 
 import com.example.tasktube.server.application.models.PopTaskDto;
-import com.example.tasktube.server.application.models.TaskDto;
+import com.example.tasktube.server.application.models.PushTaskDto;
 import com.example.tasktube.server.domain.enties.Task;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,16 +24,16 @@ class RegressApplicationStartTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldStartTask() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
 
         final UUID createdTaskId = taskIdList.get(0);
         taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
 
-        final Optional<PopTaskDto> popTask = tubeService.pop(taskDto.tube(), CLIENT);
+        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
         final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
         assertThat(taskPopped.isEmpty()).isFalse();
@@ -52,16 +52,16 @@ class RegressApplicationStartTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldStartTaskOneTime() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
 
         final UUID createdTaskId = taskIdList.get(0);
         taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
 
-        final Optional<PopTaskDto> popTask = tubeService.pop(taskDto.tube(), CLIENT);
+        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
         final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
         assertThat(taskPopped.isEmpty()).isFalse();
@@ -74,16 +74,16 @@ class RegressApplicationStartTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldStartTaskDifferentClientFailed() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
 
         final UUID createdTaskId = taskIdList.get(0);
         taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
 
-        final Optional<PopTaskDto> popTask = tubeService.pop(taskDto.tube(), CLIENT);
+        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
         final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
         assertThat(taskPopped.isEmpty()).isFalse();
@@ -93,16 +93,16 @@ class RegressApplicationStartTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldStartTaskScheduleFailed() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
 
         final UUID createdTaskId = taskIdList.get(0);
         taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
 
-        final Optional<PopTaskDto> popTask = tubeService.pop(taskDto.tube(), CLIENT);
+        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
         final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
         assertThat(taskPopped.isEmpty()).isFalse();
@@ -112,16 +112,16 @@ class RegressApplicationStartTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldStartTaskCompleteFailed() {
-        final TaskDto taskDto = TestUtils.createTaskDto();
+        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(taskDto);
+        final UUID taskId = tubeService.push(pushTaskDto);
 
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
 
         final UUID createdTaskId = taskIdList.get(0);
         taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
 
-        final Optional<PopTaskDto> popTask = tubeService.pop(taskDto.tube(), CLIENT);
+        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
         final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
         assertThat(taskPopped.isEmpty()).isFalse();

@@ -1,7 +1,7 @@
 package com.example.tasktube.server.api;
 
 import com.example.tasktube.server.application.models.FinishTaskDto;
-import com.example.tasktube.server.application.models.TaskDto;
+import com.example.tasktube.server.application.models.PushTaskDto;
 import com.example.tasktube.server.application.models.TaskSettingsDto;
 
 import java.time.Instant;
@@ -12,20 +12,20 @@ import java.util.concurrent.TimeUnit;
 
 public class TestUtils {
 
-    public static TaskDto createTaskDto() {
-        return createTaskDto(null, null);
+    public static PushTaskDto createPushTaskDto() {
+        return createPushTaskDto(null, null);
     }
 
-    public static TaskDto createTaskDto(final TaskSettingsDto taskSettingsDto) {
-        return createTaskDto(null, taskSettingsDto);
+    public static PushTaskDto createPushTaskDto(final TaskSettingsDto taskSettingsDto) {
+        return createPushTaskDto(null, taskSettingsDto);
     }
 
-    public static TaskDto createTaskDto(final List<UUID> waitFor) {
-        return createTaskDto(waitFor, null);
+    public static PushTaskDto createPushTaskDto(final List<UUID> waitFor) {
+        return createPushTaskDto(waitFor, null);
     }
 
-    public static TaskDto createTaskDto(final List<UUID> waitFor, final TaskSettingsDto taskSettingsDto) {
-        return new TaskDto(
+    public static PushTaskDto createPushTaskDto(final List<UUID> waitFor, final TaskSettingsDto taskSettingsDto) {
+        return new PushTaskDto(
                 UUID.randomUUID(),
                 "task" + UUID.randomUUID(),
                 "tube",
@@ -40,7 +40,7 @@ public class TestUtils {
         return createFinishTaskDto(taskId, client, null);
     }
 
-    public static FinishTaskDto createFinishTaskDto(final UUID taskId, final String client, final List<TaskDto> children) {
+    public static FinishTaskDto createFinishTaskDto(final UUID taskId, final String client, final List<PushTaskDto> children) {
         return new FinishTaskDto(taskId, children, Map.of("key", "value"), client, Instant.now());
     }
 
