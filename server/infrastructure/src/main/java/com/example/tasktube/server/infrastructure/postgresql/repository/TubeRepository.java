@@ -101,11 +101,14 @@ public class TubeRepository implements ITubeRepository {
         if (Objects.isNull(task)) {
             throw new ApplicationException("Parameter task cannot be null.");
         }
+        LOGGER.debug("Attempting to push task '{}'.", task);
 
         final String insertCommand = getInsertCommand();
 
-        db.update(insertCommand, mapper.getDataDto(task));
-
+        final int affected = db.update(insertCommand, mapper.getDataDto(task));
+        if (affected > 0) {
+            LOGGER.info("Successfully pushed task with ID: '{}' to tube: '{}'.", task.getId(), task.getTube());
+        }
         return task;
     }
 
@@ -114,7 +117,7 @@ public class TubeRepository implements ITubeRepository {
         if (Objects.isNull(tasks) || tasks.isEmpty()) {
             throw new ApplicationException("Parameter tasks cannot be null or empty.");
         }
-        LOGGER.debug("Tasks count: '{}'.", tasks.size());
+        LOGGER.debug("Attempting to push list of '{}' tasks.", tasks.size());
 
         if (tasks.size() == 1) {
             push(tasks.getFirst());
@@ -130,12 +133,16 @@ public class TubeRepository implements ITubeRepository {
                         .toArray(Map[]::new);
 
         if (tasks.size() <= TASK_PARTITION_SIZE) {
-            db.batchUpdate(insertCommand, getTasksBatch.apply(tasks));
+            final int[] affected = db.batchUpdate(insertCommand, getTasksBatch.apply(tasks));
+            LOGGER.debug("Batch pushed '{}' tasks. Rows affected: '{}'.", tasks.size(), affected.length);
             return;
         }
 
         final List<List<Task>> partitions = Lists.partition(tasks, TASK_PARTITION_SIZE);
-        partitions.forEach(partition -> db.batchUpdate(insertCommand, getTasksBatch.apply(partition)));
+        partitions.forEach(partition -> {
+            final int[] affected = db.batchUpdate(insertCommand, getTasksBatch.apply(partition));
+            LOGGER.debug("Batch pushed partition of '{}' tasks. Rows affected: '{}'.", partition.size(), affected.length);
+        });
     }
 
     @Override
@@ -146,6 +153,7 @@ public class TubeRepository implements ITubeRepository {
         if (Strings.isEmpty(client)) {
             throw new ApplicationException("Parameter client cannot be null or empty.");
         }
+        LOGGER.debug("Attempting to pop task from tube: '{}' by client: '{}'.", tube, client);
 
         final String queryCommand = """
                     WITH locked_task
@@ -174,7 +182,8 @@ public class TubeRepository implements ITubeRepository {
         final ResultSetExtractor<Optional<Task>> rsExtractor = rs -> {
             if (rs.next()) {
                 try {
-                    return Optional.of(mapper.getTask(rs));
+                    final Task poppedTask = mapper.getTask(rs);
+                    return Optional.of(poppedTask);
                 } catch (final JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }

@@ -35,6 +35,7 @@ public class JobRepository implements IJobRepository {
         if (Strings.isEmpty(client)) {
             throw new ApplicationException("Parameter client cannot be null or empty.");
         }
+        LOGGER.debug("Attempting to lock '{}' barrier IDs by client '{}'.", count, client);
 
         final String queryCommand = """
                     WITH locked_barriers
@@ -61,7 +62,10 @@ public class JobRepository implements IJobRepository {
 
         final RowMapper<UUID> rsMapper = (rs, rowNum) -> rs.getObject("id", UUID.class);
 
-        return db.query(queryCommand, Map.of("locked_by", client, "count", count), rsMapper);
+        final List<UUID> lockedIds = db.query(queryCommand, Map.of("locked_by", client, "count", count), rsMapper);
+        LOGGER.debug("Locked '{}' barrier IDs by client '{}'.", lockedIds.size(), client);
+
+        return lockedIds;
     }
 
     @Override
@@ -72,6 +76,8 @@ public class JobRepository implements IJobRepository {
         if (Strings.isEmpty(client)) {
             throw new ApplicationException("Parameter client cannot be null or empty.");
         }
+        LOGGER.debug("Attempting to lock '{}' task IDs with status '{}' by client '{}'.", count, status, client);
+
 
         final String queryCommand = """
                     WITH locked_task
@@ -97,7 +103,7 @@ public class JobRepository implements IJobRepository {
 
         final RowMapper<UUID> rsMapper = (rs, rowNum) -> rs.getObject("id", UUID.class);
 
-        return db.query(
+        final List<UUID> lockedIds = db.query(
                 queryCommand,
                 Map.of(
                         "locked_by", client,
@@ -106,6 +112,9 @@ public class JobRepository implements IJobRepository {
                 ),
                 rsMapper
         );
+        LOGGER.debug("Locked '{}' task IDs with status '{}' by client '{}'.", lockedIds.size(), status, client);
+
+        return lockedIds;
     }
 
     @Override
@@ -116,6 +125,7 @@ public class JobRepository implements IJobRepository {
         if (lockedTimeoutSeconds <= 0) {
             throw new ApplicationException("Parameter lockedTimeoutSeconds must be more than zero.");
         }
+        LOGGER.debug("Attempting to get '{}' locked task IDs.", count);
 
         final String queryCommand = """
                     SELECT id
@@ -127,7 +137,7 @@ public class JobRepository implements IJobRepository {
 
         final RowMapper<UUID> rsMapper = (rs, rowNum) -> rs.getObject("id", UUID.class);
 
-        return db.query(
+        final List<UUID> taskIds = db.query(
                 queryCommand,
                 Map.of(
                         "count", count,
@@ -135,6 +145,9 @@ public class JobRepository implements IJobRepository {
                 ),
                 rsMapper
         );
+        LOGGER.debug("Got '{}' locked task IDs.", taskIds.size());
+
+        return taskIds;
     }
 
     @Override
@@ -145,6 +158,7 @@ public class JobRepository implements IJobRepository {
         if (lockedTimeoutSeconds <= 0) {
             throw new ApplicationException("Parameter lockedTimeoutSeconds must be more than zero.");
         }
+        LOGGER.debug("Attempting to get '{}' locked barrier IDs.", count);
 
         final String queryCommand = """
                     SELECT id
@@ -156,7 +170,7 @@ public class JobRepository implements IJobRepository {
 
         final RowMapper<UUID> rsMapper = (rs, rowNum) -> rs.getObject("id", UUID.class);
 
-        return db.query(
+        final List<UUID> barrierIds = db.query(
                 queryCommand,
                 Map.of(
                         "count", count,
@@ -164,5 +178,8 @@ public class JobRepository implements IJobRepository {
                 ),
                 rsMapper
         );
+        LOGGER.debug("Got '{}' locked barrier IDs.", barrierIds.size());
+
+        return barrierIds;
     }
 }

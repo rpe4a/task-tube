@@ -70,10 +70,14 @@ public class BarrierRepository implements IBarrierRepository {
         if (Objects.isNull(barrier)) {
             throw new ApplicationException("Parameter barrier cannot be null.");
         }
+        LOGGER.debug("Attempting to save barrier: '{}'.", barrier);
 
         final String insertCommand = getInsertCommand();
 
-        db.update(insertCommand, mapper.getDataDto(barrier, db.getJdbcOperations()));
+        final int affected = db.update(insertCommand, mapper.getDataDto(barrier, db.getJdbcOperations()));
+        if (affected > 0) {
+            LOGGER.debug("Barrier with ID: '{}' saved successfully.", barrier.getId());
+        }
     }
 
     @Override
@@ -81,6 +85,7 @@ public class BarrierRepository implements IBarrierRepository {
         if (Objects.isNull(barrierId)) {
             throw new ApplicationException("Parameter barrierId cannot be null.");
         }
+        LOGGER.debug("Attempting to get barrier by ID: '{}'.", barrierId);
 
         final String queryCommand = """
                     SELECT * FROM barriers
@@ -89,7 +94,8 @@ public class BarrierRepository implements IBarrierRepository {
 
         final ResultSetExtractor<Optional<Barrier>> rsExtractor = rs -> {
             if (rs.next()) {
-                return Optional.of(mapper.getBarrier(rs));
+                final Barrier barrier = mapper.getBarrier(rs);
+                return Optional.of(barrier);
             } else {
                 return Optional.empty();
             }
@@ -103,6 +109,7 @@ public class BarrierRepository implements IBarrierRepository {
         if (Objects.isNull(barrier)) {
             throw new ApplicationException("parameter barrier cannot be null.");
         }
+        LOGGER.debug("Attempting to update barrier: '{}'.", barrier);
 
         final String updateCommand = """
                     UPDATE barriers
@@ -119,7 +126,10 @@ public class BarrierRepository implements IBarrierRepository {
                     WHERE id = :id
                 """;
 
-        db.update(updateCommand, mapper.getDataDto(barrier, db.getJdbcOperations()));
+        final int affected = db.update(updateCommand, mapper.getDataDto(barrier, db.getJdbcOperations()));
+        if (affected > 0) {
+            LOGGER.debug("Barrier with ID: '{}' updated successfully.", barrier.getId());
+        }
     }
 
     @Override
@@ -127,7 +137,7 @@ public class BarrierRepository implements IBarrierRepository {
         if (Objects.isNull(barriers) || barriers.isEmpty()) {
             throw new ApplicationException("Parameter barrier list cannot be null or empty.");
         }
-        LOGGER.debug("Barriers count: '{}'.", barriers.size());
+        LOGGER.debug("Attempting to save '{}' barriers.", barriers.size());
 
         if (barriers.size() == 1) {
             save(barriers.getFirst());
@@ -143,11 +153,15 @@ public class BarrierRepository implements IBarrierRepository {
                         .toArray(Map[]::new);
 
         if (barriers.size() <= BARRIER_PARTITION_SIZE) {
-            db.batchUpdate(insertCommand, getBarrierBatch.apply(barriers));
+            final int[] affected = db.batchUpdate(insertCommand, getBarrierBatch.apply(barriers));
+            LOGGER.info("Batch saved '{}' barriers. Rows affected: '{}'.", barriers.size(), affected.length);
             return;
         }
 
         final List<List<Barrier>> partitions = Lists.partition(barriers, BARRIER_PARTITION_SIZE);
-        partitions.forEach(partition -> db.batchUpdate(insertCommand, getBarrierBatch.apply(partition)));
+        partitions.forEach(partition -> {
+            final int[] affected = db.batchUpdate(insertCommand, getBarrierBatch.apply(partition));
+            LOGGER.info("Batch saved partition of '{}' barriers. Rows affected: '{}'.", partition.size(), affected.length);
+        });
     }
 }

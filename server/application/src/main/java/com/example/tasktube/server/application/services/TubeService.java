@@ -40,6 +40,7 @@ public class TubeService implements ITubeService {
             throw new ApplicationException("Parameter pushTaskDto cannot be null.");
         }
         LOGGER.info("Push task: '{}'.", pushTaskDto);
+
         final Task task = pushTaskDto.to(true);
 
         if (pushTaskDto.waitTasks() != null && !pushTaskDto.waitTasks().isEmpty()) {

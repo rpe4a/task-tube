@@ -38,6 +38,7 @@ public class TaskRepository implements ITaskRepository {
         if (Objects.isNull(id)) {
             throw new ApplicationException("Parameter taskId cannot be null.");
         }
+        LOGGER.debug("Attempting to get task by ID: '{}'.", id);
 
         final String queryCommand = """
                     SELECT * FROM tasks
@@ -47,7 +48,8 @@ public class TaskRepository implements ITaskRepository {
         final ResultSetExtractor<Optional<Task>> rsExtractor = rs -> {
             if (rs.next()) {
                 try {
-                    return Optional.of(mapper.getTask(rs));
+                    final Task task = mapper.getTask(rs);
+                    return Optional.of(task);
                 } catch (final JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
@@ -64,6 +66,7 @@ public class TaskRepository implements ITaskRepository {
         if (Objects.isNull(taskIdList) || taskIdList.isEmpty()) {
             throw new ApplicationException("Parameter taskIdList cannot be null or empty.");
         }
+        LOGGER.debug("Attempting to get '{}' tasks by IDs: '{}'.", taskIdList.size(), taskIdList);
 
         final String queryCommand = """
                     SELECT * FROM tasks
@@ -78,7 +81,10 @@ public class TaskRepository implements ITaskRepository {
             }
         };
 
-        return db.query(queryCommand, Map.of("ids", taskIdList), rsMapper);
+        final List<Task> tasks = db.query(queryCommand, Map.of("ids", taskIdList), rsMapper);
+        LOGGER.debug("Got '{}' tasks.", tasks.size());
+
+        return tasks;
     }
 
     @Override
@@ -86,6 +92,7 @@ public class TaskRepository implements ITaskRepository {
         if (Objects.isNull(task)) {
             throw new ApplicationException("Parameter task cannot be null.");
         }
+        LOGGER.debug("Attempting to update task: '{}'.", task);
 
         final String updateCommand = """
                     UPDATE tasks
@@ -117,6 +124,9 @@ public class TaskRepository implements ITaskRepository {
                     WHERE id = :id
                 """;
 
-        db.update(updateCommand, mapper.getDataDto(task));
+        final int affected = db.update(updateCommand, mapper.getDataDto(task));
+        if (affected > 0) {
+            LOGGER.info("Task with ID: '{}' updated successfully.", task.getId());
+        }
     }
 }

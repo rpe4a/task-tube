@@ -38,6 +38,8 @@ public class JobService implements IJobService {
         if (Objects.isNull(status)) {
             throw new ApplicationException("Parameter status cannot be null.");
         }
+        LOGGER.info("Client '{}' tries to lock '{}' tasks with status: '{}'.", client, count, status);
+
         return jobRepository.lockTaskIdList(status, count, client);
     }
 
@@ -50,6 +52,8 @@ public class JobService implements IJobService {
         if (lockedTimeoutSeconds <= 0) {
             throw new ApplicationException("Parameter lockedTimeoutSeconds must be  more than zero.");
         }
+        LOGGER.info("Try get '{}' locked tasks.", count);
+
         return jobRepository.getLockedTaskIdList(count, lockedTimeoutSeconds);
     }
 
@@ -62,6 +66,8 @@ public class JobService implements IJobService {
         if (Strings.isNullOrEmpty(client)) {
             throw new ApplicationException("Parameter client cannot be null or empty.");
         }
+        LOGGER.info("Client '{}' tries to lock '{}' barriers.", client, count);
+
         return jobRepository.lockBarrierIdList(count, client);
     }
 
@@ -74,6 +80,8 @@ public class JobService implements IJobService {
         if (lockedTimeoutSeconds <= 0) {
             throw new ApplicationException("Parameter lockedTimeoutSeconds must be more than zero.");
         }
+        LOGGER.info("Try get '{}' locked barriers.", count);
+
         return jobRepository.getLockedBarrierIdList(count, lockedTimeoutSeconds);
     }
 }
