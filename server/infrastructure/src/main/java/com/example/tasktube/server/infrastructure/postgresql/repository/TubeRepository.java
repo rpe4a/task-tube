@@ -1,10 +1,10 @@
 package com.example.tasktube.server.infrastructure.postgresql.repository;
 
+import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskDataMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
@@ -12,17 +12,19 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
 @Repository
 public class TubeRepository implements ITubeRepository {
     public static final int TASK_PARTITION_SIZE = 1000;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TubeRepository.class);
+
     private final NamedParameterJdbcTemplate db;
     private final TaskDataMapper mapper;
 
@@ -30,8 +32,8 @@ public class TubeRepository implements ITubeRepository {
             final NamedParameterJdbcTemplate db,
             final TaskDataMapper mapper
     ) {
-        this.db = db;
-        this.mapper = mapper;
+        this.db = Objects.requireNonNull(db);
+        this.mapper = Objects.requireNonNull(mapper);
     }
 
     private static String getInsertCommand() {
@@ -96,7 +98,9 @@ public class TubeRepository implements ITubeRepository {
 
     @Override
     public Task push(final Task task) {
-        Preconditions.checkNotNull(task);
+        if (Objects.isNull(task)) {
+            throw new ApplicationException("Parameter task cannot be null.");
+        }
 
         final String insertCommand = getInsertCommand();
 
@@ -107,8 +111,9 @@ public class TubeRepository implements ITubeRepository {
 
     @Override
     public void push(final List<Task> tasks) {
-        Preconditions.checkNotNull(tasks);
-        Preconditions.checkArgument(!tasks.isEmpty());
+        if (Objects.isNull(tasks) || tasks.isEmpty()) {
+            throw new ApplicationException("Parameter tasks cannot be null or empty.");
+        }
         LOGGER.debug("Tasks count: '{}'.", tasks.size());
 
         if (tasks.size() == 1) {
@@ -134,9 +139,13 @@ public class TubeRepository implements ITubeRepository {
     }
 
     @Override
-    public Optional<Task> pop(final String tube, final String lockedBy) {
-        Preconditions.checkArgument(Strings.isNotEmpty(tube));
-        Preconditions.checkArgument(Strings.isNotEmpty(lockedBy));
+    public Optional<Task> pop(final String tube, final String client) {
+        if (Strings.isEmpty(tube)) {
+            throw new ApplicationException("Paramter tube cannot be null or empty.");
+        }
+        if (Strings.isEmpty(client)) {
+            throw new ApplicationException("Parameter client cannot be null or empty.");
+        }
 
         final String queryCommand = """
                     WITH locked_task
@@ -174,6 +183,6 @@ public class TubeRepository implements ITubeRepository {
             }
         };
 
-        return db.query(queryCommand, Map.of("tube", tube, "locked_by", lockedBy), rsExtractor);
+        return db.query(queryCommand, Map.of("tube", tube, "locked_by", client), rsExtractor);
     }
 }

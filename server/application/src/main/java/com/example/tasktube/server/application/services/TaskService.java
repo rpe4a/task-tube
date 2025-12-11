@@ -1,5 +1,6 @@
 package com.example.tasktube.server.application.services;
 
+import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.application.models.FinishTaskDto;
 import com.example.tasktube.server.application.port.in.ITaskService;
 import com.example.tasktube.server.domain.enties.Barrier;
@@ -7,7 +8,6 @@ import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +18,14 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class TaskService implements ITaskService {
-    private static final Logger LOGGER = LoggerFactory.getLogger(TaskService.class);
     public static final String CHILDREN_ARE_FINALIZED = "Some children are finalized.";
     public static final String WAITING_TASKS_ARE_FINALIZED = "Some waiting tasks are finalized.";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskService.class);
 
     private final ITubeRepository tubeRepository;
     private final ITaskRepository taskRepository;
@@ -44,9 +44,15 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional
     public void scheduleTask(final UUID taskId, final Instant scheduledAt, final String client) {
-        Preconditions.checkNotNull(taskId);
-        Preconditions.checkNotNull(scheduledAt);
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
+        if (Objects.isNull(taskId)) {
+            throw new ApplicationException("Parameter taskId cannot be null.");
+        }
+        if (Objects.isNull(scheduledAt)) {
+            throw new ApplicationException("Parameter scheduledAt cannot be null.");
+        }
+        if (Strings.isNullOrEmpty(client)) {
+            throw new ApplicationException("Parameter client cannot be null or empty.");
+        }
         LOGGER.info("Schedule task id: '{}'.", taskId);
 
         final Task task = taskRepository.get(taskId).orElseThrow();
@@ -85,9 +91,15 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional
     public void startTask(final UUID taskId, final Instant startedAt, final String client) {
-        Preconditions.checkNotNull(taskId);
-        Preconditions.checkNotNull(startedAt);
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
+        if (Objects.isNull(taskId)) {
+            throw new ApplicationException("Parameter taskId cannot be null.");
+        }
+        if (Objects.isNull(startedAt)) {
+            throw new ApplicationException("Parameter startedAt cannot be null.");
+        }
+        if (Strings.isNullOrEmpty(client)) {
+            throw new ApplicationException("Parameter client cannot be null or empty.");
+        }
         LOGGER.info("Start task id: '{}'.", taskId);
 
         final Task task = taskRepository.get(taskId).orElseThrow();
@@ -100,9 +112,15 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional
     public void processTask(final UUID taskId, final Instant processedAt, final String client) {
-        Preconditions.checkNotNull(taskId);
-        Preconditions.checkNotNull(processedAt);
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
+        if (Objects.isNull(taskId)) {
+            throw new ApplicationException("Parameter taskId cannot be null.");
+        }
+        if (Objects.isNull(processedAt)) {
+            throw new ApplicationException("Parameter processedAt cannot be null.");
+        }
+        if (Strings.isNullOrEmpty(client)) {
+            throw new ApplicationException("Parameter client cannot be null or empty.");
+        }
         LOGGER.info("Process task id: '{}'.", taskId);
 
         final Task task = taskRepository.get(taskId).orElseThrow();
@@ -115,7 +133,9 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional
     public void finishTask(final FinishTaskDto taskDto) {
-        Preconditions.checkNotNull(taskDto);
+        if (Objects.isNull(taskDto)) {
+            throw new ApplicationException("Parameter taskDto cannot be null.");
+        }
         LOGGER.info("Finish task id: '{}'.", taskDto.taskId());
 
         final Task task = taskRepository.get(taskDto.taskId()).orElseThrow();
@@ -159,9 +179,15 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional
     public void completeTask(final UUID taskId, final Instant completedAt, final String client) {
-        Preconditions.checkNotNull(taskId);
-        Preconditions.checkNotNull(completedAt);
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
+        if (Objects.isNull(taskId)) {
+            throw new ApplicationException("Parameter taskId cannot be null.");
+        }
+        if (Objects.isNull(completedAt)) {
+            throw new ApplicationException("Parameter completedAt cannot be null.");
+        }
+        if (Strings.isNullOrEmpty(client)) {
+            throw new ApplicationException("Parameter client cannot be null or empty.");
+        }
         LOGGER.info("Complete task id: '{}'.", taskId);
 
         final Task task = taskRepository.get(taskId).orElseThrow();
@@ -200,10 +226,18 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional
     public void failTask(final UUID taskId, final Instant failedAt, final String failedReason, final String client) {
-        Preconditions.checkNotNull(taskId);
-        Preconditions.checkNotNull(failedAt);
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(failedReason));
+        if (Objects.isNull(taskId)) {
+            throw new ApplicationException("Parameter taskId cannot be null.");
+        }
+        if (Objects.isNull(failedAt)) {
+            throw new ApplicationException("Parameter failedAt cannot be null.");
+        }
+        if (Strings.isNullOrEmpty(client)) {
+            throw new ApplicationException("Parameter client cannot be null or empty.");
+        }
+        if (Strings.isNullOrEmpty(failedReason)) {
+            throw new ApplicationException("Parameter failedReason cannot be null or empty.");
+        }
         LOGGER.info("Fail task id: '{}'.", taskId);
 
         final Task task = taskRepository.get(taskId).orElseThrow();
@@ -216,8 +250,12 @@ public class TaskService implements ITaskService {
     @Override
     @Transactional
     public void unlockTask(final UUID taskId, final int lockedTimeoutSeconds) {
-        Preconditions.checkNotNull(taskId);
-        Preconditions.checkArgument(lockedTimeoutSeconds > 0);
+        if (Objects.isNull(taskId)) {
+            throw new ApplicationException("Parameter taskId cannot be null.");
+        }
+        if (lockedTimeoutSeconds <= 0) {
+            throw new ApplicationException("Parameter lockedTimeoutSeconds must be more than zero.");
+        }
         LOGGER.warn("Locked task id: '{}'.", taskId);
 
         final Task task = taskRepository.get(taskId).orElseThrow();

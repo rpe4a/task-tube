@@ -6,7 +6,6 @@ public record TaskSettingRequest(
         int maxFailures,
         int failureRetryTimeoutSeconds
 ) {
-
     public TaskSettingsDto to() {
         return new TaskSettingsDto(maxFailures, failureRetryTimeoutSeconds);
     }

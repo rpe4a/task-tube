@@ -1,10 +1,10 @@
 package com.example.tasktube.server.infrastructure.postgresql.repository;
 
+import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskDataMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,13 +29,15 @@ public class TaskRepository implements ITaskRepository {
             final NamedParameterJdbcTemplate db,
             final TaskDataMapper mapper
     ) {
-        this.db = db;
-        this.mapper = mapper;
+        this.db = Objects.requireNonNull(db);
+        this.mapper = Objects.requireNonNull(mapper);
     }
 
     @Override
     public Optional<Task> get(final UUID id) {
-        Preconditions.checkNotNull(id);
+        if (Objects.isNull(id)) {
+            throw new ApplicationException("Parameter taskId cannot be null.");
+        }
 
         final String queryCommand = """
                     SELECT * FROM tasks
@@ -58,8 +61,9 @@ public class TaskRepository implements ITaskRepository {
 
     @Override
     public List<Task> get(final List<UUID> taskIdList) {
-        Preconditions.checkNotNull(taskIdList);
-        Preconditions.checkArgument(!taskIdList.isEmpty());
+        if (Objects.isNull(taskIdList) || taskIdList.isEmpty()) {
+            throw new ApplicationException("Parameter taskIdList cannot be null or empty.");
+        }
 
         final String queryCommand = """
                     SELECT * FROM tasks
@@ -79,7 +83,9 @@ public class TaskRepository implements ITaskRepository {
 
     @Override
     public void update(final Task task) {
-        Preconditions.checkNotNull(task);
+        if (Objects.isNull(task)) {
+            throw new ApplicationException("Parameter task cannot be null.");
+        }
 
         final String updateCommand = """
                     UPDATE tasks

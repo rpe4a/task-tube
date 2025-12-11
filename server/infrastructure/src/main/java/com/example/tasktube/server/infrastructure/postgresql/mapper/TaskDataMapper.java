@@ -18,10 +18,10 @@ import java.util.UUID;
 
 @Service
 public class TaskDataMapper {
-    private final ObjectMapper jackson;
+    private final ObjectMapper objectMapper;
 
-    public TaskDataMapper(final ObjectMapper jackson) {
-        this.jackson = Objects.requireNonNull(jackson);
+    public TaskDataMapper(final ObjectMapper objectMapper) {
+        this.objectMapper = Objects.requireNonNull(objectMapper);
     }
 
     public Map<String, ?> getDataDto(final Task task) {
@@ -124,7 +124,7 @@ public class TaskDataMapper {
 
     private String toJson(final Object obj) {
         try {
-            return jackson.writeValueAsString(obj);
+            return objectMapper.writeValueAsString(obj);
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }
@@ -132,7 +132,7 @@ public class TaskDataMapper {
 
     private <T> T fromJson(final String value, final TypeReference<T> clazz) {
         try {
-            return jackson.readValue(value, clazz);
+            return objectMapper.readValue(value, clazz);
         } catch (final Exception e) {
             throw new RuntimeException(e);
         }

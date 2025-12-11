@@ -10,12 +10,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
 public class BarrierUnlockingJob {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(BarrierUnlockingJob.class);
+
     private final IJobService jobService;
     private final IBarrierService barrierService;
     private final InstanceIdProvider instanceId;
@@ -33,9 +34,9 @@ public class BarrierUnlockingJob {
             final IJobService jobService,
             final IBarrierService barrierService,
             final InstanceIdProvider instanceId) {
-        this.jobService = jobService;
-        this.barrierService = barrierService;
-        this.instanceId = instanceId;
+        this.jobService = Objects.requireNonNull(jobService);
+        this.barrierService = Objects.requireNonNull(barrierService);
+        this.instanceId = Objects.requireNonNull(instanceId);
     }
 
     @Scheduled(fixedDelayString = "${spring.application.jobs.barriers.releasing.delay}")

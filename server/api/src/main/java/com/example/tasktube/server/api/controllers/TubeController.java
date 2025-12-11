@@ -22,7 +22,6 @@ import java.util.UUID;
 @RestController()
 @RequestMapping(path = "/api/v1/tube")
 public final class TubeController extends AbstractController {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(TubeController.class);
 
     private final ITubeService tubeService;

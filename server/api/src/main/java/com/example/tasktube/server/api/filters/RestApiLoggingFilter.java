@@ -22,6 +22,7 @@ public class RestApiLoggingFilter extends OncePerRequestFilter {
     public static final String X_TASK_TUBE_TRACE_ID_HEADER = "X-TaskTube-Trace-Id";
     public static final String TRACE_ID_MDC_KEY = "traceId";
     public static final String HOST_HEADER = "host";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RestApiLoggingFilter.class);
     private static final List<String> EXCLUDED_URI_PREFIX = List.of(
             "/readiness",

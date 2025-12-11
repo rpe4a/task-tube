@@ -1,9 +1,8 @@
 package com.example.tasktube.server.infrastructure.postgresql.repository;
 
+import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IJobRepository;
-import com.example.tasktube.server.infrastructure.postgresql.mapper.BarrierDataMapper;
-import com.google.common.base.Preconditions;
 import org.apache.logging.log4j.util.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,26 +12,29 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @Repository
 public class JobRepository implements IJobRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobRepository.class);
+
     private final NamedParameterJdbcTemplate db;
-    private final BarrierDataMapper mapper;
 
     public JobRepository(
-            final NamedParameterJdbcTemplate db,
-            final BarrierDataMapper mapper
+            final NamedParameterJdbcTemplate db
     ) {
-        this.db = db;
-        this.mapper = mapper;
+        this.db = Objects.requireNonNull(db);
     }
 
     @Override
     public List<UUID> lockBarrierIdList(final int count, final String client) {
-        Preconditions.checkArgument(count > 0);
-        Preconditions.checkArgument(Strings.isNotEmpty(client));
+        if (count <= 0) {
+            throw new ApplicationException("Parameter count must be more than zero.");
+        }
+        if (Strings.isEmpty(client)) {
+            throw new ApplicationException("Parameter client cannot be null or empty.");
+        }
 
         final String queryCommand = """
                     WITH locked_barriers
@@ -64,8 +66,12 @@ public class JobRepository implements IJobRepository {
 
     @Override
     public List<UUID> lockTaskIdList(final Task.Status status, final int count, final String client) {
-        Preconditions.checkArgument(count > 0);
-        Preconditions.checkArgument(Strings.isNotEmpty(client));
+        if (count <= 0) {
+            throw new ApplicationException("Parameter count must be more than zero.");
+        }
+        if (Strings.isEmpty(client)) {
+            throw new ApplicationException("Parameter client cannot be null or empty.");
+        }
 
         final String queryCommand = """
                     WITH locked_task
@@ -104,8 +110,12 @@ public class JobRepository implements IJobRepository {
 
     @Override
     public List<UUID> getLockedTaskIdList(final int count, final int lockedTimeoutSeconds) {
-        Preconditions.checkArgument(count > 0);
-        Preconditions.checkArgument(lockedTimeoutSeconds > 0);
+        if (count <= 0) {
+            throw new ApplicationException("Parameter count must be more than zero.");
+        }
+        if (lockedTimeoutSeconds <= 0) {
+            throw new ApplicationException("Parameter lockedTimeoutSeconds must be more than zero.");
+        }
 
         final String queryCommand = """
                     SELECT id
@@ -129,8 +139,12 @@ public class JobRepository implements IJobRepository {
 
     @Override
     public List<UUID> getLockedBarrierIdList(final int count, final int lockedTimeoutSeconds) {
-        Preconditions.checkArgument(count > 0);
-        Preconditions.checkArgument(lockedTimeoutSeconds > 0);
+        if (count <= 0) {
+            throw new ApplicationException("Parameter count must be more than zero.");
+        }
+        if (lockedTimeoutSeconds <= 0) {
+            throw new ApplicationException("Parameter lockedTimeoutSeconds must be more than zero.");
+        }
 
         final String queryCommand = """
                     SELECT id
@@ -149,5 +163,6 @@ public class JobRepository implements IJobRepository {
                         "lockedTimeoutSeconds", lockedTimeoutSeconds
                 ),
                 rsMapper
-        );    }
+        );
+    }
 }

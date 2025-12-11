@@ -4,7 +4,6 @@ public record TaskSettings(
         int maxFailures,
         int failureRetryTimeoutSeconds
 ) {
-
     public static final int MAX_FAILURES = 3;
     public static final int FAILURE_RETRY_TIMEOUT_SECONDS = 60;
 

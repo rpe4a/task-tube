@@ -21,8 +21,6 @@ import java.util.concurrent.TimeUnit;
 )
 public class RestApiApplication {
 
-    private static final Logger log = LoggerFactory.getLogger(RestApiApplication.class);
-
     public static void main(final String[] args) {
         SpringApplication.run(RestApiApplication.class, args);
     }

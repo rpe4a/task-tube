@@ -1,5 +1,6 @@
 package com.example.tasktube.server.domain.values;
 
+import com.example.tasktube.server.domain.exceptions.ValidationDomainException;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
@@ -19,7 +20,9 @@ public record Lock(Instant lockedAt, boolean locked, String lockedBy) {
     }
 
     public boolean isLockedBy(final String who) {
-        Preconditions.checkArgument(!Strings.isNullOrEmpty(who));
+        if(Strings.isNullOrEmpty(who)) {
+            throw new ValidationDomainException("Parameter who must not be null or empty.");
+        }
 
         return locked && who.equals(lockedBy());
     }

@@ -1,9 +1,9 @@
 package com.example.tasktube.server.infrastructure.postgresql.repository;
 
+import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.BarrierDataMapper;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -20,7 +21,9 @@ import java.util.function.Function;
 @Repository
 public class BarrierRepository implements IBarrierRepository {
     public static final int BARRIER_PARTITION_SIZE = 1000;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BarrierRepository.class);
+
     private final NamedParameterJdbcTemplate db;
     private final BarrierDataMapper mapper;
 
@@ -28,8 +31,8 @@ public class BarrierRepository implements IBarrierRepository {
             final NamedParameterJdbcTemplate db,
             final BarrierDataMapper mapper
     ) {
-        this.db = db;
-        this.mapper = mapper;
+        this.db = Objects.requireNonNull(db);
+        this.mapper = Objects.requireNonNull(mapper);
     }
 
     private static String getInsertCommand() {
@@ -64,7 +67,9 @@ public class BarrierRepository implements IBarrierRepository {
 
     @Override
     public void save(final Barrier barrier) {
-        Preconditions.checkNotNull(barrier);
+        if (Objects.isNull(barrier)) {
+            throw new ApplicationException("Parameter barrier cannot be null.");
+        }
 
         final String insertCommand = getInsertCommand();
 
@@ -73,7 +78,9 @@ public class BarrierRepository implements IBarrierRepository {
 
     @Override
     public Optional<Barrier> get(final UUID barrierId) {
-        Preconditions.checkNotNull(barrierId);
+        if (Objects.isNull(barrierId)) {
+            throw new ApplicationException("Parameter barrierId cannot be null.");
+        }
 
         final String queryCommand = """
                     SELECT * FROM barriers
@@ -93,7 +100,9 @@ public class BarrierRepository implements IBarrierRepository {
 
     @Override
     public void update(final Barrier barrier) {
-        Preconditions.checkNotNull(barrier);
+        if (Objects.isNull(barrier)) {
+            throw new ApplicationException("parameter barrier cannot be null.");
+        }
 
         final String updateCommand = """
                     UPDATE barriers
@@ -115,8 +124,9 @@ public class BarrierRepository implements IBarrierRepository {
 
     @Override
     public void save(final List<Barrier> barriers) {
-        Preconditions.checkNotNull(barriers);
-        Preconditions.checkArgument(!barriers.isEmpty());
+        if (Objects.isNull(barriers) || barriers.isEmpty()) {
+            throw new ApplicationException("Parameter barrier list cannot be null or empty.");
+        }
         LOGGER.debug("Barriers count: '{}'.", barriers.size());
 
         if (barriers.size() == 1) {

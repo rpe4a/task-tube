@@ -123,7 +123,7 @@ public class Barrier {
 
     public void release(final String client) {
         if (Objects.isNull(client)) {
-            throw new ValidationDomainException("Client cannot be null.");
+            throw new ValidationDomainException("Parameter client cannot be null.");
         }
         if (!getLock().isLockedBy(client)) {
             throw new ValidationDomainException("Barrier is not locked by the client '%s'.".formatted(client));
@@ -145,7 +145,7 @@ public class Barrier {
 
     public void unblock(final int lockedTimeoutSeconds) {
         if (lockedTimeoutSeconds <= 0) {
-            throw new ValidationDomainException("Lock timeout must be more then zero.");
+            throw new ValidationDomainException("Parameter lockedTimeoutSeconds must be more then zero.");
         }
 
         final Instant lockedTimeout = Instant.now().minus(lockedTimeoutSeconds, ChronoUnit.SECONDS);

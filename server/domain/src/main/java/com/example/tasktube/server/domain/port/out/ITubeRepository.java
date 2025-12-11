@@ -10,5 +10,5 @@ public interface ITubeRepository {
 
     void push(List<Task> tasks);
 
-    Optional<Task> pop(String tube, String lockedBy);
+    Optional<Task> pop(String tube, String client);
 }

@@ -12,12 +12,13 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Component
 public class TaskSchedulingJob {
-
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskSchedulingJob.class);
+
     private final IJobService jobService;
     private final ITaskService taskService;
     private final InstanceIdProvider instanceId;
@@ -33,9 +34,9 @@ public class TaskSchedulingJob {
             final ITaskService taskService,
             final InstanceIdProvider instanceId
     ) {
-        this.jobService = jobService;
-        this.taskService = taskService;
-        this.instanceId = instanceId;
+        this.jobService = Objects.requireNonNull(jobService);
+        this.taskService = Objects.requireNonNull(taskService);
+        this.instanceId = Objects.requireNonNull(instanceId);
     }
 
     @Scheduled(fixedDelayString = "${spring.application.jobs.tasks.scheduling.delay}")

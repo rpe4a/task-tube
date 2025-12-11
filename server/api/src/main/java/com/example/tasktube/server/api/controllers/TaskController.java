@@ -21,7 +21,6 @@ import java.util.UUID;
 @RestController()
 @RequestMapping(path = "/api/v1/task")
 public final class TaskController extends AbstractController {
-
     private final ITaskService taskService;
 
     public TaskController(

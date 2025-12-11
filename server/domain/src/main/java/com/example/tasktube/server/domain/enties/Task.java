@@ -96,7 +96,7 @@ public class Task {
 
     private void checkWaitingTasks(final List<UUID> waitForTaskIds) {
         if (Objects.isNull(waitForTaskIds) || waitForTaskIds.isEmpty()) {
-            throw new ValidationDomainException("List of waiting tasks cannot be null or empty.");
+            throw new ValidationDomainException("Parameter waitForTaskIds cannot be null or empty.");
         }
     }
 
@@ -221,10 +221,10 @@ public class Task {
     }
 
     private void checkFinish(final Map<String, Object> output, final String client) {
-        if (Objects.isNull(output)) {
-            throw new ValidationDomainException("Task output cannot be null.");
-        }
         checkHandleBy(Status.PROCESSING, client);
+        if (Objects.isNull(output)) {
+            throw new ValidationDomainException("Parameter output cannot be null.");
+        }
     }
 
     private void checkFail(final String client) {
@@ -241,10 +241,10 @@ public class Task {
 
     private void checkHandleBy(final Status expectedStatus, final String client) {
         if (Objects.isNull(client)) {
-            throw new ValidationDomainException("Client cannot be null.");
+            throw new ValidationDomainException("Parameter client cannot be null.");
         }
         if (Objects.isNull(expectedStatus)) {
-            throw new ValidationDomainException("Expected status cannot be null.");
+            throw new ValidationDomainException("Parameter expected status cannot be null.");
         }
         if (getStatus().isNotEqual(expectedStatus)) {
             throw new ValidationDomainException("Invalid task state. Expected '%s' but was '%s'.".formatted(expectedStatus, getStatus()));
@@ -334,7 +334,7 @@ public class Task {
 
     public Task attachParent(final Task parent) {
         if (Objects.isNull(parent)) {
-            throw new ValidationDomainException("Cannot attach a parent task.");
+            throw new ValidationDomainException("Parameter parent cannot be null.");
         }
         setParentId(parent.getId());
         return this;
@@ -493,7 +493,7 @@ public class Task {
 
     public void unblock(final int lockedTimeoutSeconds) {
         if (lockedTimeoutSeconds <= 0) {
-            throw new ValidationDomainException("Lock timeout must be more then zero.");
+            throw new ValidationDomainException("Parameter lockedTimeoutSeconds must be more then zero.");
         }
 
         final Instant lockedTimeout = Instant.now().minus(lockedTimeoutSeconds, ChronoUnit.SECONDS);

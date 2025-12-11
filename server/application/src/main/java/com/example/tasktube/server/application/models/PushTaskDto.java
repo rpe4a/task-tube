@@ -19,7 +19,6 @@ public record PushTaskDto(
         @NonNull Instant createdAt,
         @Nullable TaskSettingsDto settings
 ) {
-
     public Task to(final boolean isRoot) {
         return new Task(
                 id,
