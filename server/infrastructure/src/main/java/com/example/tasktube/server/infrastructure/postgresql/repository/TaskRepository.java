@@ -78,123 +78,36 @@ public class TaskRepository implements ITaskRepository {
     }
 
     @Override
-    public void schedule(final Task task) {
+    public void update(final Task task) {
         Preconditions.checkNotNull(task);
 
         final String updateCommand = """
                     UPDATE tasks
-                    SET locked = :locked,
-                        locked_by = :locked_by,
-                        locked_at = :locked_at,
+                    SET name = :name,
+                        tube = :tube,
                         status = :status,
-                        failed_reason = :failed_reason,
+                        parent_id = :parent_id,
+                        input = :input::jsonb,
+                        output = :output::jsonb,
+                        is_root = :is_root,
+                        start_barrier = :start_barrier,
+                        finish_barrier = :finish_barrier,
+                        updated_at = current_timestamp,
+                        created_at = :created_at,
                         scheduled_at = :scheduled_at,
                         canceled_at = :canceled_at,
-                        updated_at = current_timestamp
-                    WHERE id = :id
-                """;
-
-        db.update(updateCommand, mapper.getDataDto(task));
-    }
-
-    @Override
-    public void start(final Task task) {
-        Preconditions.checkNotNull(task);
-
-        final String updateCommand = """
-                    UPDATE tasks
-                    SET locked = :locked,
-                        locked_by = :locked_by,
-                        locked_at = :locked_at,
-                        status = :status,
-                        started_at = :started_at,
-                        updated_at = current_timestamp
-                    WHERE id = :id
-                """;
-
-        db.update(updateCommand, mapper.getDataDto(task));
-    }
-
-    @Override
-    public void process(final Task task) {
-        Preconditions.checkNotNull(task);
-
-        final String updateCommand = """
-                    UPDATE tasks
-                    SET locked = :locked,
-                        locked_by = :locked_by,
-                        locked_at = :locked_at,
-                        status = :status,
-                        heartbeat_at = :heartbeat_at,
-                        updated_at = current_timestamp
-                    WHERE id = :id
-                """;
-
-        db.update(updateCommand, mapper.getDataDto(task));
-    }
-
-    @Override
-    public void finish(final Task task) {
-        Preconditions.checkNotNull(task);
-
-        final String updateCommand = """
-                    UPDATE tasks
-                    SET locked = :locked,
-                        locked_at = :locked_at,
-                        locked_by = :locked_by,
-                        status = :status,
-                        finished_at = :finished_at,
-                        finish_barrier = :finish_barrier,
-                        output = :output::jsonb,
-                        updated_at = current_timestamp
-                    WHERE id = :id
-                """;
-
-        db.update(updateCommand, mapper.getDataDto(task));
-    }
-
-    @Override
-    public void fail(final Task task) {
-        Preconditions.checkNotNull(task);
-
-        final String updateCommand = """
-                    UPDATE tasks
-                    SET status = :status,
-                        updated_at = current_timestamp,
-                        scheduled_at = :scheduled_at,
                         started_at = :started_at,
                         heartbeat_at = :heartbeat_at,
                         finished_at = :finished_at,
                         failed_at = :failed_at,
+                        aborted_at = :aborted_at,
+                        completed_at = :completed_at,
                         failures = :failures,
                         failed_reason = :failed_reason,
-                        aborted_at = :aborted_at,
-                        completed_at = :completed_at,
-                        finish_barrier = :finish_barrier,
-                        output = :output::jsonb,
-                        locked = :locked,
                         locked_at = :locked_at,
-                        locked_by = :locked_by
-                    WHERE id = :id
-                """;
-
-        db.update(updateCommand, mapper.getDataDto(task));
-    }
-
-    @Override
-    public void complete(final Task task) {
-        Preconditions.checkNotNull(task);
-
-        final String updateCommand = """
-                    UPDATE tasks
-                    SET status = :status,
-                        updated_at = current_timestamp,
-                        completed_at = :completed_at,
-                        aborted_at = :aborted_at,
-                        failed_reason = :failed_reason,
                         locked = :locked,
-                        locked_at = :locked_at,
-                        locked_by = :locked_by
+                        locked_by = :locked_by,
+                        settings = :settings::jsonb
                     WHERE id = :id
                 """;
 

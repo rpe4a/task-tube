@@ -62,7 +62,7 @@ public class BarrierDataMapper {
         barrier.setLock(
                 new Lock(
                         rs.getTimestamp("locked_at") != null
-                                ? Instant.ofEpochMilli(rs.getTimestamp("locked_at").getNanos())
+                                ? Instant.ofEpochMilli(rs.getTimestamp("locked_at").getTime())
                                 : null,
                         rs.getBoolean("locked"),
                         rs.getString("locked_by")

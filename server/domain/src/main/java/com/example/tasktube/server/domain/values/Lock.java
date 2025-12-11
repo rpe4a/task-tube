@@ -15,7 +15,7 @@ public record Lock(Instant lockedAt, boolean locked, String lockedBy) {
     }
 
     public Lock unlock() {
-        return new Lock(null, false, null);
+        return free();
     }
 
     public boolean isLockedBy(final String who) {
@@ -30,5 +30,9 @@ public record Lock(Instant lockedAt, boolean locked, String lockedBy) {
 
     public Lock prolong() {
         return new Lock(Instant.now(), true, lockedBy());
+    }
+
+    public boolean isLockedBefore(final Instant date) {
+        return locked && lockedAt.isBefore(date);
     }
 }

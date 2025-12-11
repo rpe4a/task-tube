@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
     @Test
-    void shouldFinishedTaskScheduleFailed() {
+    void shouldFinishedTaskSchedule() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -59,7 +59,7 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldFinishedTaskProcessFailed() {
+    void shouldFinishedTaskProcess() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -91,7 +91,7 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldFinishedTaskFailFailed() {
+    void shouldFinishedTaskFail() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -123,7 +123,7 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldFinishedTaskTwoTimesFailed() {
+    void shouldFinishedTaskTwoTimes() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -155,7 +155,7 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldFinishedTaskWithoutChildrenSuccessfully() {
+    void shouldFinishedTaskWithoutChildren() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -191,7 +191,7 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldFinishedTaskWithOneChildrenWithoutWaitingTasksSuccessfully() {
+    void shouldFinishedTaskWithOneChildrenWithoutWaitingTasks() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -267,7 +267,7 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldFinishedTaskWithOneChildrenWithWaitingTasksSuccessfully() {
+    void shouldFinishedTaskWithOneChildrenWithWaitingTasks() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -322,7 +322,7 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldFinishedTaskWithTwoChildrenWithWaitingTasksSuccessfully() {
+    void shouldFinishedTaskWithTwoChildrenWithWaitingTasks() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);

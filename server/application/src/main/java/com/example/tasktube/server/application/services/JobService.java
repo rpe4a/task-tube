@@ -38,10 +38,28 @@ public class JobService implements IJobService {
 
     @Override
     @Transactional
+    public List<UUID> getLockedTaskIdList(final int count, final int lockedTimeoutSeconds) {
+        Preconditions.checkArgument(count > 0);
+        Preconditions.checkArgument(lockedTimeoutSeconds > 0);
+
+        return jobRepository.getLockedTaskIdList(count, lockedTimeoutSeconds);
+    }
+
+    @Override
+    @Transactional
     public List<UUID> getBarrierIdList(final int count, final String client) {
         Preconditions.checkArgument(count > 0);
         Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
 
         return jobRepository.lockBarrierIdList(count, client);
+    }
+
+    @Override
+    @Transactional
+    public List<UUID> getLockedBarrierIdList(final int count, final int lockedTimeoutSeconds) {
+        Preconditions.checkArgument(count > 0);
+        Preconditions.checkArgument(lockedTimeoutSeconds > 0);
+
+        return jobRepository.getLockedBarrierIdList(count, lockedTimeoutSeconds);
     }
 }

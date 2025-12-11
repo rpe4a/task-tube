@@ -9,10 +9,18 @@ spring:
         finalizing:
           delay: "5000"
           count: 10
+        locked:
+          delay: "5000"
+          count: 10
+          timeoutSeconds: 600
       barriers:
         releasing:
           delay: "5000"
           count: 10
+        locked:
+          delay: "5000"
+          count: 10
+          timeoutSeconds: 600
 
   profiles:
     default: local

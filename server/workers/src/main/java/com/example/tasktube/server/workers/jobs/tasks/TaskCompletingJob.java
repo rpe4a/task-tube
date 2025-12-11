@@ -39,7 +39,7 @@ public class TaskCompletingJob {
 
     @Scheduled(fixedDelayString = "${spring.application.jobs.tasks.finalizing.delay}")
     public void run() {
-        LOGGER.info("Start finalizing tasks.");
+        LOGGER.info("Start completing tasks.");
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.FINISHED, count, instanceId.get());
 
         LOGGER.debug("List of tasks: '{}'.", taskIdList);

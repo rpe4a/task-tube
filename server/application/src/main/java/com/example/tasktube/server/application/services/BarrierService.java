@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public class BarrierService implements IBarrierService {
@@ -35,30 +34,43 @@ public class BarrierService implements IBarrierService {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(client));
         LOGGER.info("Release barrier id: '{}'.", barrierId);
 
-        final Optional<Barrier> barrier = barrierRepository.get(barrierId);
-        if (barrier.isEmpty()) {
-            LOGGER.debug("No barrier found for id: '{}'.", barrierId);
-            return;
-        }
+        final Barrier barrier = barrierRepository.get(barrierId).orElseThrow();
 
-        if (barrier.get().isReleased()) {
+        if (barrier.isReleased()) {
             LOGGER.debug("Barrier '{}' has already been released.", barrierId);
-            return;
-        }
-
-        if (barrier.get().getWaitFor().isEmpty()) {
-            LOGGER.debug("Barrier '{}' doesn't have any waiting tasks.", barrierId);
-            barrier.get().release(client);
+            barrier.unlock();
         } else {
-            LOGGER.debug("Barrier '{}' has '{}' waiting tasks.", barrierId, barrier.get().getWaitFor().size());
-            final List<Task> tasks = taskRepository.get(barrier.get().getWaitFor());
-            final boolean allTasksTerminatedState = tasks.stream().allMatch(Task::isTerminated);
-            if (allTasksTerminatedState) {
-                LOGGER.debug("Barrier '{}' has released.", barrierId);
-                barrier.get().release(client);
+            if (barrier.getWaitFor().isEmpty()) {
+                LOGGER.debug("Barrier '{}' doesn't have any waiting tasks.", barrierId);
+                barrier.release(client);
+            } else {
+                LOGGER.debug("Barrier '{}' has '{}' waiting tasks.", barrierId, barrier.getWaitFor().size());
+                final List<Task> tasks = taskRepository.get(barrier.getWaitFor());
+                final boolean allTasksTerminatedState = tasks.stream().allMatch(Task::isTerminated);
+                if (allTasksTerminatedState) {
+                    LOGGER.debug("Barrier '{}' has released.", barrierId);
+                    barrier.release(client);
+                }else {
+                    LOGGER.debug("Not all tasks have terminated state.");
+                    barrier.unlock();
+                }
             }
         }
 
-        barrierRepository.release(barrier.get());
+        barrierRepository.update(barrier);
+    }
+
+    @Override
+    @Transactional
+    public void unlockBarrier(final UUID barrierId, final int lockedTimeoutSeconds) {
+        Preconditions.checkNotNull(barrierId);
+        Preconditions.checkArgument(lockedTimeoutSeconds > 0);
+        LOGGER.warn("Locked barrier id: '{}'.", barrierId);
+
+        final Barrier barrier = barrierRepository.get(barrierId).orElseThrow();
+
+        barrier.unblock(lockedTimeoutSeconds);
+
+        barrierRepository.update(barrier);
     }
 }

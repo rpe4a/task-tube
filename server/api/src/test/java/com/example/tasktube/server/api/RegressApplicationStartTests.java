@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class RegressApplicationStartTests extends AbstractRegressApplicationTests {
 
     @Test
-    void shouldStartTaskSuccessfully() {
+    void shouldStartTask() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -51,7 +51,7 @@ class RegressApplicationStartTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldStartTaskOneTimeSuccessfully() {
+    void shouldStartTaskOneTime() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);

@@ -9,4 +9,8 @@ public interface IJobRepository {
     List<UUID> lockBarrierIdList(int count, String client);
 
     List<UUID> lockTaskIdList(Task.Status status, int count, String client);
+
+    List<UUID> getLockedTaskIdList(int count, int lockedTimeoutSeconds);
+
+    List<UUID> getLockedBarrierIdList(int count, int lockedTimeoutSeconds);
 }

@@ -101,4 +101,53 @@ public class JobRepository implements IJobRepository {
                 rsMapper
         );
     }
+
+    @Override
+    public List<UUID> getLockedTaskIdList(final int count, final int lockedTimeoutSeconds) {
+        Preconditions.checkArgument(count > 0);
+        Preconditions.checkArgument(lockedTimeoutSeconds > 0);
+
+        final String queryCommand = """
+                    SELECT id
+                        FROM tasks
+                        WHERE locked_at <= (current_timestamp - (:lockedTimeoutSeconds * interval '1 second'))
+                        ORDER BY locked_at
+                        LIMIT :count
+                """;
+
+        final RowMapper<UUID> rsMapper = (rs, rowNum) -> rs.getObject("id", UUID.class);
+
+        return db.query(
+                queryCommand,
+                Map.of(
+                        "count", count,
+                        "lockedTimeoutSeconds", lockedTimeoutSeconds
+                ),
+                rsMapper
+        );
+    }
+
+    @Override
+    public List<UUID> getLockedBarrierIdList(final int count, final int lockedTimeoutSeconds) {
+        Preconditions.checkArgument(count > 0);
+        Preconditions.checkArgument(lockedTimeoutSeconds > 0);
+
+        final String queryCommand = """
+                    SELECT id
+                        FROM barriers
+                        WHERE locked_at <= (current_timestamp - (:lockedTimeoutSeconds * interval '1 second'))
+                        ORDER BY locked_at
+                        LIMIT :count
+                """;
+
+        final RowMapper<UUID> rsMapper = (rs, rowNum) -> rs.getObject("id", UUID.class);
+
+        return db.query(
+                queryCommand,
+                Map.of(
+                        "count", count,
+                        "lockedTimeoutSeconds", lockedTimeoutSeconds
+                ),
+                rsMapper
+        );    }
 }

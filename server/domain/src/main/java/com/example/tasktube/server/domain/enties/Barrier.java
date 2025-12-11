@@ -4,6 +4,7 @@ import com.example.tasktube.server.domain.values.Lock;
 import com.google.common.base.Preconditions;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -122,10 +123,27 @@ public class Barrier {
     public void release(final String client) {
         Preconditions.checkNotNull(client);
         Preconditions.checkState(getLock().isLockedBy(client), "The client '%s' can't release barrier.".formatted(client));
-        Preconditions.checkState(!isReleased(), "Barrier is already released.");
+        Preconditions.checkState(isNotReleased(), "Barrier is already released.");
 
         setReleased(true);
         setReleasedAt(Instant.now());
+        setUpdatedAt(Instant.now());
+        unlock();
+    }
+
+    public void unlock() {
+        setUpdatedAt(Instant.now());
+        setLock(lock.unlock());
+    }
+
+    public void unblock(final int lockedTimeoutSeconds) {
+        Preconditions.checkArgument(lockedTimeoutSeconds > 0);
+        final Instant lockedTimeout = Instant.now().minus(lockedTimeoutSeconds, ChronoUnit.SECONDS);
+
+        if (getLock().isLockedBefore(lockedTimeout)) {
+            setUpdatedAt(Instant.now());
+            unlock();
+        }
     }
 
     public enum Type {

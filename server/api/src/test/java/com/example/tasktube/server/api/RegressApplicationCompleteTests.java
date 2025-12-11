@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class RegressApplicationCompleteTests extends AbstractRegressApplicationTests {
 
     @Test
-    void shouldCompletedTaskWithoutChildrenSuccessfully() {
+    void shouldCompletedTaskWithoutChildren() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -300,7 +300,7 @@ class RegressApplicationCompleteTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldWaitReleaseFinishBarrierTaskWithChildWithoutWaitingTasksSuccessfully() {
+    void shouldWaitReleaseFinishBarrierTaskWithChildWithoutWaitingTasks() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -359,7 +359,7 @@ class RegressApplicationCompleteTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldCompletedTaskWithChildWithoutWaitingTasksSuccessfully() {
+    void shouldCompletedTaskWithChildWithoutWaitingTasks() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -482,7 +482,7 @@ class RegressApplicationCompleteTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldCompletedTaskWithChildrenWithoutWaitingTasksSuccessfully() {
+    void shouldCompletedTaskWithChildrenWithoutWaitingTasks() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -611,7 +611,7 @@ class RegressApplicationCompleteTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldAbortedTaskWithChildrenWithoutWaitingTasksSuccessfully() {
+    void shouldAbortedTaskWithChildrenWithoutWaitingTasks() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -761,7 +761,7 @@ class RegressApplicationCompleteTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldAbortedParentTaskWithChildrenWithWaitingTasksAndCancelChildSuccessfully() {
+    void shouldAbortedParentTaskWithChildrenWithWaitingTasksAndCancelChild() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -927,7 +927,7 @@ class RegressApplicationCompleteTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldCompletedParentTaskWithChildrenWithWaitingTasksAndCompleteChildSuccessfully() {
+    void shouldCompletedParentTaskWithChildrenWithWaitingTasksAndCompleteChild() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);

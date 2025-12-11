@@ -26,3 +26,6 @@ SET status = 'RUNNING',
 WHERE id = ?
   AND locked_by = ?
   AND locked = true
+
+
+select current_timestamp - interval '600 second'

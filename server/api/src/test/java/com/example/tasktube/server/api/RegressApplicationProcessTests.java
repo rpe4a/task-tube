@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RegressApplicationProcessTests extends AbstractRegressApplicationTests {
 
     @Test
-    void shouldProcessTaskSuccessfully() {
+    void shouldProcessTask() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);

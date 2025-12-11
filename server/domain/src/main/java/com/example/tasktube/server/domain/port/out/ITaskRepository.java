@@ -11,15 +11,5 @@ public interface ITaskRepository {
 
     List<Task> get(List<UUID> taskIdList);
 
-    void schedule(Task task);
-
-    void start(Task task);
-
-    void process(Task task);
-
-    void finish(Task task);
-
-    void fail(Task task);
-
-    void complete(Task task);
+    void update(Task task);
 }

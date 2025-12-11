@@ -5,6 +5,7 @@ import com.example.tasktube.server.domain.values.TaskSettings;
 import com.google.common.base.Preconditions;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -490,7 +491,42 @@ public class Task {
     }
 
     public void unlock() {
+        setUpdatedAt(Instant.now());
         setLock(getLock().unlock());
+    }
+
+    public void unblock(final int lockedTimeoutSeconds) {
+        Preconditions.checkArgument(lockedTimeoutSeconds > 0);
+        final Instant lockedTimeout = Instant.now().minus(lockedTimeoutSeconds, ChronoUnit.SECONDS);
+
+        if (getLock().isLockedBefore(lockedTimeout)) {
+            if (Status.CREATED.equals(getStatus())) {
+                setCreatedAt(Instant.now());
+            }
+            if (Status.SCHEDULED.equals(getStatus())) {
+                setScheduledAt(Instant.now());
+            }
+            if (Status.PROCESSING.equals(getStatus())) {
+                setStatus(Status.SCHEDULED);
+                setScheduledAt(Instant.now());
+                setStartedAt(null);
+                setHeartbeatAt(null);
+            }
+            if (Status.FINISHED.equals(getStatus())) {
+                setFinishedAt(Instant.now());
+            }
+            if (Status.CANCELED.equals(getStatus())) {
+                setCanceledAt(Instant.now());
+            }
+            if (Status.ABORTED.equals(getStatus())) {
+                setAbortedAt(Instant.now());
+            }
+            if (Status.COMPLETED.equals(getStatus())) {
+                setCompletedAt(Instant.now());
+            }
+
+            unlock();
+        }
     }
 
     public enum Status {
@@ -500,7 +536,6 @@ public class Task {
         FINISHED,
         ABORTED,
         CANCELED,
-        //  WAITING_FINALIZED,
         COMPLETED,
     }
 }

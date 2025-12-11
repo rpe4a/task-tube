@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class RegressApplicationPushPopTests extends AbstractRegressApplicationTests {
 
     @Test
-    void shouldPushTaskWithoutStartBarrierSuccessfully() {
+    void shouldPushTaskWithoutStartBarrier() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -65,7 +65,7 @@ class RegressApplicationPushPopTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldPushTaskWithStartBarrierSuccessfully() {
+    void shouldPushTaskWithStartBarrier() {
         final TaskDto taskDto = TestUtils.createTaskDto(List.of(UUID.randomUUID()));
 
         final UUID taskId = tubeService.push(taskDto);
@@ -126,7 +126,7 @@ class RegressApplicationPushPopTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldPopTaskSuccessfully() {
+    void shouldPopTask() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -156,7 +156,7 @@ class RegressApplicationPushPopTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldPopTaskOneTimeSuccessfully() {
+    void shouldPopTaskOneTime() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);

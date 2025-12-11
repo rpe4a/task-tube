@@ -8,5 +8,10 @@ import java.util.UUID;
 public interface IJobService {
     List<UUID> getTaskIdList(Task.Status status, int count, String client);
 
+    List<UUID> getLockedTaskIdList(int count, final int lockedTimeoutSeconds);
+
     List<UUID> getBarrierIdList(int count, String client);
+
+    List<UUID> getLockedBarrierIdList(int count, final int lockedTimeoutSeconds);
+
 }

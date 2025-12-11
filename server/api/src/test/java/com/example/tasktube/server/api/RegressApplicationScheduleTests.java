@@ -80,7 +80,7 @@ class RegressApplicationScheduleTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldScheduledTaskWithoutBarrierSuccessfully() {
+    void shouldScheduledTaskWithoutBarrier() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -144,7 +144,7 @@ class RegressApplicationScheduleTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldScheduledTaskWithBarrierSuccessfully() {
+    void shouldScheduledTaskWithBarrier() {
         final TaskDto taskDto = TestUtils.createTaskDto(List.of(UUID.randomUUID()));
 
         final UUID taskId = tubeService.push(taskDto);

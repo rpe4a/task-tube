@@ -27,7 +27,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
     @Test
-    void shouldFailTaskSuccessfully() {
+    void shouldFailTask() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -79,7 +79,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldFailTaskAndRetryTimeoutSecondsSuccessfully() {
+    void shouldFailTaskAndRetryTimeoutSeconds() {
         final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(3, 15);
         final TaskDto taskDto = TestUtils.createTaskDto(taskSettingsDto);
 
@@ -112,7 +112,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldFailTaskAndPostponeTaskSuccessfully() {
+    void shouldFailTaskAndPostponeTask() {
         final TaskDto taskDto = TestUtils.createTaskDto();
 
         final UUID taskId = tubeService.push(taskDto);
@@ -143,7 +143,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldFailTaskWaitOneSecondAndPopTaskSuccessfully() {
+    void shouldFailTaskWaitOneSecondAndPopTask() {
         final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(3, 1);
         final TaskDto taskDto = TestUtils.createTaskDto(taskSettingsDto);
 
@@ -180,7 +180,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldFailTaskTwoTimesSuccessfully() {
+    void shouldFailTaskTwoTimes() {
         final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(2, 1);
         final TaskDto taskDto = TestUtils.createTaskDto(taskSettingsDto);
 
@@ -239,7 +239,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldAbortTaskSuccessfully() {
+    void shouldAbortTask() {
         final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1);
         final TaskDto taskDto = TestUtils.createTaskDto(taskSettingsDto);
 

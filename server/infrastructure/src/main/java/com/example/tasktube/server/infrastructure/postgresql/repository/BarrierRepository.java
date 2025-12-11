@@ -92,20 +92,22 @@ public class BarrierRepository implements IBarrierRepository {
     }
 
     @Override
-    public void release(final Barrier barrier) {
+    public void update(final Barrier barrier) {
         Preconditions.checkNotNull(barrier);
 
         final String updateCommand = """
                     UPDATE barriers
-                    SET locked = false,
-                        locked_by = null,
-                        locked_at = null,
+                    SET task_id = :task_id,
+                        wait_for = :wait_for,
+                        type = :type,
                         released = :released,
+                        updated_at = current_timestamp,
+                        created_at = :created_at,
                         released_at = :released_at,
-                        updated_at = current_timestamp
+                        locked = :locked,
+                        locked_by = :locked_by,
+                        locked_at = :locked_at
                     WHERE id = :id
-                        AND locked = :locked
-                        AND locked_by = :locked_by
                 """;
 
         db.update(updateCommand, mapper.getDataDto(barrier, db.getJdbcOperations()));

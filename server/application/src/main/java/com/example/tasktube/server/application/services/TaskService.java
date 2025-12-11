@@ -88,7 +88,7 @@ public class TaskService implements ITaskService {
             task.schedule(scheduledAt, client);
         }
 
-        taskRepository.schedule(task);
+        taskRepository.update(task);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class TaskService implements ITaskService {
 
         task.start(startedAt, client);
 
-        taskRepository.start(task);
+        taskRepository.update(task);
     }
 
     @Override
@@ -118,7 +118,7 @@ public class TaskService implements ITaskService {
 
         task.process(processedAt, client);
 
-        taskRepository.process(task);
+        taskRepository.update(task);
     }
 
     @Override
@@ -162,7 +162,7 @@ public class TaskService implements ITaskService {
 
         task.finish(taskDto.finishedAt(), taskDto.output(), taskDto.client());
 
-        taskRepository.finish(task);
+        taskRepository.update(task);
     }
 
     @Override
@@ -203,7 +203,7 @@ public class TaskService implements ITaskService {
             task.complete(completedAt, client);
         }
 
-        taskRepository.complete(task);
+        taskRepository.update(task);
     }
 
     @Override
@@ -219,6 +219,20 @@ public class TaskService implements ITaskService {
 
         task.fail(failedAt, failedReason, client);
 
-        taskRepository.fail(task);
+        taskRepository.update(task);
+    }
+
+    @Override
+    @Transactional
+    public void unlockTask(final UUID taskId, final int lockedTimeoutSeconds) {
+        Preconditions.checkNotNull(taskId);
+        Preconditions.checkArgument(lockedTimeoutSeconds > 0);
+        LOGGER.warn("Locked task id: '{}'.", taskId);
+
+        final Task task = taskRepository.get(taskId).orElseThrow();
+
+        task.unblock(lockedTimeoutSeconds);
+
+        taskRepository.update(task);
     }
 }
