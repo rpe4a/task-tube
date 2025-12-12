@@ -38,7 +38,7 @@ public final class TaskController extends AbstractController {
             @NotNull @Valid @RequestBody final StartTaskRequest request,
             final BindingResult result
     ) {
-        if (isNotValid(result)) {
+        if (isInvalid(result)) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -56,7 +56,7 @@ public final class TaskController extends AbstractController {
             @NotNull @Valid @RequestBody final ProcessTaskRequest request,
             final BindingResult result
     ) {
-        if (isNotValid(result)) {
+        if (isInvalid(result)) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -74,7 +74,7 @@ public final class TaskController extends AbstractController {
             @NotNull @Valid @RequestBody final FinishTaskRequest request,
             final BindingResult result
     ) {
-        if (isNotValid(result)) {
+        if (isInvalid(result)) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -92,7 +92,7 @@ public final class TaskController extends AbstractController {
             @NotNull @Valid @RequestBody final FailTaskRequest request,
             final BindingResult result
     ) {
-        if (isNotValid(result)) {
+        if (isInvalid(result)) {
             return ResponseEntity.badRequest().build();
         }
 

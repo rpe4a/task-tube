@@ -7,13 +7,13 @@ import org.springframework.validation.BindingResult;
 public abstract class AbstractController {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractController.class);
 
-    boolean isNotValid(final BindingResult result) {
+    boolean isInvalid(final BindingResult result) {
         if (result.hasErrors()) {
             result.getAllErrors().forEach(
                     error -> LOGGER.info("Client error: '{}'.", error.getDefaultMessage())
             );
-            return false;
+            return true;
         }
-        return true;
+        return false;
     }
 }

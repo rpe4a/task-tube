@@ -41,7 +41,7 @@ public final class TubeController extends AbstractController {
             @NotNull @Valid @RequestBody final TaskRequest request,
             final BindingResult result
     ) {
-        if (isNotValid(result)) {
+        if (isInvalid(result)) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -59,7 +59,7 @@ public final class TubeController extends AbstractController {
             @NotNull @Valid @RequestBody final PopTaskRequest request,
             final BindingResult result
     ) {
-        if (isNotValid(result)) {
+        if (isInvalid(result)) {
             return ResponseEntity.badRequest().build();
         }
 
