@@ -43,7 +43,7 @@ public class TaskCompletingJob {
         LOGGER.info("Start completing tasks.");
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.FINISHED, count, instanceId.get());
 
-        LOGGER.debug("List of tasks: '{}'.", taskIdList);
+        LOGGER.info("List of tasks: '{}'.", taskIdList);
         for (final UUID taskId : taskIdList) {
             taskService.completeTask(taskId, Instant.now(), instanceId.get());
         }

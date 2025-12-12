@@ -15,12 +15,29 @@ The Task-Tube model is built around two primary concepts: **Tubes** and **Tasks*
 ### Task Lifecycle
 
 A task progresses through the following states:
-1.  **PUSHED:** A client submits a task to a specific tube.
-2.  **POPPED:** A worker retrieves a task from the tube. The task is now locked for that worker.
+1.  **CREATED:** A client submits a task. It is waiting to be popped.
+2.  **SCHEDULED:** Task waits to be popped. A worker retrieves a task from the tube. The task is now locked for that worker.
 3.  **STARTED:** The worker signals that it has started processing the task.
-4.  **PROCESSED:** The worker signals that it has completed the main work.
+4.  **PROCESSING:** The worker signals that it has completed the main work.
 5.  **FINISHED:** The worker reports the successful completion of the task.
 6.  **FAILED:** If an error occurs, the worker reports the task as failed, providing a reason.
+7.  **ABORTED:** If task spends all retries.
+8.  **COMPLETED:** If task has finished and waited all children.
+9.  **CANCELED:** If task cannot get all COMPLETED children or waiting tasks.
+
+### Barriers for Task Coordination
+
+Barriers are a powerful mechanism to manage complex workflows and create dependencies between tasks. A barrier acts as a gate that a task must wait for before it can proceed to the next stage of its lifecycle. Task-Tube supports two types of barriers: `Start Barriers` and `Finish Barriers`.
+
+#### Start Barrier
+A `Start Barrier` prevents a task from being scheduled (i.e., being picked up by a worker) until all the tasks it depends on have completed.
+
+-   **Use Case:** Imagine you have a workflow where `Task B` can only begin after `Task A` has finished successfully. You can create `Task B` with a `Start Barrier` that waits for `Task A`. `Task B` will remain in a `CREATED` state until `Task A` is complete, at which point the barrier is released and `Task B` becomes available for workers to `pop`.
+
+#### Finish Barrier
+A `Finish Barrier` is used to implement a "fork-join" pattern. It allows a parent task to spawn multiple child tasks and then wait for all of them to complete before the parent task itself is considered complete.
+
+-   **Use Case:** Imagine a video processing task (`Parent Task`) that splits a video into multiple chunks and assigns each chunk to a separate transcoding task (`Child Tasks`). The `Parent Task` can create a `Finish Barrier` that waits for all `Child Tasks`. The parent task will enter a waiting state until all children are done, at which point the barrier is released, and the parent can be marked as `COMPLETED`.
 
 ## Architecture
 

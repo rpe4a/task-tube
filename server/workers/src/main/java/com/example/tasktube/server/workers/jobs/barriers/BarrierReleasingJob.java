@@ -41,7 +41,7 @@ public class BarrierReleasingJob {
         LOGGER.info("Start releasing barriers.");
         final List<UUID> barrierIdList = jobService.getBarrierIdList(count, instanceId.get());
 
-        LOGGER.debug("List of barriers: '{}'.", barrierIdList);
+        LOGGER.info("List of barriers: '{}'.", barrierIdList);
         for (final UUID barrierId : barrierIdList) {
             barrierService.releaseBarrier(barrierId, instanceId.get());
         }

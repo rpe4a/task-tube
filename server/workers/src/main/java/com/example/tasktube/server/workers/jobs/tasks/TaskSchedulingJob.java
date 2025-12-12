@@ -44,7 +44,7 @@ public class TaskSchedulingJob {
         LOGGER.info("Start scheduling tasks.");
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, count, instanceId.get());
 
-        LOGGER.debug("List of tasks: '{}'.", taskIdList);
+        LOGGER.info("List of tasks: '{}'.", taskIdList);
         for (final UUID taskId : taskIdList) {
             taskService.scheduleTask(taskId, Instant.now(), instanceId.get());
         }
