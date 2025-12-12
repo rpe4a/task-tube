@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="task-tube [clean,package]" type="MavenRunConfiguration" factoryName="Maven" nameIsGenerated="true">
+  <configuration default="false" name="workers [clean,package]" type="MavenRunConfiguration" factoryName="Maven">
     <MavenSettings>
       <option name="myGeneralSettings" />
       <option name="myRunnerSettings" />
@@ -13,6 +13,9 @@
             <list>
               <option value="clean" />
               <option value="package" />
+              <option value="-pl" />
+              <option value=":workers" />
+              <option value="--also-make" />
             </list>
           </option>
           <option name="multimoduleDir" />

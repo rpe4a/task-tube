@@ -26,6 +26,6 @@ spring:
     default: local
 
   datasource:
-    url: ${postgresql.url}
-    username: ${postgresql.admin}
-    password: ${postgresql.password}
+    url: jdbc:postgresql://localhost:5432/task_tube
+    username: admin
+    password: 12345

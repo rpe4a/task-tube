@@ -34,7 +34,7 @@
 
         <!--        persistence-->
         <postgresql.url>jdbc:postgresql://localhost:5432/task_tube</postgresql.url>
-        <postgresql.admin>admin</postgresql.admin>
+        <postgresql.admin>admin123</postgresql.admin>
         <postgresql.password>12345</postgresql.password>
     </properties>
 

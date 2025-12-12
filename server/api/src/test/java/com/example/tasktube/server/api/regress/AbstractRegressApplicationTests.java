@@ -1,4 +1,4 @@
-package com.example.tasktube.server.api;
+package com.example.tasktube.server.api.regress;
 
 import com.example.tasktube.server.application.port.in.IBarrierService;
 import com.example.tasktube.server.application.port.in.IJobService;

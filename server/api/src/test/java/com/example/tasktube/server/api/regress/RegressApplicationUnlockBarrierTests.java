@@ -1,5 +1,6 @@
-package com.example.tasktube.server.api;
+package com.example.tasktube.server.api.regress;
 
+import com.example.tasktube.server.api.RestApiApplication;
 import com.example.tasktube.server.application.models.PushTaskDto;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;

@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="RestApiApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+  <configuration default="false" name="rest-api" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <module name="api" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.tasktube.server.api.RestApiApplication" />
     <method v="2">

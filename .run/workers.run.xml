@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="WorkersApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot" nameIsGenerated="true">
+  <configuration default="false" name="workers" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <module name="workers" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.tasktube.server.workers.WorkersApplication" />
     <method v="2">

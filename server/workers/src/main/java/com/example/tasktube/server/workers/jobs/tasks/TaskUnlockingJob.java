@@ -41,6 +41,11 @@ public class TaskUnlockingJob {
         LOGGER.info("Start find locked tasks.");
         final List<UUID> lockedTaskIdList = jobService.getLockedTaskIdList(count, timeoutSeconds);
 
+        if(lockedTaskIdList.isEmpty()) {
+            LOGGER.info("No locked tasks found.");
+            return;
+        }
+
         LOGGER.info("List of tasks: '{}'.", lockedTaskIdList);
         for (final UUID taskId : lockedTaskIdList) {
             taskService.unlockTask(taskId, timeoutSeconds);

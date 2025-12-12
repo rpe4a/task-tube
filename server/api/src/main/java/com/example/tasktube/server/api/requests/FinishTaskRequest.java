@@ -20,7 +20,6 @@ public record FinishTaskRequest(
 ) {
     public FinishTaskDto to(final UUID taskId) {
         Preconditions.checkNotNull(taskId);
-        Preconditions.checkNotNull(output);
         Preconditions.checkNotNull(client);
 
         final List<PushTaskDto> tasks = children == null ? null : children()

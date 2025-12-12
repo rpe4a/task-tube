@@ -44,6 +44,11 @@ public class BarrierUnlockingJob {
         LOGGER.info("Start find locked barriers.");
         final List<UUID> lockedBarrierIdList = jobService.getLockedBarrierIdList(count, timeoutSeconds);
 
+        if(lockedBarrierIdList.isEmpty()) {
+            LOGGER.info("No locked barriers found.");
+            return;
+        }
+
         LOGGER.info("List of barriers: '{}'.", lockedBarrierIdList);
         for (final UUID barrierId : lockedBarrierIdList) {
             barrierService.unlockBarrier(barrierId, timeoutSeconds);

@@ -39,9 +39,9 @@ public final class TubeController extends AbstractController {
     public ResponseEntity<UUID> push(
             @PathVariable("name") final String tube,
             @NotNull @Valid @RequestBody final TaskRequest request,
-            final BindingResult result
+            final BindingResult bindingResult
     ) {
-        if (isInvalid(result)) {
+        if (isInvalid(bindingResult)) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -57,9 +57,9 @@ public final class TubeController extends AbstractController {
     public ResponseEntity<PopTaskResponse> pop(
             @PathVariable("name") final String tube,
             @NotNull @Valid @RequestBody final PopTaskRequest request,
-            final BindingResult result
+            final BindingResult bindingResult
     ) {
-        if (isInvalid(result)) {
+        if (isInvalid(bindingResult)) {
             return ResponseEntity.badRequest().build();
         }
 

@@ -44,6 +44,11 @@ public class TaskSchedulingJob {
         LOGGER.info("Start scheduling tasks.");
         final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, count, instanceId.get());
 
+        if(taskIdList.isEmpty()) {
+            LOGGER.info("No created tasks found.");
+            return;
+        }
+
         LOGGER.info("List of tasks: '{}'.", taskIdList);
         for (final UUID taskId : taskIdList) {
             taskService.scheduleTask(taskId, Instant.now(), instanceId.get());

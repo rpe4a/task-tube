@@ -1,4 +1,4 @@
-package com.example.tasktube.server.api;
+package com.example.tasktube.server.api.regress;
 
 import com.example.tasktube.server.application.models.FinishTaskDto;
 import com.example.tasktube.server.application.models.PushTaskDto;

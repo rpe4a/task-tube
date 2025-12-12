@@ -36,9 +36,9 @@ public final class TaskController extends AbstractController {
     public ResponseEntity<Void> start(
             @PathVariable("id") final UUID taskId,
             @NotNull @Valid @RequestBody final StartTaskRequest request,
-            final BindingResult result
+            final BindingResult bindingResult
     ) {
-        if (isInvalid(result)) {
+        if (isInvalid(bindingResult)) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -54,9 +54,9 @@ public final class TaskController extends AbstractController {
     public ResponseEntity<Void> process(
             @PathVariable("id") final UUID taskId,
             @NotNull @Valid @RequestBody final ProcessTaskRequest request,
-            final BindingResult result
+            final BindingResult bindingResult
     ) {
-        if (isInvalid(result)) {
+        if (isInvalid(bindingResult)) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -72,9 +72,9 @@ public final class TaskController extends AbstractController {
     public ResponseEntity<Void> finish(
             @PathVariable("id") final UUID taskId,
             @NotNull @Valid @RequestBody final FinishTaskRequest request,
-            final BindingResult result
+            final BindingResult bindingResult
     ) {
-        if (isInvalid(result)) {
+        if (isInvalid(bindingResult)) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -90,9 +90,9 @@ public final class TaskController extends AbstractController {
     public ResponseEntity<Void> fail(
             @PathVariable("id") final UUID taskId,
             @NotNull @Valid @RequestBody final FailTaskRequest request,
-            final BindingResult result
+            final BindingResult bindingResult
     ) {
-        if (isInvalid(result)) {
+        if (isInvalid(bindingResult)) {
             return ResponseEntity.badRequest().build();
         }
 
