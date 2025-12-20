@@ -1,17 +1,9 @@
 package com.example.tasktube.server.api;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.example.tasktube.server.api.controllers.TubeController;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-import java.util.ArrayList;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.TimeUnit;
+import org.springframework.context.ConfigurableApplicationContext;
 
 @SpringBootApplication(
         scanBasePackages = {
@@ -22,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class RestApiApplication {
 
     public static void main(final String[] args) {
-        SpringApplication.run(RestApiApplication.class, args);
+        final ConfigurableApplicationContext constex = SpringApplication.run(RestApiApplication.class, args);
     }
 
 }

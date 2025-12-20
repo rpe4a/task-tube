@@ -2,6 +2,7 @@ package com.example.tasktube.server.api.requests;
 
 import com.example.tasktube.server.application.models.FinishTaskDto;
 import com.example.tasktube.server.application.models.PushTaskDto;
+import com.example.tasktube.server.domain.values.Slot;
 import com.google.common.base.Preconditions;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -14,7 +15,7 @@ import java.util.UUID;
 
 public record FinishTaskRequest(
         @Nullable List<TaskRequest> children,
-        @Nullable Map<String, Object> output,
+        @Nullable Slot output,
         @NotBlank String client,
         @NotNull Instant finishedAt
 ) {

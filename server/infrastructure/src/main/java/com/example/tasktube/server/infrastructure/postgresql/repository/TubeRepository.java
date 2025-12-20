@@ -6,7 +6,7 @@ import com.example.tasktube.server.domain.port.out.ITubeRepository;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskDataMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
-import org.apache.logging.log4j.util.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -147,10 +147,10 @@ public class TubeRepository implements ITubeRepository {
 
     @Override
     public Optional<Task> pop(final String tube, final String client) {
-        if (Strings.isEmpty(tube)) {
+        if (StringUtils.isEmpty(tube)) {
             throw new ApplicationException("Paramter tube cannot be null or empty.");
         }
-        if (Strings.isEmpty(client)) {
+        if (StringUtils.isEmpty(client)) {
             throw new ApplicationException("Parameter client cannot be null or empty.");
         }
         LOGGER.debug("Attempting to pop task from tube: '{}' by client: '{}'.", tube, client);

@@ -3,7 +3,7 @@ package com.example.tasktube.server.infrastructure.postgresql.repository;
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IJobRepository;
-import org.apache.logging.log4j.util.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -32,7 +32,7 @@ public class JobRepository implements IJobRepository {
         if (count <= 0) {
             throw new ApplicationException("Parameter count must be more than zero.");
         }
-        if (Strings.isEmpty(client)) {
+        if (StringUtils.isEmpty(client)) {
             throw new ApplicationException("Parameter client cannot be null or empty.");
         }
         LOGGER.debug("Attempting to lock '{}' barrier IDs by client '{}'.", count, client);
@@ -73,7 +73,7 @@ public class JobRepository implements IJobRepository {
         if (count <= 0) {
             throw new ApplicationException("Parameter count must be more than zero.");
         }
-        if (Strings.isEmpty(client)) {
+        if (StringUtils.isEmpty(client)) {
             throw new ApplicationException("Parameter client cannot be null or empty.");
         }
         LOGGER.debug("Attempting to lock '{}' task IDs with status '{}' by client '{}'.", count, status, client);

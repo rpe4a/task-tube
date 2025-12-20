@@ -23,7 +23,6 @@
 
     <properties>
         <versions.springframework.boot>3.5.7</versions.springframework.boot>
-        <versions.logging.slf4j>2.0.17</versions.logging.slf4j>
     </properties>
 
     <dependencyManagement>
@@ -67,11 +66,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-autoconfigure</artifactId>
                 <version>${versions.springframework.boot}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${versions.logging.slf4j}</version>
             </dependency>
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>

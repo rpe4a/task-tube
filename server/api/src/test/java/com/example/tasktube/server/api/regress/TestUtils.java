@@ -3,8 +3,10 @@ package com.example.tasktube.server.api.regress;
 import com.example.tasktube.server.application.models.FinishTaskDto;
 import com.example.tasktube.server.application.models.PushTaskDto;
 import com.example.tasktube.server.application.models.TaskSettingsDto;
+import com.example.tasktube.server.domain.values.Slot;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -29,7 +31,7 @@ public class TestUtils {
                 UUID.randomUUID(),
                 "task" + UUID.randomUUID(),
                 "tube",
-                Map.of("key", "value"),
+                new ArrayList<>(),
                 waitFor,
                 Instant.now(),
                 taskSettingsDto
@@ -41,7 +43,7 @@ public class TestUtils {
     }
 
     public static FinishTaskDto createFinishTaskDto(final UUID taskId, final String client, final List<PushTaskDto> children) {
-        return new FinishTaskDto(taskId, children, Map.of("key", "value"), client, Instant.now());
+        return new FinishTaskDto(taskId, children, new Slot(), client, Instant.now());
     }
 
     public static void await(final long amount, final TimeUnit timeUnit) {

@@ -1,6 +1,7 @@
 package com.example.tasktube.server.application.models;
 
 import com.example.tasktube.server.domain.enties.Task;
+import com.example.tasktube.server.domain.values.Slot;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -14,7 +15,7 @@ public record PushTaskDto(
         @NonNull UUID id,
         @NonNull String name,
         @NonNull String tube,
-        @NonNull Map<String, Object> input,
+        @Nullable List<Slot> input,
         @Nullable List<UUID> waitTasks,
         @NonNull Instant createdAt,
         @Nullable TaskSettingsDto settings

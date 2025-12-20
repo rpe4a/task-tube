@@ -8,7 +8,7 @@ import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
-import org.apache.logging.log4j.util.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -58,10 +58,10 @@ public class TubeService implements ITubeService {
     @Override
     @Transactional
     public Optional<PopTaskDto> pop(final String tube, final String client) {
-        if (Strings.isEmpty(tube)) {
+        if (StringUtils.isEmpty(tube)) {
             throw new ApplicationException("Parameter tube name cannot be null or empty.");
         }
-        if (Strings.isEmpty(client)) {
+        if (StringUtils.isEmpty(client)) {
             throw new ApplicationException("Parameter client name cannot be null or empty.");
         }
         LOGGER.info("Pop task from '{}' by '{}' client.", tube, client);

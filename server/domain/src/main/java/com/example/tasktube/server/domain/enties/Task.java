@@ -2,6 +2,7 @@ package com.example.tasktube.server.domain.enties;
 
 import com.example.tasktube.server.domain.exceptions.ValidationDomainException;
 import com.example.tasktube.server.domain.values.Lock;
+import com.example.tasktube.server.domain.values.Slot;
 import com.example.tasktube.server.domain.values.TaskSettings;
 
 import java.time.Instant;
@@ -18,8 +19,8 @@ public class Task {
     private String tube;
     private Status status;
     private UUID parentId;
-    private Map<String, Object> input;
-    private Map<String, Object> output;
+    private List<Slot> input;
+    private Slot output;
     private boolean isRoot;
     private UUID startBarrier;
     private UUID finishBarrier;
@@ -43,8 +44,8 @@ public class Task {
                 final String tube,
                 final Status status,
                 final UUID parentId,
-                final Map<String, Object> input,
-                final Map<String, Object> output,
+                final List<Slot> input,
+                final Slot output,
                 final boolean isRoot,
                 final UUID startBarrier,
                 final UUID finishBarrier,
@@ -132,11 +133,11 @@ public class Task {
         this.status = status;
     }
 
-    public Map<String, Object> getInput() {
+    public List<Slot> getInput() {
         return input;
     }
 
-    public void setInput(final Map<String, Object> input) {
+    public void setInput(final List<Slot> input) {
         this.input = input;
     }
 
@@ -220,7 +221,7 @@ public class Task {
         checkHandleBy(Status.PROCESSING, client);
     }
 
-    private void checkFinish(final Map<String, Object> output, final String client) {
+    private void checkFinish(final Slot output, final String client) {
         checkHandleBy(Status.PROCESSING, client);
         if (Objects.isNull(output)) {
             throw new ValidationDomainException("Parameter output cannot be null.");
@@ -283,7 +284,7 @@ public class Task {
         setLock(getLock().prolong());
     }
 
-    public void finish(final Instant finishedAt, final Map<String, Object> output, final String client) {
+    public void finish(final Instant finishedAt, final Slot output, final String client) {
         checkFinish(output, client);
         setFinishedAt(finishedAt);
         setStatus(Status.FINISHED);
@@ -402,11 +403,11 @@ public class Task {
         this.finishBarrier = finishBarrier;
     }
 
-    public Map<String, Object> getOutput() {
+    public Slot getOutput() {
         return output;
     }
 
-    public void setOutput(final Map<String, Object> output) {
+    public void setOutput(final Slot output) {
         this.output = output;
     }
 
