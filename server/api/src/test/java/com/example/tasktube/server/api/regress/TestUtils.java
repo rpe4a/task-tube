@@ -8,7 +8,6 @@ import com.example.tasktube.server.domain.values.Slot;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -31,6 +30,7 @@ public class TestUtils {
                 UUID.randomUUID(),
                 "task" + UUID.randomUUID(),
                 "tube",
+                UUID.randomUUID().toString(),
                 new ArrayList<>(),
                 waitFor,
                 Instant.now(),

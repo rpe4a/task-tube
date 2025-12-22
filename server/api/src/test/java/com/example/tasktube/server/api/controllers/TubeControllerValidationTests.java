@@ -53,6 +53,7 @@ class TubeControllerValidationTests {
                 null,
                 null,
                 null,
+                null,
                 null
         );
 
@@ -68,6 +69,7 @@ class TubeControllerValidationTests {
                 UUID.randomUUID(),
                 null,
                 "test-tube",
+                null,
                 null,
                 null,
                 null,
@@ -89,6 +91,7 @@ class TubeControllerValidationTests {
                 null,
                 null,
                 null,
+                null,
                 null
         );
 
@@ -103,6 +106,7 @@ class TubeControllerValidationTests {
         final TaskRequest request = new TaskRequest(
                 UUID.randomUUID(),
                 "test-task",
+                null,
                 null,
                 null,
                 null,
@@ -125,6 +129,7 @@ class TubeControllerValidationTests {
                 null,
                 null,
                 null,
+                null,
                 null
         );
 
@@ -143,6 +148,7 @@ class TubeControllerValidationTests {
                 null,
                 null,
                 null,
+                null,
                 null
         );
 
@@ -158,6 +164,7 @@ class TubeControllerValidationTests {
                 UUID.randomUUID(),
                 "test-task",
                 "test-tube",
+                null,
                 null,
                 null,
                 Instant.now(),

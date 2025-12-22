@@ -30,6 +30,7 @@ public class TaskDataMapper {
         map.put("name", task.getName());
         map.put("tube", task.getTube());
         map.put("status", task.getStatus().name());
+        map.put("correlation_id", task.getCorrelationId());
         map.put("parent_id", task.getParentId());
         map.put("input", task.getInput() != null ? toJson(task.getInput()) : null);
         map.put("output", task.getOutput() != null ? toJson(task.getOutput()) : null);
@@ -68,6 +69,7 @@ public class TaskDataMapper {
         task.setName(rs.getString("name"));
         task.setTube(rs.getString("tube"));
         task.setStatus(Task.Status.valueOf(rs.getString("status")));
+        task.setCorrelationId(rs.getString("correlation_id"));
         task.setParentId(rs.getObject("parent_id", UUID.class));
         task.setInput(rs.getString("input") != null
                 ? fromJson(rs.getString("input"), new TypeReference<>() {

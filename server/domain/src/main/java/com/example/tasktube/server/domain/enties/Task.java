@@ -8,7 +8,6 @@ import com.example.tasktube.server.domain.values.TaskSettings;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,7 +17,7 @@ public class Task {
     private String name;
     private String tube;
     private Status status;
-    // correlationID
+    private String correlationId;
     private UUID parentId;
     private List<Slot> input;
     private Slot output;
@@ -44,6 +43,7 @@ public class Task {
                 final String name,
                 final String tube,
                 final Status status,
+                final String correlationId,
                 final UUID parentId,
                 final List<Slot> input,
                 final Slot output,
@@ -69,6 +69,7 @@ public class Task {
         this.name = name;
         this.tube = tube;
         this.status = status;
+        this.correlationId = correlationId;
         this.parentId = parentId;
         this.input = input;
         this.output = output;
@@ -100,6 +101,14 @@ public class Task {
         if (Objects.isNull(waitForTaskIds) || waitForTaskIds.isEmpty()) {
             throw new ValidationDomainException("Parameter waitForTaskIds cannot be null or empty.");
         }
+    }
+
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    public void setCorrelationId(final String correlationId) {
+        this.correlationId = correlationId;
     }
 
     public UUID getId() {

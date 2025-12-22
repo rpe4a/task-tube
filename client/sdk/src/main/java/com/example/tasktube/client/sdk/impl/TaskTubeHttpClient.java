@@ -6,6 +6,7 @@ import com.example.tasktube.client.sdk.dto.FailTaskRequest;
 import com.example.tasktube.client.sdk.dto.FinishTaskRequest;
 import com.example.tasktube.client.sdk.dto.PopTaskRequest;
 import com.example.tasktube.client.sdk.dto.PopTaskResponse;
+import com.example.tasktube.client.sdk.dto.PopTasksRequest;
 import com.example.tasktube.client.sdk.dto.ProcessTaskRequest;
 import com.example.tasktube.client.sdk.dto.StartTaskRequest;
 import com.example.tasktube.client.sdk.dto.TaskRequest;
@@ -24,6 +25,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -81,13 +83,34 @@ public class TaskTubeHttpClient implements TaskTubeClient {
 
     @Override
     public Optional<PopTaskResponse> popTask(final String tubeName, final PopTaskRequest request) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        Preconditions.checkArgument(StringUtils.isNotBlank(tubeName));
+        Preconditions.checkNotNull(request);
+
+        final HttpRequest httpRequest = getRequestBuilder()
+                .uri(getUri("api/v1/tube/%s/pop".formatted(tubeName)))
+                .POST(getBody(request))
+                .build();
+
+        return send(httpRequest, new TypeReference<>() {});
+    }
+
+    @Override
+    public List<PopTaskResponse> popTasks(final String tubeName, final PopTasksRequest request) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(tubeName));
+        Preconditions.checkNotNull(request);
+
+        final HttpRequest httpRequest = getRequestBuilder()
+                .uri(getUri("api/v1/tube/%s/pop/list".formatted(tubeName)))
+                .POST(getBody(request))
+                .build();
+
+        return send(httpRequest, new TypeReference<>() {});
     }
 
     private <T> T send(final HttpRequest httpRequest, final TypeReference<T> typeReference) {
         try {
             final HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() != 200) {
+            if (response.statusCode() >= 400) {
                 throw new TaskTubeApiException(response.body());
             }
 
