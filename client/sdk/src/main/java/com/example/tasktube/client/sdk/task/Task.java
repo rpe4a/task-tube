@@ -6,7 +6,6 @@ import java.util.List;
 
 public abstract class Task<TResult> {
     private final List<TaskRecord<?>> children = new LinkedList<>();
-    private TaskRecord<TResult> record;
 
     public List<TaskRecord<?>> getChildren() {
         return children;
@@ -14,10 +13,6 @@ public abstract class Task<TResult> {
 
     public String getName() {
         return getClass().getCanonicalName();
-    }
-
-    public void setRecord(final TaskRecord<TResult> record) {
-        this.record = record;
     }
 
     public final Nothing nothing() {
@@ -43,14 +38,14 @@ public abstract class Task<TResult> {
 
     public final <R, A0> TaskResult<R> pushIn(final Task1<R, A0> task, final Value<A0> value, final TaskConfiguration... configurations) {
         final TaskRecord<R> child = addChild(task, configurations);
-        child.setArg(value);
+        child.addArg(value);
         return child.getResult();
     }
 
     public final <R, A0, A1> TaskResult<R> pushIn(final Task2<R, A0, A1> task, final Value<A0> value0, final Value<A1> value1, final TaskConfiguration... configurations) {
         final TaskRecord<R> child = addChild(task, configurations);
-        child.setArg(value0);
-        child.setArg(value1);
+        child.addArg(value0);
+        child.addArg(value1);
         return child.getResult();
     }
 
@@ -65,8 +60,10 @@ public abstract class Task<TResult> {
     private <R> TaskRecord<R> addChild(final Task<R> task, final TaskConfiguration[] configurations) {
         final TaskRecord<R> child = task.attachTo(this);
 
-        Arrays.stream(configurations)
-                .forEach(child::applyConfiguration);
+        if (configurations.length > 0) {
+            Arrays.stream(configurations)
+                    .forEach(c -> c.applyTo(child));
+        }
 
         return child;
     }
@@ -85,6 +82,10 @@ public abstract class Task<TResult> {
 
     private void appendChild(final TaskRecord<?> child) {
         children.add(child);
+    }
+
+    public TaskOutput run(final TaskInput input) {
+        return null; //TODO
     }
 
     public class TaskConfigurationInternal {

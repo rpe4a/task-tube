@@ -1,11 +1,9 @@
 package com.example.tasktube.client.sdk.dto;
 
 import com.example.tasktube.client.sdk.slot.Slot;
-import com.example.tasktube.client.sdk.task.TaskSetting;
+import com.example.tasktube.client.sdk.task.TaskSettings;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public record TaskRequest(
@@ -15,6 +13,6 @@ public record TaskRequest(
         Slot[] input,
         UUID[] waitTasks,
         Instant createdAt,
-        TaskSetting settings
+        TaskSettings settings
 ) {
 }

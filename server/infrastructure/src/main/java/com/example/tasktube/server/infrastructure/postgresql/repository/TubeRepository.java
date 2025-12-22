@@ -9,7 +9,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -148,12 +148,30 @@ public class TubeRepository implements ITubeRepository {
     @Override
     public Optional<Task> pop(final String tube, final String client) {
         if (StringUtils.isEmpty(tube)) {
-            throw new ApplicationException("Paramter tube cannot be null or empty.");
+            throw new ApplicationException("Parameter tube cannot be null or empty.");
         }
         if (StringUtils.isEmpty(client)) {
             throw new ApplicationException("Parameter client cannot be null or empty.");
         }
         LOGGER.debug("Attempting to pop task from tube: '{}' by client: '{}'.", tube, client);
+
+        return popList(tube, client, 1)
+                .stream()
+                .findFirst();
+    }
+
+    @Override
+    public List<Task> popList(final String tube, final String client, final int count) {
+        if (StringUtils.isEmpty(tube)) {
+            throw new ApplicationException("Parameter tube cannot be null or empty.");
+        }
+        if (StringUtils.isEmpty(client)) {
+            throw new ApplicationException("Parameter client cannot be null or empty.");
+        }
+        if (count <= 0) {
+            throw new ApplicationException("Parameter count should be greater than 0.");
+        }
+        LOGGER.debug("Attempting to pop '{}' tasks from tube: '{}' by client: '{}'.", count, tube, client);
 
         final String queryCommand = """
                     WITH locked_task
@@ -168,7 +186,7 @@ public class TubeRepository implements ITubeRepository {
                           AND scheduled_at <= current_timestamp
                         ORDER BY scheduled_at
                             FOR UPDATE SKIP LOCKED
-                        LIMIT 1
+                        LIMIT :count
                     )
                     UPDATE tasks
                     SET locked = true,
@@ -179,19 +197,17 @@ public class TubeRepository implements ITubeRepository {
                     RETURNING *
                 """;
 
-        final ResultSetExtractor<Optional<Task>> rsExtractor = rs -> {
-            if (rs.next()) {
-                try {
-                    final Task poppedTask = mapper.getTask(rs);
-                    return Optional.of(poppedTask);
-                } catch (final JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            } else {
-                return Optional.empty();
+        final RowMapper<Task> rsMapper = (rs, rowNum) -> {
+            try {
+                return mapper.getTask(rs);
+            } catch (final JsonProcessingException e) {
+                throw new RuntimeException(e);
             }
         };
 
-        return db.query(queryCommand, Map.of("tube", tube, "locked_by", client), rsExtractor);
+        final List<Task> tasks = db.query(queryCommand, Map.of("tube", tube, "locked_by", client, "count", count), rsMapper);
+        LOGGER.debug("Got '{}' tasks.", tasks.size());
+
+        return tasks;
     }
 }

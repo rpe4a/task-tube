@@ -1,12 +1,13 @@
 package com.example.tasktube.client.sdk.dto;
 
+import com.example.tasktube.client.sdk.slot.Slot;
+
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 
 public record FinishTaskRequest(
         List<TaskRequest> children,
-        Map<String, Object> output,
+        Slot output,
         String client,
         Instant finishedAt
 ) {

@@ -15,6 +15,8 @@ public interface TaskConfiguration {
         return new FailureRetryTimeoutSeconds(value);
     }
 
+    void applyTo(TaskRecord<?> taskRecord);
+
     final class WaitForTask implements TaskConfiguration {
         private final UUID id;
 
@@ -24,6 +26,11 @@ public interface TaskConfiguration {
 
         public UUID getId() {
             return id;
+        }
+
+        @Override
+        public void applyTo(final TaskRecord<?> taskRecord) {
+            taskRecord.waitFor(id);
         }
     }
 
@@ -37,6 +44,11 @@ public interface TaskConfiguration {
         public int getValue() {
             return value;
         }
+
+        @Override
+        public void applyTo(final TaskRecord<?> taskRecord) {
+            taskRecord.getSetting().setMaxFailures(value);
+        }
     }
 
     class FailureRetryTimeoutSeconds implements TaskConfiguration {
@@ -48,6 +60,11 @@ public interface TaskConfiguration {
 
         public int getValue() {
             return value;
+        }
+
+        @Override
+        public void applyTo(final TaskRecord<?> taskRecord) {
+            taskRecord.getSetting().setFailureRetryTimeoutSeconds(value);
         }
     }
 

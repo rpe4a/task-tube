@@ -18,6 +18,7 @@ public class Task {
     private String name;
     private String tube;
     private Status status;
+    // correlationID
     private UUID parentId;
     private List<Slot> input;
     private Slot output;

@@ -11,4 +11,6 @@ public interface ITubeRepository {
     void push(List<Task> tasks);
 
     Optional<Task> pop(String tube, String client);
+
+    List<Task> popList(String tube, String client, int count);
 }

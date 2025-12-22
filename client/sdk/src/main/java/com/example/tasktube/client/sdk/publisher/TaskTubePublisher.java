@@ -1,7 +1,7 @@
 package com.example.tasktube.client.sdk.publisher;
 
 import com.example.tasktube.client.sdk.TaskTubeClient;
-import com.example.tasktube.client.sdk.task.TaskSetting;
+import com.example.tasktube.client.sdk.task.TaskSettings;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 
@@ -16,7 +16,7 @@ public final class TaskTubePublisher {
         this.builder = Objects.requireNonNull(builder);
     }
 
-    public TaskTubePublisher settings(final TaskSetting setting) {
+    public TaskTubePublisher settings(final TaskSettings setting) {
         Preconditions.checkNotNull(setting);
 
         builder.setSettings(setting);

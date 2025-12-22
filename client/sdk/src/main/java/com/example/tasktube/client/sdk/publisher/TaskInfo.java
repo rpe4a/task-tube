@@ -3,7 +3,7 @@ package com.example.tasktube.client.sdk.publisher;
 import com.example.tasktube.client.sdk.dto.TaskRequest;
 import com.example.tasktube.client.sdk.slot.Slot;
 import com.example.tasktube.client.sdk.slot.SlotValueMapper;
-import com.example.tasktube.client.sdk.task.TaskSetting;
+import com.example.tasktube.client.sdk.task.TaskSettings;
 import com.example.tasktube.client.sdk.task.Value;
 
 import java.time.Instant;
@@ -14,7 +14,7 @@ import java.util.UUID;
 
 public class TaskInfo {
     private final List<Slot> slots = new LinkedList<>();
-    private TaskSetting setting = TaskSetting.DEFAULT();
+    private TaskSettings setting = TaskSettings.DEFAULT();
     private UUID id;
     private String name;
     private String tube;
@@ -46,11 +46,11 @@ public class TaskInfo {
         this.tube = tube;
     }
 
-    public TaskSetting getSetting() {
+    public TaskSettings getSetting() {
         return setting;
     }
 
-    void setSetting(final TaskSetting setting) {
+    void setSetting(final TaskSettings setting) {
         this.setting = setting;
     }
 
@@ -80,7 +80,7 @@ public class TaskInfo {
             return this;
         }
 
-        public TaskInfo.Builder setSettings(final TaskSetting setting) {
+        public TaskInfo.Builder setSettings(final TaskSettings setting) {
             taskInfo.setSetting(setting);
             return this;
         }

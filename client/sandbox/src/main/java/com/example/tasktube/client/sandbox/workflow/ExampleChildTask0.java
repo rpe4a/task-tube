@@ -10,6 +10,7 @@ public class ExampleChildTask0 extends Task0<Integer> {
         return "test_name";
     }
 
+
     @Override
     public Value<Integer> execute() throws Exception {
         return constant(0);

@@ -1,6 +1,6 @@
 package com.example.tasktube.client.sdk.task;
 
-import com.google.common.base.Preconditions;
+import com.example.tasktube.client.sdk.dto.TaskRequest;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -10,7 +10,7 @@ public class TaskRecord<TResult> {
 
     private final List<Value<?>> args = new LinkedList<>();
     private final List<UUID> waitForTasks = new LinkedList<>();
-    private final TaskSetting setting = TaskSetting.DEFAULT();
+    private final TaskSettings setting = TaskSettings.DEFAULT();
     private UUID id;
     private UUID parentId;
     private String name;
@@ -24,7 +24,7 @@ public class TaskRecord<TResult> {
         this.id = id;
     }
 
-    public TaskSetting getSetting() {
+    public TaskSettings getSetting() {
         return setting;
     }
 
@@ -48,8 +48,12 @@ public class TaskRecord<TResult> {
         return new TaskResult<>(id);
     }
 
-    void setArg(final Value<?> value) {
+    void addArg(final Value<?> value) {
         args.add(value);
+    }
+
+    void waitFor(final UUID taskId) {
+        waitForTasks.add(taskId);
     }
 
     public UUID getParentId() {
@@ -68,20 +72,7 @@ public class TaskRecord<TResult> {
         this.tube = tube;
     }
 
-    public void applyConfiguration(final TaskConfiguration configuration) {
-        Preconditions.checkNotNull(configuration);
-        if (TaskConfiguration.WaitForTask.class.isAssignableFrom(configuration.getClass())) {
-            final TaskConfiguration.WaitForTask waitForTask = (TaskConfiguration.WaitForTask) configuration;
-            waitForTasks.add(waitForTask.getId());
-        } else if (TaskConfiguration.MaxCountOfFailures.class.isAssignableFrom(configuration.getClass())) {
-            final TaskConfiguration.MaxCountOfFailures maxCountOfFailures = (TaskConfiguration.MaxCountOfFailures) configuration;
-            setting.setMaxFailures(maxCountOfFailures.getValue());
-        } else if (TaskConfiguration.FailureRetryTimeoutSeconds.class.isAssignableFrom(configuration.getClass())) {
-            final TaskConfiguration.FailureRetryTimeoutSeconds failureRetryTimeoutSeconds = (TaskConfiguration.FailureRetryTimeoutSeconds) configuration;
-            setting.setFailureRetryTimeoutSeconds(failureRetryTimeoutSeconds.getValue());
-        } else {
-            throw new IllegalArgumentException("Unsupported configuration type: " + configuration.getClass());
-        }
+    public TaskRequest toRequest() {
     }
 
     public static final class Builder<TResult> {
@@ -112,7 +103,7 @@ public class TaskRecord<TResult> {
         }
 
         public <A0> Builder<TResult> setArg(final Constant<A0> arg0) {
-            taskRecord.setArg(arg0);
+            taskRecord.addArg(arg0);
             return this;
         }
 

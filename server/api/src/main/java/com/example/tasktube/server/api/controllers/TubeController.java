@@ -2,6 +2,7 @@ package com.example.tasktube.server.api.controllers;
 
 import com.example.tasktube.server.api.requests.PopTaskRequest;
 import com.example.tasktube.server.api.requests.PopTaskResponse;
+import com.example.tasktube.server.api.requests.PopTasksRequest;
 import com.example.tasktube.server.api.requests.TaskRequest;
 import com.example.tasktube.server.application.port.in.ITubeService;
 import jakarta.validation.Valid;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -71,4 +73,29 @@ public final class TubeController extends AbstractController {
                 )
                 .orElseGet(() -> ResponseEntity.noContent().build());
     }
+
+    @RequestMapping(
+            value = "/{name}/pop/list",
+            method = RequestMethod.POST
+    )
+    public ResponseEntity<List<PopTaskResponse>> popList(
+            @PathVariable("name") final String tube,
+            @NotNull @Valid @RequestBody final PopTasksRequest request,
+            final BindingResult bindingResult
+    ) {
+        if (isInvalid(bindingResult)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        final List<PopTaskResponse> responses = tubeService.popList(tube, request.client(), request.count())
+                .stream()
+                .map(PopTaskResponse::from)
+                .toList();
+
+        return responses.isEmpty()
+                ? ResponseEntity.noContent().build()
+                : ResponseEntity.ok(responses);
+
+    }
+
 }

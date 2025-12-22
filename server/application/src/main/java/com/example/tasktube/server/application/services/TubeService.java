@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -69,5 +70,28 @@ public class TubeService implements ITubeService {
         return tubeRepository
                 .pop(tube, client)
                 .map(PopTaskDto::from);
+    }
+
+    @Override
+    @Transactional
+    public List<PopTaskDto> popList(final String tube, final String client, final int count) {
+        if (StringUtils.isEmpty(tube)) {
+            throw new ApplicationException("Parameter tube name cannot be null or empty.");
+        }
+        if (StringUtils.isEmpty(client)) {
+            throw new ApplicationException("Parameter client name cannot be null or empty.");
+        }
+        if (count <= 0) {
+            throw new ApplicationException("Parameter count should be greater than 0.");
+        }
+
+        LOGGER.info("Pop '{}' tasks from '{}' by '{}' client.", count, tube, client);
+
+        return tubeRepository
+                .popList(tube, client, count)
+                .stream()
+                .map(PopTaskDto::from)
+                .toList();
+
     }
 }
