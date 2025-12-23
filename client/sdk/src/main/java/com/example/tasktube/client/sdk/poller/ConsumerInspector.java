@@ -3,6 +3,8 @@ package com.example.tasktube.client.sdk.poller;
 import com.example.tasktube.client.sdk.InstanceIdProvider;
 import com.example.tasktube.client.sdk.TaskTubeClient;
 import com.example.tasktube.client.sdk.poller.middleware.Middleware;
+import com.example.tasktube.client.sdk.slot.SlotArgumentDeserializer;
+import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
 import com.example.tasktube.client.sdk.task.TaskInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,8 @@ final class ConsumerInspector implements Runnable {
     private final TaskFactory taskFactory;
     private final BlockingQueue<TaskInput> queue;
     private final ExecutorService consumerPool;
+    private final SlotArgumentDeserializer slotDeserializer;
+    private final SlotValueSerializer slotValueSerializer;
     private final TaskTubePollerSettings settings;
     private final List<Middleware> middlewares;
 
@@ -27,12 +31,16 @@ final class ConsumerInspector implements Runnable {
             final BlockingQueue<TaskInput> queue,
             final ExecutorService consumerPool,
             final List<Middleware> middlewares,
+            final SlotArgumentDeserializer slotDeserializer,
+            final SlotValueSerializer slotValueSerializer,
             final TaskTubePollerSettings settings
     ) {
         this.taskFactory = Objects.requireNonNull(taskFactory);
         this.queue = Objects.requireNonNull(queue);
         this.consumerPool = Objects.requireNonNull(consumerPool);
         this.middlewares = Objects.requireNonNull(middlewares);
+        this.slotDeserializer = Objects.requireNonNull(slotDeserializer);
+        this.slotValueSerializer = Objects.requireNonNull(slotValueSerializer);
         this.settings = Objects.requireNonNull(settings);
 
         // add default consumers
@@ -79,7 +87,7 @@ final class ConsumerInspector implements Runnable {
 
     private void addConsumer() {
         consumersCount.incrementAndGet();
-        consumerPool.execute(new TaskTubeConsumer(taskFactory, queue, this, middlewares, settings));
+        consumerPool.execute(new TaskTubeConsumer(taskFactory, queue, this, middlewares, slotDeserializer, slotValueSerializer, settings));
     }
 
     private void removeConsumer() {

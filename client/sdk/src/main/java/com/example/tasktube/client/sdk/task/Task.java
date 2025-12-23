@@ -1,58 +1,173 @@
 package com.example.tasktube.client.sdk.task;
 
+import com.example.tasktube.client.sdk.slot.Slot;
+import com.example.tasktube.client.sdk.slot.SlotArgumentDeserializer;
+import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.google.common.base.Preconditions;
+import jakarta.annotation.Nonnull;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 public abstract class Task<TResult> {
+    private static final String CANNOT_FIND_METHOD_RUN = "Cannot find method run.";
+    private static final String DEFAULT_METHOD_NAME = "run";
+
     private final List<TaskRecord<?>> children = new LinkedList<>();
 
-    public List<TaskRecord<?>> getChildren() {
-        return children;
+    private UUID id;
+    private String tube;
+    private String correlationId;
+    private TaskSettings settings;
+
+    private SlotArgumentDeserializer slotDeserializer;
+    private SlotValueSerializer slotSerializer;
+
+    @Nonnull
+    public UUID getId() {
+        return id;
     }
 
+    private void setId(final UUID id) {
+        this.id = id;
+    }
+
+    @Nonnull
     public String getName() {
         return getClass().getCanonicalName();
     }
 
-    public final Nothing nothing() {
-        return new Nothing();
+    @Nonnull
+    public TaskSettings getSettings() {
+        return settings;
     }
 
-    public final <V> Constant<V> constant(final V value) {
+    private void setSettings(final TaskSettings settings) {
+        this.settings = settings;
+    }
+
+    @Nonnull
+    public String getTube() {
+        return tube;
+    }
+
+    private void setTube(final String tube) {
+        this.tube = tube;
+    }
+
+    @Nonnull
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    private void setCorrelationId(final String correlationId) {
+        this.correlationId = correlationId;
+    }
+
+    private void setSlotDeserializer(final SlotArgumentDeserializer slotDeserializer) {
+        this.slotDeserializer = slotDeserializer;
+    }
+
+    private void setSlotValueSerializer(final SlotValueSerializer slotValueSerializer) {
+        this.slotSerializer = slotValueSerializer;
+    }
+
+
+    @Nonnull
+    public final <V> Nothing<V> nothing() {
+        return new Nothing<>();
+    }
+
+    @Nonnull
+    public final <V> Constant<V> constant(@Nonnull final V value) {
+        Preconditions.checkNotNull(value);
+
         return new Constant<>(value);
     }
 
-    public final <V> ValueList<V> list(final List<Value<V>> values) {
+    @Nonnull
+    public final <V> Constant<V> constant(@Nonnull final V value, @Nonnull final TypeReference<V> typeReference) {
+        Preconditions.checkNotNull(value);
+        Preconditions.checkNotNull(typeReference);
+
+        return new Constant<>(value, typeReference);
+    }
+
+    @Nonnull
+    public final <V> ValueList<V> list(@Nonnull final List<Value<V>> values) {
+        Preconditions.checkNotNull(values);
+
         return new ValueList<>(values);
     }
 
     @SafeVarargs
-    public final <V> ValueList<V> list(final Value<V>... values) {
+    @Nonnull
+    public final <V> ValueList<V> list(@Nonnull final Value<V>... values) {
+        Preconditions.checkNotNull(values);
+
         return new ValueList<>(Arrays.asList(values));
     }
 
-    public final <R> TaskResult<R> pushIn(final Task0<R> task, final TaskConfiguration... configurations) {
+    @Nonnull
+    public final <R> TaskResult<R> pushIn(
+            @Nonnull final Task0<R> task,
+            @Nonnull final TaskConfiguration... configurations
+    ) {
+        Preconditions.checkNotNull(task);
+        Preconditions.checkNotNull(configurations);
+
         return addChild(task, configurations).getResult();
     }
 
-    public final <R, A0> TaskResult<R> pushIn(final Task1<R, A0> task, final Value<A0> value, final TaskConfiguration... configurations) {
+    @Nonnull
+    public final <R, A0> TaskResult<R> pushIn(
+            @Nonnull final Task1<R, A0> task,
+            @Nonnull final Value<A0> value,
+            final TaskConfiguration... configurations
+    ) {
+        Preconditions.checkNotNull(task);
+        Preconditions.checkNotNull(value);
+        Preconditions.checkNotNull(configurations);
+
         final TaskRecord<R> child = addChild(task, configurations);
         child.addArg(value);
         return child.getResult();
     }
 
-    public final <R, A0, A1> TaskResult<R> pushIn(final Task2<R, A0, A1> task, final Value<A0> value0, final Value<A1> value1, final TaskConfiguration... configurations) {
+    @Nonnull
+    public final <R, A0, A1> TaskResult<R> pushIn(
+            @Nonnull final Task2<R, A0, A1> task,
+            @Nonnull final Value<A0> value0,
+            @Nonnull final Value<A1> value1,
+            @Nonnull final TaskConfiguration... configurations
+    ) {
+        Preconditions.checkNotNull(task);
+        Preconditions.checkNotNull(value0);
+        Preconditions.checkNotNull(value1);
+        Preconditions.checkNotNull(configurations);
+
         final TaskRecord<R> child = addChild(task, configurations);
         child.addArg(value0);
         child.addArg(value1);
         return child.getResult();
     }
 
-    public final TaskConfiguration waitFor(final TaskResult<Integer> taskResult) {
+    @Nonnull
+    public final TaskConfiguration waitFor(@Nonnull final TaskResult<Integer> taskResult) {
+        Preconditions.checkNotNull(taskResult);
+
         return new TaskConfiguration.WaitForTask(taskResult);
     }
 
+    @Nonnull
     public final TaskConfigurationInternal configure() {
         return new TaskConfigurationInternal();
     }
@@ -60,9 +175,8 @@ public abstract class Task<TResult> {
     private <R> TaskRecord<R> addChild(final Task<R> task, final TaskConfiguration[] configurations) {
         final TaskRecord<R> child = task.attachTo(this);
 
-        if (configurations.length > 0) {
-            Arrays.stream(configurations)
-                    .forEach(c -> c.applyTo(child));
+        for (final TaskConfiguration configuration : configurations) {
+            configuration.applyTo(child);
         }
 
         return child;
@@ -71,8 +185,9 @@ public abstract class Task<TResult> {
     private TaskRecord<TResult> attachTo(final Task<?> parent) {
         final TaskRecord<TResult> child = new TaskRecord.Builder<TResult>()
                 .setName(getName())
-                .setParent(parent.record.getId())
-                .setTube(parent.record.getTube())
+                .setParent(parent.getId())
+                .setTube(parent.getTube())
+                .setTube(parent.getCorrelationId())
                 .build();
 
         parent.appendChild(child);
@@ -84,15 +199,64 @@ public abstract class Task<TResult> {
         children.add(child);
     }
 
-    public TaskOutput run(final TaskInput input) {
-        return null; //TODO
+    @Nonnull
+    public TaskOutput execute(
+            @Nonnull final TaskInput input,
+            @Nonnull final SlotArgumentDeserializer slotDeserializer,
+            @Nonnull final SlotValueSerializer slotValueSerializer
+    ) {
+        Preconditions.checkNotNull(slotDeserializer);
+        Preconditions.checkNotNull(slotValueSerializer);
+        Preconditions.checkNotNull(input);
+        Preconditions.checkArgument(input.getName().equals(getName()));
+
+        setSlotDeserializer(slotDeserializer);
+        setSlotDeserializer(slotDeserializer);
+
+        setId(input.getId());
+        setTube(input.getTube());
+        setCorrelationId(input.getCorrelationId());
+        setSettings(input.getSettings());
+
+        final Value<TResult> result = executeRunMethod(input.getArgs()).orElseGet(this::nothing);
+
+        return TaskOutput.createInstance(input)
+                .setResult(result.serialize(slotSerializer));
     }
 
-    public class TaskConfigurationInternal {
+    private Optional<Value<TResult>> executeRunMethod(final List<Slot> slots) {
+        try {
+            final Method run = getRunMethod();
+            final Parameter[] parameters = run.getParameters();
+            final Object[] args = new Object[parameters.length];
+            for (int i = 0; i < parameters.length; i++) {
+                args[i] = slotDeserializer.deserialize(slots.get(i));
+            }
+            return Optional.ofNullable((Value<TResult>) run.invoke(this, args));
+        } catch (final InvocationTargetException | IllegalAccessException e) {
+            final Throwable innerException = Objects.nonNull(e.getCause()) ? e.getCause() : e;
+            throw new RunnableMethodException(innerException);
+        }
+    }
+
+    private Method getRunMethod() {
+        final Method[] methods = Objects.requireNonNull(this.getClass()).getMethods();
+        for (final Method method : methods) {
+            if (DEFAULT_METHOD_NAME.equals(method.getName())) {
+                return method;
+            }
+        }
+        throw new IllegalArgumentException(CANNOT_FIND_METHOD_RUN);
+    }
+
+    public static class TaskConfigurationInternal {
+
+        @Nonnull
         public TaskConfiguration.MaxCountOfFailures maxCountOfFailures(final int value) {
             return new TaskConfiguration.MaxCountOfFailures(value);
         }
 
+        @Nonnull
         public TaskConfiguration.FailureRetryTimeoutSeconds failureRetryTimeoutSeconds(final int value) {
             return new TaskConfiguration.FailureRetryTimeoutSeconds(value);
         }

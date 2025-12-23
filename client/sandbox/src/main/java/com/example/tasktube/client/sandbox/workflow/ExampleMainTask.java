@@ -7,7 +7,7 @@ import com.example.tasktube.client.sdk.task.Value;
 public class ExampleMainTask extends Task1<String, String> {
 
     @Override
-    public Value<String> execute(final String arg0) {
+    public Value<String> run(final String arg0) {
         final TaskResult<Integer> childTaskResult0 = pushIn(new ExampleChildTask0());
 
         final TaskResult<Integer> childTaskResult1 =
@@ -23,6 +23,6 @@ public class ExampleMainTask extends Task1<String, String> {
 
         final TaskResult<Integer> childTaskResult4 = pushIn(new ExampleChildTask1List(), list(constant(1), constant(2), childTaskResult2));
 
-        return constant("String");
+        return nothing();
     }
 }

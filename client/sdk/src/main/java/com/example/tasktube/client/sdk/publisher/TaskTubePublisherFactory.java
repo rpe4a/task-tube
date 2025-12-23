@@ -1,7 +1,7 @@
 package com.example.tasktube.client.sdk.publisher;
 
 import com.example.tasktube.client.sdk.TaskTubeClient;
-import com.example.tasktube.client.sdk.slot.SlotValueMapper;
+import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
 import com.example.tasktube.client.sdk.task.Task0;
 import com.example.tasktube.client.sdk.task.Task1;
 import com.example.tasktube.client.sdk.task.Task2;
@@ -12,9 +12,9 @@ import java.util.UUID;
 
 public final class TaskTubePublisherFactory {
     private final TaskTubeClient client;
-    private final SlotValueMapper mapper;
+    private final SlotValueSerializer mapper;
 
-    public TaskTubePublisherFactory(final TaskTubeClient client, final SlotValueMapper mapper) {
+    public TaskTubePublisherFactory(final TaskTubeClient client, final SlotValueSerializer mapper) {
         this.client = Objects.requireNonNull(client);
         this.mapper = Objects.requireNonNull(mapper);
     }

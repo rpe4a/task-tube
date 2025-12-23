@@ -1,8 +1,10 @@
 package com.example.tasktube.client.sdk.poller;
 
 import com.example.tasktube.client.sdk.poller.middleware.Middleware;
-import com.example.tasktube.client.sdk.poller.middleware.PipelineBuilder;
 import com.example.tasktube.client.sdk.poller.middleware.Pipeline;
+import com.example.tasktube.client.sdk.poller.middleware.PipelineBuilder;
+import com.example.tasktube.client.sdk.slot.SlotArgumentDeserializer;
+import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
 import com.example.tasktube.client.sdk.task.Task;
 import com.example.tasktube.client.sdk.task.TaskInput;
 import org.slf4j.Logger;
@@ -18,6 +20,8 @@ final class TaskTubeConsumer implements Runnable {
     private final BlockingQueue<TaskInput> queue;
     private final TaskFactory taskFactory;
     private final ConsumerInspector inspector;
+    private final SlotArgumentDeserializer slotDeserializer;
+    private final SlotValueSerializer slotValueSerializer;
     private final TaskTubePollerSettings settings;
     private final List<Middleware> middlewares;
 
@@ -26,12 +30,16 @@ final class TaskTubeConsumer implements Runnable {
             final BlockingQueue<TaskInput> queue,
             final ConsumerInspector inspector,
             final List<Middleware> middlewares,
+            final SlotArgumentDeserializer slotDeserializer,
+            final SlotValueSerializer slotValueSerializer,
             final TaskTubePollerSettings settings
     ) {
         this.middlewares = Objects.requireNonNull(middlewares);
         this.queue = Objects.requireNonNull(queue);
         this.taskFactory = Objects.requireNonNull(taskFactory);
         this.inspector = Objects.requireNonNull(inspector);
+        this.slotDeserializer = Objects.requireNonNull(slotDeserializer);
+        this.slotValueSerializer = Objects.requireNonNull(slotValueSerializer);
         this.settings = Objects.requireNonNull(settings);
     }
 
@@ -63,7 +71,7 @@ final class TaskTubeConsumer implements Runnable {
 
         final Pipeline pipeline = new PipelineBuilder()
                 .add(middlewares)
-                .createInstance(task::run);
+                .createInstance((i) -> task.execute(i, slotDeserializer, slotValueSerializer));
 
         pipeline.handle(input);
     }

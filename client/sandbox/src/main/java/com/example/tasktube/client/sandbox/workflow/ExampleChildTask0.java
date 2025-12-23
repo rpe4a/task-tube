@@ -12,7 +12,7 @@ public class ExampleChildTask0 extends Task0<Integer> {
 
 
     @Override
-    public Value<Integer> execute() throws Exception {
+    public Value<Integer> run() throws Exception {
         return constant(0);
     }
 }

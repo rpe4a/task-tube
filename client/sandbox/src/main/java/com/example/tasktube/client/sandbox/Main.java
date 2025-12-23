@@ -5,7 +5,7 @@ import com.example.tasktube.client.sdk.TaskTubeClient;
 import com.example.tasktube.client.sdk.TaskTubeClientSettings;
 import com.example.tasktube.client.sdk.impl.TaskTubeHttpClient;
 import com.example.tasktube.client.sdk.publisher.TaskTubePublisherFactory;
-import com.example.tasktube.client.sdk.slot.SlotValueMapper;
+import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
 import com.example.tasktube.client.sdk.task.TaskRecord;
 import com.example.tasktube.client.sdk.task.Value;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -22,10 +22,10 @@ public class Main {
         objectMapper.registerModule(new JavaTimeModule());
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-        final SlotValueMapper slotValueMapper = new SlotValueMapper(objectMapper);
+        final SlotValueSerializer slotValueSerializer = new SlotValueSerializer(objectMapper);
         final TaskTubeClientSettings settings = new TaskTubeClientSettings(30, "http://localhost:8080/");
         final TaskTubeClient taskTubeClient = new TaskTubeHttpClient(objectMapper, settings);
-        final TaskTubePublisherFactory publisherFactory = new TaskTubePublisherFactory(taskTubeClient, slotValueMapper);
+        final TaskTubePublisherFactory publisherFactory = new TaskTubePublisherFactory(taskTubeClient, slotValueSerializer);
 //        final TaskTubePublisher publisher = publisherFactory
 //                .create(new ExampleMainTask(),"test-task")
 //                .settings(TaskSetting.DEFAULT());
@@ -40,6 +40,6 @@ public class Main {
                         .setTube("tube")
                         .build()
         );
-        final Value<String> r = exampleMainTask.execute("task");
+        final Value<String> r = exampleMainTask.run("task");
     }
 }

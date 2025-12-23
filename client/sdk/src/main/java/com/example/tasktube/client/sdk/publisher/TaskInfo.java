@@ -2,7 +2,7 @@ package com.example.tasktube.client.sdk.publisher;
 
 import com.example.tasktube.client.sdk.dto.TaskRequest;
 import com.example.tasktube.client.sdk.slot.Slot;
-import com.example.tasktube.client.sdk.slot.SlotValueMapper;
+import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
 import com.example.tasktube.client.sdk.task.TaskSettings;
 import com.example.tasktube.client.sdk.task.Value;
 
@@ -64,10 +64,10 @@ public class TaskInfo {
 
     public static final class Builder {
         private final TaskInfo taskInfo = new TaskInfo();
-        private final SlotValueMapper slotValueMapper;
+        private final SlotValueSerializer slotValueSerializer;
 
-        public Builder(final SlotValueMapper slotValueMapper) {
-            this.slotValueMapper = Objects.requireNonNull(slotValueMapper);
+        public Builder(final SlotValueSerializer slotValueSerializer) {
+            this.slotValueSerializer = Objects.requireNonNull(slotValueSerializer);
         }
 
         public TaskInfo.Builder setId(final UUID id) {
@@ -91,7 +91,7 @@ public class TaskInfo {
         }
 
         public Builder setSlot(final Value<?> value) {
-            taskInfo.addSlot(slotValueMapper.map(value));
+            taskInfo.addSlot(slotValueSerializer.map(value));
             return this;
         }
 

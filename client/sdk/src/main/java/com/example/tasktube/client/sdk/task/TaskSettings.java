@@ -1,5 +1,7 @@
 package com.example.tasktube.client.sdk.task;
 
+import jakarta.annotation.Nonnull;
+
 import java.util.Objects;
 
 public final class TaskSettings {
@@ -20,6 +22,7 @@ public final class TaskSettings {
         this.heartbeatTimeoutSeconds = heartbeatTimeoutSeconds;
     }
 
+    @Nonnull
     public static TaskSettings DEFAULT() {
         return new TaskSettings(3, 60, 60 * 60, 10 * 60);
     }
