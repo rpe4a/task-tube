@@ -1,9 +1,12 @@
 package com.example.tasktube.client.sdk.task;
 
+import com.example.tasktube.client.sdk.dto.TaskRequest;
 import com.example.tasktube.client.sdk.slot.Slot;
 import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
+import java.util.List;
 import java.util.UUID;
 
 public class TaskOutput {
@@ -13,6 +16,7 @@ public class TaskOutput {
     private final String correlationId;
     private Slot result;
     private String failureMessage;
+    private List<TaskRequest> children;
 
     private TaskOutput(
             @Nonnull final UUID id,
@@ -37,11 +41,29 @@ public class TaskOutput {
         );
     }
 
-    public TaskOutput setFailureMessage(@Nonnull final String failureMessage) {
-        Preconditions.checkNotNull(failureMessage);
+    @Nonnull
+    public UUID getId() {
+        return id;
+    }
 
-        this.failureMessage = failureMessage;
-        return this;
+    @Nonnull
+    public String getName() {
+        return name;
+    }
+
+    @Nonnull
+    public String getTube() {
+        return tube;
+    }
+
+    @Nonnull
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    @Nullable
+    public Slot getResult() {
+        return result;
     }
 
     public TaskOutput setResult(@Nonnull final Slot result) {
@@ -50,4 +72,27 @@ public class TaskOutput {
         this.result = result;
         return this;
     }
+
+    @Nullable
+    public String getFailureMessage() {
+        return failureMessage;
+    }
+
+    public TaskOutput setFailureMessage(@Nonnull final String failureMessage) {
+        Preconditions.checkNotNull(failureMessage);
+
+        this.failureMessage = failureMessage;
+        return this;
+    }
+
+    @Nullable
+    public List<TaskRequest> getChildren() {
+        return List.copyOf(children);
+    }
+
+    public TaskOutput setChildren(final List<TaskRequest> children) {
+        this.children = List.copyOf(children);
+        return this;
+    }
+
 }

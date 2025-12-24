@@ -7,6 +7,7 @@ import com.example.tasktube.client.sdk.slot.SlotArgumentDeserializer;
 import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
 import com.example.tasktube.client.sdk.task.Task;
 import com.example.tasktube.client.sdk.task.TaskInput;
+import com.example.tasktube.client.sdk.task.TaskOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,8 +72,11 @@ final class TaskTubeConsumer implements Runnable {
 
         final Pipeline pipeline = new PipelineBuilder()
                 .add(middlewares)
-                .createInstance((i) -> task.execute(i, slotDeserializer, slotValueSerializer));
+                .createInstance(
+                        (i, o) ->
+                                new Task.Executor(task).invoke(i, o, slotDeserializer, slotValueSerializer)
+                );
 
-        pipeline.handle(input);
+        pipeline.handle(input, TaskOutput.createInstance(input));
     }
 }

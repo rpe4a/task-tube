@@ -2,6 +2,7 @@ package com.example.tasktube.client.sdk.poller.middleware;
 
 import com.example.tasktube.client.sdk.task.TaskInput;
 import com.example.tasktube.client.sdk.task.TaskOutput;
+import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,14 +13,13 @@ abstract class AbstractMiddleware implements Middleware {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Override
-    public TaskOutput invoke(final TaskInput input, final Pipeline next) {
+    public void invoke(@Nonnull final TaskInput input, @Nonnull final TaskOutput output, @Nonnull final Pipeline next) {
         logger.debug(START_INVOKE_MIDDLEWARE);
-        final TaskOutput output = invokeImpl(input, next);
+        invokeImpl(input, output, next);
         logger.debug(MIDDLEWARE_FINISHED);
-        return output;
     }
 
-    public abstract TaskOutput invokeImpl(TaskInput input, Pipeline next);
+    public abstract void invokeImpl(@Nonnull TaskInput input, @Nonnull TaskOutput output, @Nonnull Pipeline next);
 }
 
 

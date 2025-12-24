@@ -2,50 +2,84 @@ package com.example.tasktube.client.sdk.publisher;
 
 import com.example.tasktube.client.sdk.TaskTubeClient;
 import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
+import com.example.tasktube.client.sdk.task.Constant;
+import com.example.tasktube.client.sdk.task.Task;
 import com.example.tasktube.client.sdk.task.Task0;
 import com.example.tasktube.client.sdk.task.Task1;
 import com.example.tasktube.client.sdk.task.Task2;
-import com.example.tasktube.client.sdk.task.Constant;
+import com.example.tasktube.client.sdk.task.TaskConfiguration;
+import com.example.tasktube.client.sdk.task.TaskRecord;
+import jakarta.annotation.Nonnull;
 
 import java.util.Objects;
 import java.util.UUID;
 
 public final class TaskTubePublisherFactory {
     private final TaskTubeClient client;
-    private final SlotValueSerializer mapper;
+    private final SlotValueSerializer slotSerializer;
 
-    public TaskTubePublisherFactory(final TaskTubeClient client, final SlotValueSerializer mapper) {
+    public TaskTubePublisherFactory(final TaskTubeClient client, final SlotValueSerializer slotSerializer) {
         this.client = Objects.requireNonNull(client);
-        this.mapper = Objects.requireNonNull(mapper);
+        this.slotSerializer = Objects.requireNonNull(slotSerializer);
     }
 
-    public <R> TaskTubePublisher create(final Task0<R> task) {
+    @Nonnull
+    public <R> TaskTubePublisher create(
+            @Nonnull final Task0<R> task,
+            @Nonnull final TaskConfiguration... configurations
+    ) {
+        final TaskRecord.Builder<R> builder = createBuilder(task);
+
         return new TaskTubePublisher(
                 client,
-                new TaskInfo.Builder(mapper)
-                        .setId(UUID.randomUUID())
-                        .setName(task.getName())
+                slotSerializer,
+                builder,
+                configurations
         );
     }
 
-    public <R, A0> TaskTubePublisher create(final Task1<R, A0> task, final A0 arg0) {
+    @Nonnull
+    public <R, A0> TaskTubePublisher create(
+            @Nonnull final Task1<R, A0> task,
+            @Nonnull final Constant<A0> arg0,
+            @Nonnull final TaskConfiguration... configurations
+    ) {
+        final TaskRecord.Builder<R> builder = createBuilder(task);
+
+        builder.setArg(arg0);
+
         return new TaskTubePublisher(
                 client,
-                new TaskInfo.Builder(mapper)
-                        .setId(UUID.randomUUID())
-                        .setName(task.getName())
-                        .setSlot(new Constant<>(arg0))
+                slotSerializer,
+                builder,
+                configurations
         );
     }
 
-    public <R, A0, A1> TaskTubePublisher create(final Task2<R, A0, A1> task, final A0 arg0, final A1 arg1) {
+    @Nonnull
+    public <R, A0, A1> TaskTubePublisher create(
+            @Nonnull final Task2<R, A0, A1> task,
+            @Nonnull final Constant<A0> arg0,
+            @Nonnull final Constant<A1> arg1,
+            @Nonnull final TaskConfiguration... configurations
+    ) {
+        final TaskRecord.Builder<R> builder = createBuilder(task);
+
+        builder.setArg(arg0)
+                .setArg(arg1);
+
         return new TaskTubePublisher(
                 client,
-                new TaskInfo.Builder(mapper)
-                        .setId(UUID.randomUUID())
-                        .setName(task.getName())
-                        .setSlot(new Constant<>(arg0))
-                        .setSlot(new Constant<>(arg1))
+                slotSerializer,
+                builder,
+                configurations
         );
+    }
+
+    private <R> TaskRecord.Builder<R> createBuilder(final Task<?> task) {
+        return new TaskRecord.Builder<R>()
+                .setId(UUID.randomUUID())
+                .setName(task.getName())
+                .setCorrelationId(UUID.randomUUID().toString());
     }
 }

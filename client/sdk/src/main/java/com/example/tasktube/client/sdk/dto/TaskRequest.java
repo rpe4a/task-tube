@@ -10,6 +10,7 @@ public record TaskRequest(
         UUID id,
         String name,
         String tube,
+        String correlationId,
         Slot[] input,
         UUID[] waitTasks,
         Instant createdAt,

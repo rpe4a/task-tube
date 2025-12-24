@@ -80,7 +80,6 @@ public abstract class Task<TResult> {
         this.slotSerializer = slotValueSerializer;
     }
 
-
     @Nonnull
     public final <V> Nothing<V> nothing() {
         return new Nothing<>();
@@ -187,7 +186,7 @@ public abstract class Task<TResult> {
                 .setName(getName())
                 .setParent(parent.getId())
                 .setTube(parent.getTube())
-                .setTube(parent.getCorrelationId())
+                .setCorrelationId(parent.getCorrelationId())
                 .build();
 
         parent.appendChild(child);
@@ -199,19 +198,20 @@ public abstract class Task<TResult> {
         children.add(child);
     }
 
-    @Nonnull
-    public TaskOutput execute(
+    void execute(
             @Nonnull final TaskInput input,
+            @Nonnull final TaskOutput output,
             @Nonnull final SlotArgumentDeserializer slotDeserializer,
             @Nonnull final SlotValueSerializer slotValueSerializer
     ) {
         Preconditions.checkNotNull(slotDeserializer);
         Preconditions.checkNotNull(slotValueSerializer);
         Preconditions.checkNotNull(input);
+        Preconditions.checkNotNull(output);
         Preconditions.checkArgument(input.getName().equals(getName()));
 
         setSlotDeserializer(slotDeserializer);
-        setSlotDeserializer(slotDeserializer);
+        setSlotValueSerializer(slotValueSerializer);
 
         setId(input.getId());
         setTube(input.getTube());
@@ -220,8 +220,12 @@ public abstract class Task<TResult> {
 
         final Value<TResult> result = executeRunMethod(input.getArgs()).orElseGet(this::nothing);
 
-        return TaskOutput.createInstance(input)
-                .setResult(result.serialize(slotSerializer));
+        output.setResult(result.serialize(slotSerializer));
+        output.setChildren(
+                children.stream()
+                        .map(taskRecord -> taskRecord.toRequest(slotSerializer))
+                        .toList()
+        );
     }
 
     private Optional<Value<TResult>> executeRunMethod(final List<Slot> slots) {
@@ -259,6 +263,45 @@ public abstract class Task<TResult> {
         @Nonnull
         public TaskConfiguration.FailureRetryTimeoutSeconds failureRetryTimeoutSeconds(final int value) {
             return new TaskConfiguration.FailureRetryTimeoutSeconds(value);
+        }
+
+        @Nonnull
+        public TaskConfiguration.TimeoutSeconds timeoutSeconds(final int value) {
+            return new TaskConfiguration.TimeoutSeconds(value);
+        }
+
+        @Nonnull
+        public TaskConfiguration.HeartbeatTimeoutSeconds heartbeatTimeoutSeconds(final int value) {
+            return new TaskConfiguration.HeartbeatTimeoutSeconds(value);
+        }
+    }
+
+    public static class Executor {
+        public static final String EXECUTE_METHOD_NAME = "execute";
+        private final Task<?> task;
+
+        public Executor(final Task<?> task) {
+            this.task = task;
+        }
+
+        public void invoke(
+                final TaskInput input,
+                final TaskOutput output,
+                final SlotArgumentDeserializer slotDeserializer,
+                final SlotValueSerializer slotSerializer
+        ) {
+            try {
+                final Method execute = Objects.requireNonNull(task.getClass())
+                        .getMethod(EXECUTE_METHOD_NAME, TaskInput.class, TaskOutput.class, SlotArgumentDeserializer.class, SlotValueSerializer.class);
+
+                execute.invoke(task, input, output, slotDeserializer, slotSerializer);
+            } catch (final NoSuchMethodException e) {
+                throw new RuntimeException(e);
+            } catch (final InvocationTargetException e) {
+                throw new RuntimeException(e);
+            } catch (final IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

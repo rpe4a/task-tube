@@ -204,7 +204,7 @@ class TubeControllerValidationTests {
                 UUID.randomUUID(),
                 "test-task",
                 "test-tube",
-                null,
+                "correlationId",
                 null,
                 null,
                 Instant.now(),

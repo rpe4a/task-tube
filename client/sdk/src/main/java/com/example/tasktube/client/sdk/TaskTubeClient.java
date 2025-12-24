@@ -8,6 +8,7 @@ import com.example.tasktube.client.sdk.dto.PopTasksRequest;
 import com.example.tasktube.client.sdk.dto.ProcessTaskRequest;
 import com.example.tasktube.client.sdk.dto.StartTaskRequest;
 import com.example.tasktube.client.sdk.dto.TaskRequest;
+import jakarta.annotation.Nonnull;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,17 +16,18 @@ import java.util.UUID;
 
 public interface TaskTubeClient {
 
-    void startTask(UUID taskId, StartTaskRequest request);
+    void startTask(@Nonnull UUID taskId, @Nonnull StartTaskRequest request);
 
-    void processTask(UUID taskId, ProcessTaskRequest request);
+    void processTask(@Nonnull UUID taskId, @Nonnull ProcessTaskRequest request);
 
-    void finishTask(UUID taskId, FinishTaskRequest request);
+    void finishTask(@Nonnull UUID taskId, @Nonnull FinishTaskRequest request);
 
-    void failTask(UUID taskId, FailTaskRequest request);
+    void failTask(@Nonnull UUID taskId, @Nonnull FailTaskRequest request);
 
-    UUID pushTask(String tubeName, TaskRequest request);
+    Optional<UUID> pushTask(@Nonnull String tubeName, @Nonnull TaskRequest request);
 
-    Optional<PopTaskResponse> popTask(String tubeName, PopTaskRequest request);
+    Optional<PopTaskResponse> popTask(@Nonnull String tubeName, @Nonnull PopTaskRequest request);
 
-    List<PopTaskResponse> popTasks(String tubeName, PopTasksRequest request);
+    @Nonnull
+    List<PopTaskResponse> popTasks(@Nonnull String tubeName, @Nonnull PopTasksRequest request);
 }

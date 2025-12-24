@@ -14,7 +14,8 @@ public class ExampleMainTask extends Task1<String, String> {
                 pushIn(new ExampleChildTask1(), constant("Hello World"),
                         waitFor(childTaskResult0),
                         configure().maxCountOfFailures(5),
-                        configure().failureRetryTimeoutSeconds(120)
+                        configure().failureRetryTimeoutSeconds(120),
+                        configure().timeoutSeconds(60 * 30)
                 );
 
         final TaskResult<Integer> childTaskResult2 = pushIn(new ExampleChildTask2(), childTaskResult1, childTaskResult0);

@@ -6,6 +6,6 @@ import jakarta.annotation.Nonnull;
 
 @FunctionalInterface
 public interface Pipeline {
-    @Nonnull TaskOutput handle(@Nonnull TaskInput input);
+    void handle(@Nonnull TaskInput input, @Nonnull TaskOutput output);
 }
 

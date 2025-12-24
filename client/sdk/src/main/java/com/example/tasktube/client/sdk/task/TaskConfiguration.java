@@ -1,5 +1,7 @@
 package com.example.tasktube.client.sdk.task;
 
+import jakarta.annotation.Nonnull;
+
 import java.util.UUID;
 
 public interface TaskConfiguration {
@@ -29,7 +31,7 @@ public interface TaskConfiguration {
         }
 
         @Override
-        public void applyTo(final TaskRecord<?> taskRecord) {
+        public void applyTo(@Nonnull final TaskRecord<?> taskRecord) {
             taskRecord.waitFor(id);
         }
     }
@@ -46,7 +48,7 @@ public interface TaskConfiguration {
         }
 
         @Override
-        public void applyTo(final TaskRecord<?> taskRecord) {
+        public void applyTo(@Nonnull final TaskRecord<?> taskRecord) {
             taskRecord.getSetting().setMaxFailures(value);
         }
     }
@@ -63,9 +65,42 @@ public interface TaskConfiguration {
         }
 
         @Override
-        public void applyTo(final TaskRecord<?> taskRecord) {
+        public void applyTo(@Nonnull final TaskRecord<?> taskRecord) {
             taskRecord.getSetting().setFailureRetryTimeoutSeconds(value);
         }
     }
 
+    class TimeoutSeconds implements TaskConfiguration {
+        private final int value;
+
+        public TimeoutSeconds(final int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        @Override
+        public void applyTo(@Nonnull final TaskRecord<?> taskRecord) {
+            taskRecord.getSetting().setTimeoutSeconds(value);
+        }
+    }
+
+    class HeartbeatTimeoutSeconds implements TaskConfiguration {
+        private final int value;
+
+        public HeartbeatTimeoutSeconds(final int value) {
+            this.value = value;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        @Override
+        public void applyTo(@Nonnull final TaskRecord<?> taskRecord) {
+            taskRecord.getSetting().setHeartbeatTimeoutSeconds(value);
+        }
+    }
 }

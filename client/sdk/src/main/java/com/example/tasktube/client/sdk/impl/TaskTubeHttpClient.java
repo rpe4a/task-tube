@@ -15,6 +15,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
+import jakarta.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
@@ -49,27 +50,59 @@ public class TaskTubeHttpClient implements TaskTubeClient {
     }
 
     @Override
-    public void startTask(final UUID taskId, final StartTaskRequest request) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void startTask(@Nonnull final UUID taskId, @Nonnull final StartTaskRequest request) {
+        Preconditions.checkNotNull(taskId);
+        Preconditions.checkNotNull(request);
+
+        final HttpRequest httpRequest = getRequestBuilder()
+                .uri(getUri("/api/v1/task/%s/start".formatted(taskId)))
+                .POST(getBody(request))
+                .build();
+
+        send(httpRequest);
     }
 
     @Override
-    public void processTask(final UUID taskId, final ProcessTaskRequest request) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void processTask(@Nonnull final UUID taskId, @Nonnull final ProcessTaskRequest request) {
+        Preconditions.checkNotNull(taskId);
+        Preconditions.checkNotNull(request);
+
+        final HttpRequest httpRequest = getRequestBuilder()
+                .uri(getUri("/api/v1/task/%s/process".formatted(taskId)))
+                .POST(getBody(request))
+                .build();
+
+        send(httpRequest);
     }
 
     @Override
-    public void finishTask(final UUID taskId, final FinishTaskRequest request) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void finishTask(@Nonnull final UUID taskId, @Nonnull final FinishTaskRequest request) {
+        Preconditions.checkNotNull(taskId);
+        Preconditions.checkNotNull(request);
+
+        final HttpRequest httpRequest = getRequestBuilder()
+                .uri(getUri("/api/v1/task/%s/finish".formatted(taskId)))
+                .POST(getBody(request))
+                .build();
+
+        send(httpRequest);
     }
 
     @Override
-    public void failTask(final UUID taskId, final FailTaskRequest request) {
-        throw new UnsupportedOperationException("Not implemented yet");
+    public void failTask(@Nonnull final UUID taskId, @Nonnull final FailTaskRequest request) {
+        Preconditions.checkNotNull(taskId);
+        Preconditions.checkNotNull(request);
+
+        final HttpRequest httpRequest = getRequestBuilder()
+                .uri(getUri("/api/v1/task/%s/fail".formatted(taskId)))
+                .POST(getBody(request))
+                .build();
+
+        send(httpRequest);
     }
 
     @Override
-    public UUID pushTask(final String tubeName, final TaskRequest request) {
+    public Optional<UUID> pushTask(@Nonnull final String tubeName, @Nonnull final TaskRequest request) {
         Preconditions.checkArgument(StringUtils.isNotBlank(tubeName));
         Preconditions.checkNotNull(request);
 
@@ -82,7 +115,7 @@ public class TaskTubeHttpClient implements TaskTubeClient {
     }
 
     @Override
-    public Optional<PopTaskResponse> popTask(final String tubeName, final PopTaskRequest request) {
+    public Optional<PopTaskResponse> popTask(@Nonnull final String tubeName, @Nonnull final PopTaskRequest request) {
         Preconditions.checkArgument(StringUtils.isNotBlank(tubeName));
         Preconditions.checkNotNull(request);
 
@@ -95,7 +128,8 @@ public class TaskTubeHttpClient implements TaskTubeClient {
     }
 
     @Override
-    public List<PopTaskResponse> popTasks(final String tubeName, final PopTasksRequest request) {
+    @Nonnull
+    public List<PopTaskResponse> popTasks(@Nonnull final String tubeName, @Nonnull final PopTasksRequest request) {
         Preconditions.checkArgument(StringUtils.isNotBlank(tubeName));
         Preconditions.checkNotNull(request);
 
@@ -104,17 +138,26 @@ public class TaskTubeHttpClient implements TaskTubeClient {
                 .POST(getBody(request))
                 .build();
 
-        return send(httpRequest, new TypeReference<>() {});
+        final Optional<List<PopTaskResponse>> result = send(httpRequest, new TypeReference<>() {});
+
+        return result.orElse(List.of());
     }
 
-    private <T> T send(final HttpRequest httpRequest, final TypeReference<T> typeReference) {
+    private void send(final HttpRequest httpRequest) {
+        send(httpRequest, null);
+    }
+
+    private <T> Optional<T> send(final HttpRequest httpRequest, final TypeReference<T> typeReference) {
         try {
             final HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() >= 400) {
                 throw new TaskTubeApiException(response.body());
             }
 
-            return objectMapper.readValue(response.body(), typeReference);
+            return Objects.isNull(typeReference)
+                    ? Optional.empty()
+                    : Optional.of(objectMapper.readValue(response.body(), typeReference));
+
         } catch (final IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }

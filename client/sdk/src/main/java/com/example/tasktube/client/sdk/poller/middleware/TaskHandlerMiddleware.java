@@ -4,13 +4,11 @@ import com.example.tasktube.client.sdk.InstanceIdProvider;
 import com.example.tasktube.client.sdk.TaskTubeClient;
 import com.example.tasktube.client.sdk.dto.FinishTaskRequest;
 import com.example.tasktube.client.sdk.dto.StartTaskRequest;
-import com.example.tasktube.client.sdk.dto.TaskRequest;
 import com.example.tasktube.client.sdk.task.TaskInput;
 import com.example.tasktube.client.sdk.task.TaskOutput;
-import com.example.tasktube.client.sdk.task.TaskRecord;
+import jakarta.annotation.Nonnull;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Objects;
 
 @Order(4)
@@ -23,18 +21,16 @@ public final class TaskHandlerMiddleware extends AbstractMiddleware {
             final InstanceIdProvider instanceIdProvider
     ) {
         this.taskTubeClient = Objects.requireNonNull(taskTubeClient);
-        this.instanceIdProvider = instanceIdProvider;
+        this.instanceIdProvider = Objects.requireNonNull(instanceIdProvider);
     }
 
     @Override
-    public TaskOutput invokeImpl(final TaskInput input, final Pipeline next) {
+    public void invokeImpl(@Nonnull final TaskInput input, @Nonnull final TaskOutput output, @Nonnull final Pipeline next) {
         start(input);
 
-        final TaskOutput output = next.handle(input);
+        next.handle(input, output);
 
         finish(output);
-
-        return output;
     }
 
     private void start(final TaskInput input) {
@@ -44,13 +40,12 @@ public final class TaskHandlerMiddleware extends AbstractMiddleware {
         ));
     }
 
-    private void finish(final TaskOutput task) {
-        final List<TaskRequest> children = task.getChildren().stream().map(TaskRecord::toRequest).toList();
+    private void finish(final TaskOutput output) {
         taskTubeClient.finishTask(
-                task.getId(),
+                output.getId(),
                 new FinishTaskRequest(
-                        children,
-                        task.getOutput(),
+                        output.getChildren(),
+                        output.getResult(),
                         instanceIdProvider.get(),
                         Instant.now()
                 )

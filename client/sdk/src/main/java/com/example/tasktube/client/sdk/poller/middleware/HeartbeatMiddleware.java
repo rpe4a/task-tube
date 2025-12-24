@@ -9,6 +9,7 @@ import com.example.tasktube.client.sdk.poller.exception.TaskInterruptedException
 import com.example.tasktube.client.sdk.poller.exception.TaskTimeoutException;
 import com.example.tasktube.client.sdk.task.TaskInput;
 import com.example.tasktube.client.sdk.task.TaskOutput;
+import jakarta.annotation.Nonnull;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -39,12 +40,12 @@ public final class HeartbeatMiddleware extends AbstractMiddleware {
     }
 
     @Override
-    public TaskOutput invokeImpl(final TaskInput input, final Pipeline next) {
+    public void invokeImpl(@Nonnull final TaskInput input, @Nonnull final TaskOutput output, @Nonnull final Pipeline next) {
         final ExecutorService taskLocalExecutor = getTaskLocalExecutor(input);
 
-        final CompletableFuture<TaskOutput> handleFuture =
+        final CompletableFuture<Void> handleFuture =
                 CompletableFuture
-                        .supplyAsync(() -> next.handle(input), taskLocalExecutor);
+                        .runAsync(() -> next.handle(input, output), taskLocalExecutor);
 
         // if the task has timeout, we must set it
         // else the task doesn't have timeout and it will execute infinitely
@@ -69,7 +70,8 @@ public final class HeartbeatMiddleware extends AbstractMiddleware {
                     heartbeating.cancel(true);
                 }
             }
-            return handleFuture.get();
+
+            handleFuture.get();
         } catch (final InterruptedException e) {
             throw new TaskInterruptedException("Task execution has been interrupted.");
         } catch (final ExecutionException e) {

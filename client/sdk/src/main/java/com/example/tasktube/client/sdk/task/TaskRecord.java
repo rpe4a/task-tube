@@ -1,7 +1,10 @@
 package com.example.tasktube.client.sdk.task;
 
 import com.example.tasktube.client.sdk.dto.TaskRequest;
+import com.example.tasktube.client.sdk.slot.Slot;
+import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
 
+import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -15,6 +18,7 @@ public class TaskRecord<TResult> {
     private UUID parentId;
     private String name;
     private String tube;
+    private String correlationId;
 
     private TaskRecord() {
         setId(UUID.randomUUID());
@@ -56,6 +60,13 @@ public class TaskRecord<TResult> {
         waitForTasks.add(taskId);
     }
 
+
+    public void setupBy(final TaskConfiguration[] configurations) {
+        for (final TaskConfiguration configuration : configurations) {
+            configuration.applyTo(this);
+        }
+    }
+
     public UUID getParentId() {
         return parentId;
     }
@@ -72,7 +83,28 @@ public class TaskRecord<TResult> {
         this.tube = tube;
     }
 
-    public TaskRequest toRequest() {
+    public String getCorrelationId() {
+        return correlationId;
+    }
+
+    void setCorrelationId(final String correlationId) {
+        this.correlationId = correlationId;
+    }
+
+    public TaskRequest toRequest(final SlotValueSerializer slotSerializer) {
+        return new TaskRequest(
+                getId(),
+                getName(),
+                getTube(),
+                getCorrelationId(),
+                args.stream()
+                        .map(v -> v.serialize(slotSerializer))
+                        .toList()
+                        .toArray(new Slot[0]),
+                waitForTasks.toArray(new UUID[0]),
+                Instant.now(),
+                getSetting()
+        );
     }
 
     public static final class Builder<TResult> {
@@ -102,14 +134,20 @@ public class TaskRecord<TResult> {
             return this;
         }
 
-        public <A0> Builder<TResult> setArg(final Constant<A0> arg0) {
+        public Builder<TResult> setArg(final Value<?> arg0) {
             taskRecord.addArg(arg0);
+            return this;
+        }
+
+        public Builder<TResult> setCorrelationId(final String correlationId) {
+            taskRecord.setCorrelationId(correlationId);
             return this;
         }
 
         public TaskRecord<TResult> build() {
             return taskRecord;
         }
+
     }
 
 }
