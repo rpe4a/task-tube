@@ -81,7 +81,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldFailTaskAndRetryTimeoutSeconds() {
-        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(3, 15);
+        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(3, 15, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
         final UUID taskId = tubeService.push(pushTaskDto);
@@ -109,7 +109,8 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
         assertThat(taskScheduled.get().getScheduledAt().toEpochMilli()).isEqualTo(failedAt.plusSeconds(taskSettingsDto.failureRetryTimeoutSeconds()).toEpochMilli());
         assertThat(taskScheduled.get().getFailedAt().toEpochMilli()).isEqualTo(failedAt.toEpochMilli());
         assertThat(taskScheduled.get().getSettings()).isNotEqualTo(TaskSettings.getDefault());
-        assertThat(taskScheduled.get().getSettings()).isEqualTo(new TaskSettings(taskSettingsDto.maxFailures(), taskSettingsDto.failureRetryTimeoutSeconds()));
+        assertThat(taskScheduled.get().getSettings()).isEqualTo(
+                new TaskSettings(taskSettingsDto.maxFailures(), taskSettingsDto.failureRetryTimeoutSeconds(), taskSettingsDto.timeoutSeconds(), taskSettingsDto.heartbeatTimeoutSeconds()));
     }
 
     @Test
@@ -145,7 +146,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldFailTaskWaitOneSecondAndPopTask() {
-        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(3, 1);
+        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(3, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
         final UUID taskId = tubeService.push(pushTaskDto);
@@ -182,7 +183,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldFailTaskTwoTimes() {
-        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(2, 1);
+        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(2, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
         final UUID taskId = tubeService.push(pushTaskDto);
@@ -236,12 +237,12 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
         assertThat(taskScheduled3.get().getFailures()).isEqualTo(2);
         assertThat(taskScheduled3.get().getFailedReason()).isEqualTo(failReasonMessage2);
         assertThat(taskScheduled3.get().getSettings()).isNotEqualTo(TaskSettings.getDefault());
-        assertThat(taskScheduled3.get().getSettings()).isEqualTo(new TaskSettings(taskSettingsDto.maxFailures(), taskSettingsDto.failureRetryTimeoutSeconds()));
+        assertThat(taskScheduled3.get().getSettings()).isEqualTo(new TaskSettings(taskSettingsDto.maxFailures(), taskSettingsDto.failureRetryTimeoutSeconds(),  taskSettingsDto.timeoutSeconds(), taskSettingsDto.heartbeatTimeoutSeconds()));
     }
 
     @Test
     void shouldAbortTask() {
-        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1);
+        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
         final UUID taskId = tubeService.push(pushTaskDto);
@@ -307,12 +308,12 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
         assertThat(taskAborted.get().getFailures()).isEqualTo(1);
         assertThat(taskAborted.get().getFailedReason()).isEqualTo(failReasonMessage2);
         assertThat(taskAborted.get().getLock()).isEqualTo(Lock.free());
-        assertThat(taskAborted.get().getSettings()).isEqualTo(new TaskSettings(taskSettingsDto.maxFailures(), taskSettingsDto.failureRetryTimeoutSeconds()));
+        assertThat(taskAborted.get().getSettings()).isEqualTo(new TaskSettings(taskSettingsDto.maxFailures(), taskSettingsDto.failureRetryTimeoutSeconds(),  taskSettingsDto.timeoutSeconds(), taskSettingsDto.heartbeatTimeoutSeconds()));
     }
 
     @Test
     void shouldAbortTaskScheduleFailed() {
-        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1);
+        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
         final UUID taskId = tubeService.push(pushTaskDto);
@@ -359,7 +360,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldAbortTaskStartFailed() {
-        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1);
+        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
         final UUID taskId = tubeService.push(pushTaskDto);
@@ -406,7 +407,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldAbortTaskProcessFailed() {
-        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1);
+        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
         final UUID taskId = tubeService.push(pushTaskDto);
@@ -453,7 +454,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldAbortTaskFailFailed() {
-        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1);
+        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
         final UUID taskId = tubeService.push(pushTaskDto);
@@ -500,7 +501,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldAbortTaskFinishFailed() {
-        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1);
+        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
         final UUID taskId = tubeService.push(pushTaskDto);
@@ -547,7 +548,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
     @Test
     void shouldAbortTaskCompleteFailed() {
-        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1);
+        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1, 10,10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
         final UUID taskId = tubeService.push(pushTaskDto);

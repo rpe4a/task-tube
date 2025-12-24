@@ -1,7 +1,9 @@
 package com.example.tasktube.client.sdk.dto;
 
+import jakarta.annotation.Nonnull;
+
 public record PopTasksRequest(
-        String client,
-        int count
+        @Nonnull String client,
+        @Nonnull int count
 ) {
 }

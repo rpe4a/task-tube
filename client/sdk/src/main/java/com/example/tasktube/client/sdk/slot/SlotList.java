@@ -33,4 +33,11 @@ public class SlotList extends Slot {
         values = slots;
         return this;
     }
+
+    @Override
+    public Object deserialize(@Nonnull final SlotArgumentDeserializer slotDeserializer) {
+        Preconditions.checkNotNull(slotDeserializer);
+
+        return slotDeserializer.deserialize(this);
+    }
 }

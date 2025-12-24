@@ -1,11 +1,11 @@
 package com.example.tasktube.client.sdk.exception;
 
 public class TaskTubeException extends RuntimeException {
-    public TaskTubeException(String message) {
+    public TaskTubeException(final String message) {
         super(message);
     }
 
-    public TaskTubeException(String message, Throwable cause) {
+    public TaskTubeException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }

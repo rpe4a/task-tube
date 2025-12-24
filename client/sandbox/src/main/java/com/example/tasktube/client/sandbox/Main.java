@@ -1,6 +1,6 @@
 package com.example.tasktube.client.sandbox;
 
-import com.example.tasktube.client.sandbox.workflow.ExampleMainTask;
+import com.example.tasktube.client.sandbox.workflow.ParentTaskReturnString0String;
 import com.example.tasktube.client.sdk.TaskTubeClient;
 import com.example.tasktube.client.sdk.TaskTubeClientSettings;
 import com.example.tasktube.client.sdk.impl.TaskTubeHttpClient;
@@ -29,7 +29,7 @@ public class Main {
         final TaskTubePublisherFactory publisherFactory = new TaskTubePublisherFactory(taskTubeClient, slotValueSerializer);
         final TaskTubePublisher publisher = publisherFactory
                 .create(
-                        new ExampleMainTask(),
+                        new ParentTaskReturnString0String(),
                         new Constant<>("simple string"),
                         TaskConfiguration.failureRetryTimeoutSeconds(120),
                         TaskConfiguration.maxCountOfFailures(5)

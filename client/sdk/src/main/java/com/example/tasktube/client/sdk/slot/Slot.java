@@ -1,5 +1,8 @@
 package com.example.tasktube.client.sdk.slot;
 
+import com.google.common.base.Preconditions;
+import jakarta.annotation.Nonnull;
+
 import java.util.Map;
 import java.util.UUID;
 
@@ -75,5 +78,11 @@ public class Slot {
         CONSTANT,
         LIST,
         TASK
+    }
+
+    public Object deserialize(@Nonnull final SlotArgumentDeserializer slotDeserializer) {
+        Preconditions.checkNotNull(slotDeserializer);
+
+        return slotDeserializer.deserialize(this);
     }
 }

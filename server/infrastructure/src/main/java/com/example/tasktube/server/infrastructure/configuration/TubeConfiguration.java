@@ -1,6 +1,7 @@
 package com.example.tasktube.server.infrastructure.configuration;
 
 import com.example.tasktube.server.application.port.in.ITubeService;
+import com.example.tasktube.server.application.services.TaskSlotArgumentFiller;
 import com.example.tasktube.server.application.services.TubeService;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
@@ -14,7 +15,11 @@ public class TubeConfiguration {
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public ITubeService registerTubeService(final ITubeRepository tubeRepository, final IBarrierRepository barrierRepository) {
-        return new TubeService(tubeRepository, barrierRepository);
+    public ITubeService registerTubeService(
+            final ITubeRepository tubeRepository,
+            final IBarrierRepository barrierRepository,
+            final TaskSlotArgumentFiller taskSlotArgumentFiller
+    ) {
+        return new TubeService(tubeRepository, barrierRepository, taskSlotArgumentFiller);
     }
 }

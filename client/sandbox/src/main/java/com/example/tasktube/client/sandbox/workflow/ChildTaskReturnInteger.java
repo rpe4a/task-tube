@@ -3,7 +3,7 @@ package com.example.tasktube.client.sandbox.workflow;
 import com.example.tasktube.client.sdk.task.Task0;
 import com.example.tasktube.client.sdk.task.Value;
 
-public class ExampleChildTask0 extends Task0<Integer> {
+public class ChildTaskReturnInteger extends Task0<Integer> {
 
     @Override
     public String getName() {

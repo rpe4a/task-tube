@@ -234,7 +234,7 @@ public abstract class Task<TResult> {
             final Parameter[] parameters = run.getParameters();
             final Object[] args = new Object[parameters.length];
             for (int i = 0; i < parameters.length; i++) {
-                args[i] = slotDeserializer.deserialize(slots.get(i));
+                args[i] = slots.get(i).deserialize(slotDeserializer);
             }
             return Optional.ofNullable((Value<TResult>) run.invoke(this, args));
         } catch (final InvocationTargetException | IllegalAccessException e) {

@@ -627,8 +627,8 @@ class RegressApplicationCompleteTests extends AbstractRegressApplicationTests {
 
         taskService.processTask(popTask.get().id(), Instant.now(), CLIENT);
 
-        final PushTaskDto child1 = TestUtils.createPushTaskDto(new TaskSettingsDto(0, 1));
-        final PushTaskDto child2 = TestUtils.createPushTaskDto(new TaskSettingsDto(0, 1));
+        final PushTaskDto child1 = TestUtils.createPushTaskDto(new TaskSettingsDto(0, 1, 10, 10));
+        final PushTaskDto child2 = TestUtils.createPushTaskDto(new TaskSettingsDto(0, 1, 10, 10));
         final FinishTaskDto finishTask = TestUtils.createFinishTaskDto(popTask.get().id(), CLIENT, List.of(child1, child2));
         taskService.finishTask(finishTask);
 
@@ -777,8 +777,8 @@ class RegressApplicationCompleteTests extends AbstractRegressApplicationTests {
 
         taskService.processTask(popTask.get().id(), Instant.now(), CLIENT);
 
-        final PushTaskDto child1 = TestUtils.createPushTaskDto(new TaskSettingsDto(0, 1));
-        final PushTaskDto child2 = TestUtils.createPushTaskDto(List.of(child1.id()), new TaskSettingsDto(0, 1));
+        final PushTaskDto child1 = TestUtils.createPushTaskDto(new TaskSettingsDto(0, 1, 10, 10));
+        final PushTaskDto child2 = TestUtils.createPushTaskDto(List.of(child1.id()), new TaskSettingsDto(0, 1, 10, 10));
         final FinishTaskDto finishTask = TestUtils.createFinishTaskDto(popTask.get().id(), CLIENT, List.of(child1, child2));
         taskService.finishTask(finishTask);
 
@@ -943,8 +943,8 @@ class RegressApplicationCompleteTests extends AbstractRegressApplicationTests {
 
         taskService.processTask(popTask.get().id(), Instant.now(), CLIENT);
 
-        final PushTaskDto child1 = TestUtils.createPushTaskDto(new TaskSettingsDto(0, 1));
-        final PushTaskDto child2 = TestUtils.createPushTaskDto(List.of(child1.id()), new TaskSettingsDto(0, 1));
+        final PushTaskDto child1 = TestUtils.createPushTaskDto(new TaskSettingsDto(0, 1, 10, 10));
+        final PushTaskDto child2 = TestUtils.createPushTaskDto(List.of(child1.id()), new TaskSettingsDto(0, 1, 10, 10));
         final FinishTaskDto finishTask = TestUtils.createFinishTaskDto(popTask.get().id(), CLIENT, List.of(child1, child2));
         taskService.finishTask(finishTask);
 

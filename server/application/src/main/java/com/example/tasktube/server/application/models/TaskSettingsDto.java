@@ -4,9 +4,11 @@ import com.example.tasktube.server.domain.values.TaskSettings;
 
 public record TaskSettingsDto(
         int maxFailures,
-        int failureRetryTimeoutSeconds
+        int failureRetryTimeoutSeconds,
+        int timeoutSeconds,
+        int heartbeatTimeoutSeconds
 ) {
     public TaskSettings to() {
-        return new TaskSettings(maxFailures, failureRetryTimeoutSeconds);
+        return new TaskSettings(maxFailures, failureRetryTimeoutSeconds, timeoutSeconds, heartbeatTimeoutSeconds);
     }
 }

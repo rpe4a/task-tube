@@ -97,8 +97,8 @@ public class Task {
     public Task() {
     }
 
-    private void checkWaitingTasks(final List<UUID> waitForTaskIds) {
-        if (Objects.isNull(waitForTaskIds) || waitForTaskIds.isEmpty()) {
+    private void checkTaskIdList(final List<UUID> taskIdList) {
+        if (Objects.isNull(taskIdList) || taskIdList.isEmpty()) {
             throw new ValidationDomainException("Parameter waitForTaskIds cannot be null or empty.");
         }
     }
@@ -359,13 +359,13 @@ public class Task {
         this.parentId = parentId;
     }
 
-    public Barrier addStartBarrier(final List<UUID> waitForTaskIds) {
-        checkWaitingTasks(waitForTaskIds);
+    public Barrier addStartBarrier(final List<UUID> taskIdList) {
+        checkTaskIdList(taskIdList);
 
         final Barrier barrier = new Barrier(
                 UUID.randomUUID(),
                 getId(),
-                waitForTaskIds,
+                taskIdList,
                 Barrier.Type.START,
                 false,
                 Instant.now(),
@@ -379,7 +379,7 @@ public class Task {
     }
 
     public Barrier addFinishBarrier(final List<UUID> waitForTaskIds) {
-        checkWaitingTasks(waitForTaskIds);
+        checkTaskIdList(waitForTaskIds);
 
         final Barrier barrier = new Barrier(
                 UUID.randomUUID(),

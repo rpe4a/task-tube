@@ -14,7 +14,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class RestApiApplication {
 
     public static void main(final String[] args) {
-        final ConfigurableApplicationContext constex = SpringApplication.run(RestApiApplication.class, args);
+        SpringApplication.run(RestApiApplication.class, args);
     }
 
 }

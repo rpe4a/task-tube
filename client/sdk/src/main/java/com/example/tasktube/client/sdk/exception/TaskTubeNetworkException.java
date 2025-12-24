@@ -1,11 +1,11 @@
 package com.example.tasktube.client.sdk.exception;
 
 public class TaskTubeNetworkException extends TaskTubeException {
-    public TaskTubeNetworkException(String message) {
+    public TaskTubeNetworkException(final String message) {
         super(message);
     }
 
-    public TaskTubeNetworkException(String message, Throwable cause) {
+    public TaskTubeNetworkException(final String message, final Throwable cause) {
         super(message, cause);
     }
 }
