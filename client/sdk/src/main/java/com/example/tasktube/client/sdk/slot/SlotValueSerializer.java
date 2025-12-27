@@ -20,47 +20,40 @@ public class SlotValueSerializer {
     }
 
     @Nonnull
-    public Slot serialize(@Nonnull final Nothing<?> value) {
+    public Slot<?> serialize(@Nonnull final Nothing<?> value) {
         Preconditions.checkNotNull(value);
 
-        return new Slot()
+        return new NothingSlot()
                 .setValue(value.getNull())
-                .setValueReferenceType(getJavaType(value.getType()))
-                .setFill(true)
-                .setType(Slot.SlotType.NOTHING);
+                .setValueReferenceType(getJavaType(value.getType()));
     }
 
     @Nonnull
-    public Slot serialize(@Nonnull final Constant<?> value) {
+    public Slot<?>  serialize(@Nonnull final Constant<?> value) {
         Preconditions.checkNotNull(value);
 
-        return new Slot()
+        return new ConstantSlot()
                 .setValue(value.getData())
-                .setValueReferenceType(getJavaType(value.getType()))
-                .setFill(true)
-                .setType(Slot.SlotType.CONSTANT);
+                .setValueReferenceType(getJavaType(value.getType()));
     }
 
     @Nonnull
-    public Slot serialize(@Nonnull final TaskResult<?> value) {
+    public Slot<?>  serialize(@Nonnull final TaskResult<?> value) {
         Preconditions.checkNotNull(value);
 
-        return new Slot()
-                .setTaskReference(value.getId())
-                .setMetadata(null)
-                .setType(Slot.SlotType.TASK);
+        return new TaskSlot()
+                .setTaskReference(value.getId());
     }
 
     @Nonnull
-    public Slot serialize(@Nonnull final ValueList<?> value) {
+    public Slot<?>  serialize(@Nonnull final ValueList<?> value) {
         Preconditions.checkNotNull(value);
 
-        final List<Slot> slots = value.get().stream()
+        final List<? extends Slot<?>> slots = value.get().stream()
                 .map(v -> v.serialize(this))
                 .toList();
 
-        return new SlotList()
-                .setType(Slot.SlotType.LIST)
+        return new ListSlot()
                 .setValues(slots);
     }
 

@@ -9,7 +9,7 @@ import jakarta.annotation.Nonnull;
 import java.lang.reflect.Type;
 import java.util.Objects;
 
-public class Constant<T> implements Value<T> {
+public final class Constant<T> implements Value<T> {
     private final T data;
     private final Type type;
 
@@ -38,7 +38,7 @@ public class Constant<T> implements Value<T> {
 
     @Override
     @Nonnull
-    public Slot serialize(@Nonnull final SlotValueSerializer serializer) {
+    public Slot<?>  serialize(@Nonnull final SlotValueSerializer serializer) {
         Preconditions.checkNotNull(serializer);
 
         return serializer.serialize(this);

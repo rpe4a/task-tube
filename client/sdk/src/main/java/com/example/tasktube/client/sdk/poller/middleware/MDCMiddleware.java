@@ -7,8 +7,8 @@ import org.slf4j.MDC;
 
 @Order(1)
 public final class MDCMiddleware extends AbstractMiddleware {
-    private static final String CORRELATION_ID = "correlationId";
-    private static final String TASK_ID = "taskId";
+    public static final String CORRELATION_ID = "correlationId";
+    public static final String TASK_ID = "taskId";
 
     @Override
     public void invokeImpl(@Nonnull final TaskInput input, @Nonnull final TaskOutput output, @Nonnull final Pipeline next) {

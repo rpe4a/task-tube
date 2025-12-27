@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
 public class SlotArgumentDeserializer {
@@ -15,18 +13,29 @@ public class SlotArgumentDeserializer {
         this.objectMapper = Objects.requireNonNull(objectMapper);
     }
 
-    public Object deserialize(final Slot slot) {
+    public Object deserialize(final NothingSlot slot) {
         Preconditions.checkNotNull(slot);
 
         return objectMapper.convertValue(slot.getValue(), getJavaType(slot.getValueReferenceType()));
     }
 
-    public Object deserialize(final SlotList slotList) {
-        Preconditions.checkNotNull(slotList);
+    public Object deserialize(final ConstantSlot slot) {
+        Preconditions.checkNotNull(slot);
 
-        return  slotList.values
+        return objectMapper.convertValue(slot.getValue(), getJavaType(slot.getValueReferenceType()));
+    }
+
+    // TODO - как от этого избавиться ввести Аргументы?
+    public Object deserialize(final TaskSlot slot) {
+        throw new IllegalStateException("Task slot cannot be deserialized. Server side is currently not supported.");
+    }
+
+    public Object deserialize(final ListSlot listSlot) {
+        Preconditions.checkNotNull(listSlot);
+
+        return listSlot.values
                 .stream()
-                .map(this::deserialize)
+                .map(s -> s.deserialize(this))
                 .toList();
     }
 

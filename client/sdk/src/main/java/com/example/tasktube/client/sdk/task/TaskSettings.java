@@ -2,13 +2,14 @@ package com.example.tasktube.client.sdk.task;
 
 import jakarta.annotation.Nonnull;
 
-import java.util.Objects;
-
 public final class TaskSettings {
     private int heartbeatTimeoutSeconds;
     private int timeoutSeconds;
     private int maxFailures;
     private int failureRetryTimeoutSeconds;
+
+    public TaskSettings() {
+    }
 
     public TaskSettings(
             final int maxFailures,
@@ -57,31 +58,6 @@ public final class TaskSettings {
 
     public void setHeartbeatTimeoutSeconds(final int heartbeatTimeoutSeconds) {
         this.heartbeatTimeoutSeconds = heartbeatTimeoutSeconds;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (obj == this) {
-            return true;
-        }
-        if (obj == null || obj.getClass() != this.getClass()) {
-            return false;
-        }
-        final TaskSettings that = (TaskSettings) obj;
-        return this.maxFailures == that.maxFailures &&
-                this.failureRetryTimeoutSeconds == that.failureRetryTimeoutSeconds;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(maxFailures, failureRetryTimeoutSeconds);
-    }
-
-    @Override
-    public String toString() {
-        return "TaskSetting[" +
-                "maxFailures=" + maxFailures + ", " +
-                "failureRetryTimeoutSeconds=" + failureRetryTimeoutSeconds + ']';
     }
 
 }

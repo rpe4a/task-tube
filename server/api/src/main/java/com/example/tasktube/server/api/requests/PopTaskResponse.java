@@ -1,7 +1,7 @@
 package com.example.tasktube.server.api.requests;
 
 import com.example.tasktube.server.application.models.PopTaskDto;
-import com.example.tasktube.server.domain.values.Slot;
+import com.example.tasktube.server.domain.values.slot.Slot;
 import com.example.tasktube.server.domain.values.TaskSettings;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;

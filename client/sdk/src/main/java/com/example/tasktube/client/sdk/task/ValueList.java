@@ -8,7 +8,7 @@ import jakarta.annotation.Nonnull;
 import java.util.List;
 import java.util.Objects;
 
-public class ValueList<T> implements Value<List<T>> {
+public final class ValueList<T> implements Value<List<T>> {
     private final List<? extends Value<T>> list;
 
     public ValueList(@Nonnull final List<? extends Value<T>> list) {
@@ -22,7 +22,7 @@ public class ValueList<T> implements Value<List<T>> {
 
     @Override
     @Nonnull
-    public Slot serialize(final SlotValueSerializer serializer) {
+    public Slot<?> serialize(final SlotValueSerializer serializer) {
         Preconditions.checkNotNull(serializer);
 
         return serializer.serialize(this);

@@ -55,7 +55,7 @@ public class TaskTubeHttpClient implements TaskTubeClient {
         Preconditions.checkNotNull(request);
 
         final HttpRequest httpRequest = getRequestBuilder()
-                .uri(getUri("/api/v1/task/%s/start".formatted(taskId)))
+                .uri(getUri("api/v1/task/%s/start".formatted(taskId)))
                 .POST(getBody(request))
                 .build();
 
@@ -68,7 +68,7 @@ public class TaskTubeHttpClient implements TaskTubeClient {
         Preconditions.checkNotNull(request);
 
         final HttpRequest httpRequest = getRequestBuilder()
-                .uri(getUri("/api/v1/task/%s/process".formatted(taskId)))
+                .uri(getUri("api/v1/task/%s/process".formatted(taskId)))
                 .POST(getBody(request))
                 .build();
 
@@ -81,7 +81,7 @@ public class TaskTubeHttpClient implements TaskTubeClient {
         Preconditions.checkNotNull(request);
 
         final HttpRequest httpRequest = getRequestBuilder()
-                .uri(getUri("/api/v1/task/%s/finish".formatted(taskId)))
+                .uri(getUri("api/v1/task/%s/finish".formatted(taskId)))
                 .POST(getBody(request))
                 .build();
 
@@ -94,7 +94,7 @@ public class TaskTubeHttpClient implements TaskTubeClient {
         Preconditions.checkNotNull(request);
 
         final HttpRequest httpRequest = getRequestBuilder()
-                .uri(getUri("/api/v1/task/%s/fail".formatted(taskId)))
+                .uri(getUri("api/v1/task/%s/fail".formatted(taskId)))
                 .POST(getBody(request))
                 .build();
 
@@ -152,6 +152,10 @@ public class TaskTubeHttpClient implements TaskTubeClient {
             final HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() >= 400) {
                 throw new TaskTubeApiException(response.body());
+            }
+
+            if (response.statusCode() == 204) {
+                return Optional.empty();
             }
 
             return Objects.isNull(typeReference)

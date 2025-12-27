@@ -64,9 +64,9 @@ final class TaskTubeProducer implements Runnable {
                 taskTubeClient.popTasks(tube, new PopTasksRequest(instanceIdProvider.get(), taskCount));
 
         if (responses.isEmpty()) {
-            LOGGER.debug("There is nothing to handle by '{}' client.", instanceIdProvider.get());
+            LOGGER.info("There is nothing to handle by '{}' client.", instanceIdProvider.get());
         } else {
-            LOGGER.debug("There are '{}' tasks to handle by '{}' client. Tasks: {}",
+            LOGGER.info("There are '{}' tasks to handle by '{}' client. Tasks: {}",
                     responses.size(),
                     instanceIdProvider.get(),
                     responses.stream().map(r -> r.id().toString()).collect(Collectors.joining(", "))

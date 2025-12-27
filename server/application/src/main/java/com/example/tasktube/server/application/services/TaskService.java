@@ -3,6 +3,7 @@ package com.example.tasktube.server.application.services;
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.application.models.FinishTaskDto;
 import com.example.tasktube.server.application.port.in.ITaskService;
+import com.example.tasktube.server.application.utils.SlotUtils;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
@@ -147,13 +148,19 @@ public class TaskService implements ITaskService {
 
             taskDto.children().forEach(childDto -> {
                 final Task child = childDto.to(false);
+                final List<UUID> waitingTaskIdList = new ArrayList<>();
+                if (childDto.waitTasks() != null && !childDto.waitTasks().isEmpty()) {
+                    waitingTaskIdList.addAll(childDto.waitTasks());
+                }
+                if (childDto.input() != null && !childDto.input().isEmpty()) {
+                    final List<UUID> taskSlots = SlotUtils.getTaskIdList(childDto.input());
+                    waitingTaskIdList.addAll(taskSlots);
+                }
 
                 child.attachParent(task);
 
-                if (childDto.waitTasks() != null && !childDto.waitTasks().isEmpty()) {
-                    LOGGER.debug("Child task id '{}' has '{}' waiting tasks.", child.getId(), childDto.waitTasks().size());
-
-                    barriers.add(child.addStartBarrier(childDto.waitTasks()));
+                if (!waitingTaskIdList.isEmpty()) {
+                    barriers.add(child.addStartBarrier(waitingTaskIdList));
                 }
 
                 children.add(child);

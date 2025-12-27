@@ -2,7 +2,7 @@ package com.example.tasktube.client.sdk.task;
 
 import jakarta.annotation.Nullable;
 
-public abstract class Task1<TResult, TArg0> extends Task<TResult> {
+public abstract non-sealed class Task1<TResult, TArg0> extends Task<TResult> {
 
     public abstract Value<TResult> run(@Nullable TArg0 arg0) throws Exception;
 

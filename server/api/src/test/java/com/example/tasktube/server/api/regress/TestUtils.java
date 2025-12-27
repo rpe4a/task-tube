@@ -3,7 +3,7 @@ package com.example.tasktube.server.api.regress;
 import com.example.tasktube.server.application.models.FinishTaskDto;
 import com.example.tasktube.server.application.models.PushTaskDto;
 import com.example.tasktube.server.application.models.TaskSettingsDto;
-import com.example.tasktube.server.domain.values.Slot;
+import com.example.tasktube.server.domain.values.slot.Slot;
 
 import java.time.Instant;
 import java.util.ArrayList;

@@ -61,13 +61,13 @@ public class TaskOutput {
         return correlationId;
     }
 
-    @Nullable
+    @Nonnull
     public Slot getResult() {
         return result;
     }
 
     public TaskOutput setResult(@Nonnull final Slot result) {
-        Preconditions.checkNotNull(failureMessage);
+        Preconditions.checkNotNull(result);
 
         this.result = result;
         return this;
@@ -91,6 +91,8 @@ public class TaskOutput {
     }
 
     public TaskOutput setChildren(final List<TaskRequest> children) {
+        Preconditions.checkNotNull(children);
+
         this.children = List.copyOf(children);
         return this;
     }

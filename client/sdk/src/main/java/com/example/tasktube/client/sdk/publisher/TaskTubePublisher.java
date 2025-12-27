@@ -38,7 +38,7 @@ public final class TaskTubePublisher {
 
         final TaskRecord<?> record = builder.build();
 
-        record.setupBy(configurations);
+        record.configure(configurations);
 
         return client.pushTask(tube, record.toRequest(slotSerializer));
     }

@@ -6,13 +6,12 @@ import com.example.tasktube.server.application.models.PushTaskDto;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.values.Lock;
-import com.example.tasktube.server.domain.values.Slot;
+import com.example.tasktube.server.domain.values.slot.Slot;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

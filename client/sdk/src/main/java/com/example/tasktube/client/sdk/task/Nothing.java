@@ -8,7 +8,7 @@ import jakarta.annotation.Nullable;
 
 import java.lang.reflect.Type;
 
-public class Nothing<T> implements Value<T> {
+public final class Nothing<T> implements Value<T> {
 
     @Nullable
     public T getNull() {
@@ -22,7 +22,7 @@ public class Nothing<T> implements Value<T> {
 
     @Override
     @Nonnull
-    public Slot serialize(final SlotValueSerializer serializer) {
+    public Slot<?> serialize(final SlotValueSerializer serializer) {
         Preconditions.checkNotNull(serializer);
 
         return serializer.serialize(this);

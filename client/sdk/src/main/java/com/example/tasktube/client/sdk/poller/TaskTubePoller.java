@@ -20,11 +20,10 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
 public final class TaskTubePoller {
+    public static final String INSPECTOR_THREAD_GROUP = "inspector";
+    public static final String PRODUCER_THREAD_GROUP = "producer";
+    public static final String CONSUMER_THREAD_GROUP = "consumer";
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskTubePoller.class);
-    private static final String INSPECTOR_THREAD_GROUP = "inspector";
-    private static final String PRODUCER_THREAD_GROUP = "producer";
-    private static final String CONSUMER_THREAD_GROUP = "consumer";
-
     private final BlockingQueue<TaskInput> clientQueue;
     private final TaskTubeClient taskTubeClient;
     private final TaskTubePollerSettings settings;

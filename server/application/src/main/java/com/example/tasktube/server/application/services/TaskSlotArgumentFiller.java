@@ -3,8 +3,9 @@ package com.example.tasktube.server.application.services;
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
-import com.example.tasktube.server.domain.values.Slot;
-import com.example.tasktube.server.domain.values.SlotList;
+import com.example.tasktube.server.domain.values.slot.Slot;
+import com.example.tasktube.server.domain.values.slot.SlotList;
+import com.example.tasktube.server.domain.values.slot.TaskSlot;
 
 import java.util.List;
 import java.util.Objects;
@@ -20,18 +21,18 @@ public class TaskSlotArgumentFiller {
     }
 
     public Slot fill(final Slot slot) {
-        if (slot.isNothingSlot() || slot.isConstantSlot()) {
+        if (Slot.SlotType.NOTHING.equals(slot.getType()) || Slot.SlotType.CONSTANT.equals(slot.getType())) {
             return slot;
-        } else if (slot.isTaskSlot()) {
-            return fillTaskSlot(slot);
-        } else if (slot.isListSlot()) {
+        } else if (Slot.SlotType.TASK.equals(slot.getType())) {
+            return fillTaskSlot((TaskSlot) slot);
+        } else if (Slot.SlotType.LIST.equals(slot.getType())) {
             return fillSlotList((SlotList) slot);
         } else {
             throw new IllegalArgumentException("Invalid slot type: " + slot.getType());
         }
     }
 
-    private Slot fillTaskSlot(final Slot slot) {
+    private Slot fillTaskSlot(final TaskSlot slot) {
         final UUID taskId = slot.getTaskReference();
         final Task task = taskRepository.get(taskId).get();
         if (!task.isCompleted()) {
@@ -51,7 +52,6 @@ public class TaskSlotArgumentFiller {
                         .map(this::fill)
                         .toList();
         return new SlotList()
-                .setType(Slot.SlotType.LIST)
                 .setValues(slots);
     }
 }

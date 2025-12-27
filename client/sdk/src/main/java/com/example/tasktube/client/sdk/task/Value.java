@@ -7,5 +7,5 @@ import jakarta.annotation.Nonnull;
 public interface Value<T> {
 
     @Nonnull
-    Slot serialize(final SlotValueSerializer serializer);
+    Slot<?> serialize(final SlotValueSerializer serializer);
 }

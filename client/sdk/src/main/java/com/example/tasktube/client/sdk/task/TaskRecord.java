@@ -61,7 +61,7 @@ public class TaskRecord<TResult> {
     }
 
 
-    public void setupBy(final TaskConfiguration[] configurations) {
+    public void configure(final TaskConfiguration[] configurations) {
         for (final TaskConfiguration configuration : configurations) {
             configuration.applyTo(this);
         }

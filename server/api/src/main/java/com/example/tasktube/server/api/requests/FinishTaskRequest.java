@@ -2,7 +2,7 @@ package com.example.tasktube.server.api.requests;
 
 import com.example.tasktube.server.application.models.FinishTaskDto;
 import com.example.tasktube.server.application.models.PushTaskDto;
-import com.example.tasktube.server.domain.values.Slot;
+import com.example.tasktube.server.domain.values.slot.Slot;
 import com.google.common.base.Preconditions;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -10,12 +10,11 @@ import org.springframework.lang.Nullable;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 public record FinishTaskRequest(
         @Nullable List<TaskRequest> children,
-        @Nullable Slot output,
+        @NotNull Slot output,
         @NotBlank String client,
         @NotNull Instant finishedAt
 ) {
@@ -23,10 +22,10 @@ public record FinishTaskRequest(
         Preconditions.checkNotNull(taskId);
         Preconditions.checkNotNull(client);
 
-        final List<PushTaskDto> tasks = children == null ? null : children()
-                .stream()
-                .map(TaskRequest::to)
-                .toList();
+        final List<PushTaskDto> tasks =
+                children == null
+                        ? null
+                        : children().stream().map(TaskRequest::to).toList();
 
         return new FinishTaskDto(
                 taskId,

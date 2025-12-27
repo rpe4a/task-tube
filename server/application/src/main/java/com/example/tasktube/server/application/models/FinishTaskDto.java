@@ -1,6 +1,6 @@
 package com.example.tasktube.server.application.models;
 
-import com.example.tasktube.server.domain.values.Slot;
+import com.example.tasktube.server.domain.values.slot.Slot;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 

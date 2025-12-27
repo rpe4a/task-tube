@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-public abstract class Task<TResult> {
+public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
     private static final String CANNOT_FIND_METHOD_RUN = "Cannot find method run.";
     private static final String DEFAULT_METHOD_NAME = "run";
 
@@ -198,7 +198,7 @@ public abstract class Task<TResult> {
         children.add(child);
     }
 
-    void execute(
+    private void execute(
             @Nonnull final TaskInput input,
             @Nonnull final TaskOutput output,
             @Nonnull final SlotArgumentDeserializer slotDeserializer,
@@ -280,8 +280,8 @@ public abstract class Task<TResult> {
         public static final String EXECUTE_METHOD_NAME = "execute";
         private final Task<?> task;
 
-        public Executor(final Task<?> task) {
-            this.task = task;
+        public Executor(@Nonnull final Task<?> task) {
+            this.task = Objects.requireNonNull(task);
         }
 
         public void invoke(
@@ -291,16 +291,23 @@ public abstract class Task<TResult> {
                 final SlotValueSerializer slotSerializer
         ) {
             try {
-                final Method execute = Objects.requireNonNull(task.getClass())
-                        .getMethod(EXECUTE_METHOD_NAME, TaskInput.class, TaskOutput.class, SlotArgumentDeserializer.class, SlotValueSerializer.class);
+                final Method execute = findExecuteMethod(task.getClass());
+
+                execute.setAccessible(true);
 
                 execute.invoke(task, input, output, slotDeserializer, slotSerializer);
+            } catch (final InvocationTargetException | IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        private Method findExecuteMethod(final Class<?> clazz) {
+            try {
+                return clazz
+                        .getSuperclass()
+                        .getDeclaredMethod(EXECUTE_METHOD_NAME, TaskInput.class, TaskOutput.class, SlotArgumentDeserializer.class, SlotValueSerializer.class);
             } catch (final NoSuchMethodException e) {
-                throw new RuntimeException(e);
-            } catch (final InvocationTargetException e) {
-                throw new RuntimeException(e);
-            } catch (final IllegalAccessException e) {
-                throw new RuntimeException(e);
+                return findExecuteMethod(clazz.getSuperclass());
             }
         }
     }

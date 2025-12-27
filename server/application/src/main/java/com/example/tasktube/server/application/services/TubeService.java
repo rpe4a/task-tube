@@ -9,7 +9,7 @@ import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
-import com.example.tasktube.server.domain.values.Slot;
+import com.example.tasktube.server.domain.values.slot.Slot;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

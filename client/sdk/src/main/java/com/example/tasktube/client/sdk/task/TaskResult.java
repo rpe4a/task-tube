@@ -22,7 +22,7 @@ public class TaskResult<T> implements Value<T> {
 
     @Override
     @Nonnull
-    public Slot serialize(final SlotValueSerializer serializer) {
+    public Slot<?> serialize(final SlotValueSerializer serializer) {
         Preconditions.checkNotNull(serializer);
 
         return serializer.serialize(this);

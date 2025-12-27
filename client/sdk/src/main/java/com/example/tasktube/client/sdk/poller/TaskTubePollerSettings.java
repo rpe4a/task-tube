@@ -7,19 +7,16 @@ public final class TaskTubePollerSettings {
     public static final int DEFAULT_INPUT_MAX_PAYLOAD_KB = 32768;
     public static final int DEFAULT_OUTPUT_PAYLOAD_KB = 1024;
     public static final int DEFAULT_OUTPUT_MAX_PAYLOAD_KB = 32768;
-    public static final boolean DEFAULT_EXTERNAL_PAYLOAD_STORAGE_ENABLED = true;
-    private static final int DEFAULT_POLLING_INTERVAL_MILLISECONDS = 1000;
+    private static final int DEFAULT_POLLING_INTERVAL_MILLISECONDS = 5000;
     private static final int DEFAULT_SHUTDOWN_SECONDS = 60;
     private static final int DEFAULT_INSPECTOR_INTERVAL_MILLISECONDS = 5000;
-    private static final int DEFAULT_MONITOR_INTERVAL_MILLISECONDS = 30000;
-    private static final int DEFAULT_MAX_CONSUMERS_COUNT = 16;
+    private static final int DEFAULT_MAX_CONSUMERS_COUNT = 1;
     private static final int DEFAULT_MIN_CONSUMERS_COUNT = 1;
     private static final int DEFAULT_CONSUMER_EMPTY_QUEUE_SLEEP_TIME_OUT_MILLISECONDS = 100;
     private static final double DEFAULT_TASK_LEASE_DURATION_FACTOR = 0.5;
     private static final int DEFAULT_MAX_BATCH_REQUESTED_TASK_COUNT = 16;
     private static final int DEFAULT_QUEUE_SIZE = 32;
     private static final String DEFAULT_USER_QUEUE_PREFIX = "com.cloudaware";
-    private boolean externalPayloadStorageEnabled;
     private int inputPayloadKb;
     private int inputMaxPayloadKb;
     private int outputPayloadKb;
@@ -32,7 +29,6 @@ public final class TaskTubePollerSettings {
     private int minConsumersCount;
     private int consumerEmptyQueueSleepTimeoutMilliseconds;
     private int inspectorPollingIntervalMilliseconds;
-    private int monitorPollingIntervalMilliseconds;
     private int maxBatchRequestedTasksCount;
     private int queueSize;
 
@@ -44,7 +40,6 @@ public final class TaskTubePollerSettings {
                 DEFAULT_MIN_CONSUMERS_COUNT,
                 DEFAULT_CONSUMER_EMPTY_QUEUE_SLEEP_TIME_OUT_MILLISECONDS,
                 DEFAULT_INSPECTOR_INTERVAL_MILLISECONDS,
-                DEFAULT_MONITOR_INTERVAL_MILLISECONDS,
                 DEFAULT_MAX_BATCH_REQUESTED_TASK_COUNT,
                 DEFAULT_USER_QUEUE_PREFIX,
                 DEFAULT_TASK_LEASE_DURATION_FACTOR,
@@ -52,7 +47,6 @@ public final class TaskTubePollerSettings {
                 DEFAULT_INPUT_MAX_PAYLOAD_KB,
                 DEFAULT_OUTPUT_PAYLOAD_KB,
                 DEFAULT_OUTPUT_MAX_PAYLOAD_KB,
-                DEFAULT_EXTERNAL_PAYLOAD_STORAGE_ENABLED,
                 DEFAULT_QUEUE_SIZE
         );
     }
@@ -64,7 +58,6 @@ public final class TaskTubePollerSettings {
             final int minConsumersCount,
             final int consumerEmptyQueueSleepTimeoutMilliseconds,
             final int inspectorPollingIntervalMilliseconds,
-            final int monitorPollingIntervalMilliseconds,
             final int maxBatchRequestedTasksCount,
             final String userQueuePrefix,
             final double taskLeaseDurationFactor,
@@ -72,7 +65,6 @@ public final class TaskTubePollerSettings {
             final int inputMaxPayloadKb,
             final int outputPayloadKb,
             final int outputMaxPayloadKb,
-            final Boolean externalPayloadStorageEnabled,
             final int queueSize
     ) {
         this.producerPollingIntervalMilliseconds = producerPollingIntervalMilliseconds == 0
@@ -93,9 +85,6 @@ public final class TaskTubePollerSettings {
         this.inspectorPollingIntervalMilliseconds = inspectorPollingIntervalMilliseconds == 0
                 ? DEFAULT_INSPECTOR_INTERVAL_MILLISECONDS
                 : inspectorPollingIntervalMilliseconds;
-        this.monitorPollingIntervalMilliseconds = monitorPollingIntervalMilliseconds == 0
-                ? DEFAULT_MONITOR_INTERVAL_MILLISECONDS
-                : monitorPollingIntervalMilliseconds;
         this.maxBatchRequestedTasksCount = maxBatchRequestedTasksCount == 0
                 ? DEFAULT_MAX_BATCH_REQUESTED_TASK_COUNT
                 : maxBatchRequestedTasksCount;
@@ -117,9 +106,6 @@ public final class TaskTubePollerSettings {
         this.outputMaxPayloadKb = outputMaxPayloadKb == 0
                 ? DEFAULT_OUTPUT_MAX_PAYLOAD_KB
                 : outputMaxPayloadKb;
-        this.externalPayloadStorageEnabled = externalPayloadStorageEnabled == null
-                ? DEFAULT_EXTERNAL_PAYLOAD_STORAGE_ENABLED
-                : externalPayloadStorageEnabled;
         this.queueSize = queueSize == 0
                 ? DEFAULT_QUEUE_SIZE
                 : queueSize;
@@ -177,14 +163,6 @@ public final class TaskTubePollerSettings {
         this.inspectorPollingIntervalMilliseconds = inspectorPollingIntervalMilliseconds;
     }
 
-    public int getMonitorPollingIntervalMilliseconds() {
-        return monitorPollingIntervalMilliseconds;
-    }
-
-    public void setMonitorPollingIntervalMilliseconds(final int monitorPollingIntervalMilliseconds) {
-        this.monitorPollingIntervalMilliseconds = monitorPollingIntervalMilliseconds;
-    }
-
     public int getMaxBatchRequestedTasksCount() {
         return maxBatchRequestedTasksCount;
     }
@@ -218,8 +196,7 @@ public final class TaskTubePollerSettings {
             return false;
         }
         final TaskTubePollerSettings that = (TaskTubePollerSettings) o;
-        return externalPayloadStorageEnabled == that.externalPayloadStorageEnabled
-                && inputPayloadKb == that.inputPayloadKb
+        return inputPayloadKb == that.inputPayloadKb
                 && inputMaxPayloadKb == that.inputMaxPayloadKb
                 && outputPayloadKb == that.outputPayloadKb
                 && outputMaxPayloadKb == that.outputMaxPayloadKb
@@ -230,7 +207,6 @@ public final class TaskTubePollerSettings {
                 && minConsumersCount == that.minConsumersCount
                 && consumerEmptyQueueSleepTimeoutMilliseconds == that.consumerEmptyQueueSleepTimeoutMilliseconds
                 && inspectorPollingIntervalMilliseconds == that.inspectorPollingIntervalMilliseconds
-                && monitorPollingIntervalMilliseconds == that.monitorPollingIntervalMilliseconds
                 && maxBatchRequestedTasksCount == that.maxBatchRequestedTasksCount
                 && queueSize == that.queueSize
                 && Objects.equals(userQueuePrefix, that.userQueuePrefix);
@@ -238,8 +214,7 @@ public final class TaskTubePollerSettings {
 
     @Override
     public String toString() {
-        return "TaskPollerSettings{" + "externalPayloadStorageEnabled=" + externalPayloadStorageEnabled
-                + ", inputPayloadKb=" + inputPayloadKb
+        return "TaskPollerSettings{" + "inputPayloadKb=" + inputPayloadKb
                 + ", inputMaxPayloadKb=" + inputMaxPayloadKb
                 + ", outputPayloadKb=" + outputPayloadKb
                 + ", outputMaxPayloadKb=" + outputMaxPayloadKb
@@ -251,7 +226,6 @@ public final class TaskTubePollerSettings {
                 + ", minConsumersCount=" + minConsumersCount
                 + ", consumerEmptyQueueSleepTimeoutMilliseconds=" + consumerEmptyQueueSleepTimeoutMilliseconds
                 + ", inspectorPollingIntervalMilliseconds=" + inspectorPollingIntervalMilliseconds
-                + ", monitorPollingIntervalMilliseconds=" + monitorPollingIntervalMilliseconds
                 + ", maxBatchRequestedTasksCount=" + maxBatchRequestedTasksCount
                 + ", queueSize=" + queueSize
                 + '}';
@@ -260,7 +234,6 @@ public final class TaskTubePollerSettings {
     @Override
     public int hashCode() {
         return Objects.hash(
-                externalPayloadStorageEnabled,
                 inputPayloadKb,
                 inputMaxPayloadKb,
                 outputPayloadKb,
@@ -273,18 +246,9 @@ public final class TaskTubePollerSettings {
                 minConsumersCount,
                 consumerEmptyQueueSleepTimeoutMilliseconds,
                 inspectorPollingIntervalMilliseconds,
-                monitorPollingIntervalMilliseconds,
                 maxBatchRequestedTasksCount,
                 queueSize
         );
-    }
-
-    public boolean isExternalPayloadStorageEnabled() {
-        return externalPayloadStorageEnabled;
-    }
-
-    public void setExternalPayloadStorageEnabled(final boolean externalPayloadStorageEnabled) {
-        this.externalPayloadStorageEnabled = externalPayloadStorageEnabled;
     }
 
     public int getInputPayloadKb() {

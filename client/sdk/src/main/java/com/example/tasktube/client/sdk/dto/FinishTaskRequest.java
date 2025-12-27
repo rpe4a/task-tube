@@ -9,7 +9,7 @@ import java.util.List;
 
 public record FinishTaskRequest(
         @Nullable List<TaskRequest> children,
-        @Nullable Slot result,
+        @Nonnull Slot output,
         @Nonnull String client,
         @Nonnull Instant finishedAt
 ) {

@@ -2,7 +2,7 @@ package com.example.tasktube.server.domain.enties;
 
 import com.example.tasktube.server.domain.exceptions.ValidationDomainException;
 import com.example.tasktube.server.domain.values.Lock;
-import com.example.tasktube.server.domain.values.Slot;
+import com.example.tasktube.server.domain.values.slot.Slot;
 import com.example.tasktube.server.domain.values.TaskSettings;
 
 import java.time.Instant;
@@ -378,13 +378,13 @@ public class Task {
         return barrier;
     }
 
-    public Barrier addFinishBarrier(final List<UUID> waitForTaskIds) {
-        checkTaskIdList(waitForTaskIds);
+    public Barrier addFinishBarrier(final List<UUID> taskIdList) {
+        checkTaskIdList(taskIdList);
 
         final Barrier barrier = new Barrier(
                 UUID.randomUUID(),
                 getId(),
-                waitForTaskIds,
+                taskIdList,
                 Barrier.Type.FINISH,
                 false,
                 Instant.now(),

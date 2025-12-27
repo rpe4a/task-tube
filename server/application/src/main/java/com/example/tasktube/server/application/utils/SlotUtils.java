@@ -1,7 +1,8 @@
 package com.example.tasktube.server.application.utils;
 
-import com.example.tasktube.server.domain.values.Slot;
-import com.example.tasktube.server.domain.values.SlotList;
+import com.example.tasktube.server.domain.values.slot.Slot;
+import com.example.tasktube.server.domain.values.slot.SlotList;
+import com.example.tasktube.server.domain.values.slot.TaskSlot;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,7 @@ import java.util.UUID;
 public class SlotUtils {
 
     public static List<UUID> getTaskIdList(final List<Slot> slots) {
-        if(slots == null || slots.isEmpty()){
+        if (slots == null || slots.isEmpty()) {
             return List.of();
         }
 
@@ -20,8 +21,8 @@ public class SlotUtils {
 
         taskIdList.addAll(slots
                 .stream()
-                .filter(Slot::isListSlot)
-                .map(s -> (SlotList)s)
+                .filter(s -> Slot.SlotType.LIST.equals(s.getType()))
+                .map(s -> (SlotList) s)
                 .flatMap(s -> getTaskIdList(s.values).stream())
                 .toList());
 
@@ -31,8 +32,8 @@ public class SlotUtils {
     private static List<UUID> getTaskIdListInternal(final List<Slot> slots) {
         return slots
                 .stream()
-                .filter(Slot::isTaskSlot)
-                .map(Slot::getTaskReference)
+                .filter(s -> Slot.SlotType.TASK.equals(s.getType()))
+                .map(s -> ((TaskSlot) s).getTaskReference())
                 .toList();
     }
 }

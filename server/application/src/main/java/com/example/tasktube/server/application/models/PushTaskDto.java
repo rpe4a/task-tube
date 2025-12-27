@@ -1,13 +1,12 @@
 package com.example.tasktube.server.application.models;
 
 import com.example.tasktube.server.domain.enties.Task;
-import com.example.tasktube.server.domain.values.Slot;
+import com.example.tasktube.server.domain.values.slot.Slot;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
