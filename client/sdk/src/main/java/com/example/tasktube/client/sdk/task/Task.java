@@ -81,8 +81,8 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
     }
 
     @Nonnull
-    public final <V> Nothing<V> nothing() {
-        return new Nothing<>();
+    public final <V> Constant<V> nothing() {
+        return new Constant<>(null, Object.class);
     }
 
     @Nonnull
@@ -228,7 +228,7 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
         );
     }
 
-    private Optional<Value<TResult>> executeRunMethod(final List<Slot> slots) {
+    private Optional<Value<TResult>> executeRunMethod(final List<Slot<?>> slots) {
         try {
             final Method run = getRunMethod();
             final Parameter[] parameters = run.getParameters();

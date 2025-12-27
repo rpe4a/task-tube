@@ -13,12 +13,6 @@ public class SlotArgumentDeserializer {
         this.objectMapper = Objects.requireNonNull(objectMapper);
     }
 
-    public Object deserialize(final NothingSlot slot) {
-        Preconditions.checkNotNull(slot);
-
-        return objectMapper.convertValue(slot.getValue(), getJavaType(slot.getValueReferenceType()));
-    }
-
     public Object deserialize(final ConstantSlot slot) {
         Preconditions.checkNotNull(slot);
 

@@ -28,9 +28,8 @@ public abstract sealed class Slot<T extends Slot<?>> permits ConstantSlot, ListS
     public abstract Object deserialize(@Nonnull final SlotArgumentDeserializer slotDeserializer);
 
     public enum SlotType {
-        NOTHING,
         CONSTANT,
+        TASK,
         LIST,
-        TASK
     }
 }

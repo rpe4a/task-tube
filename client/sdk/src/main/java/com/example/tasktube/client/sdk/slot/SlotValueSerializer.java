@@ -1,7 +1,6 @@
 package com.example.tasktube.client.sdk.slot;
 
 import com.example.tasktube.client.sdk.task.Constant;
-import com.example.tasktube.client.sdk.task.Nothing;
 import com.example.tasktube.client.sdk.task.TaskResult;
 import com.example.tasktube.client.sdk.task.ValueList;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,15 +16,6 @@ public class SlotValueSerializer {
 
     public SlotValueSerializer(final ObjectMapper objectMapper) {
         this.objectMapper = Objects.requireNonNull(objectMapper);
-    }
-
-    @Nonnull
-    public Slot<?> serialize(@Nonnull final Nothing<?> value) {
-        Preconditions.checkNotNull(value);
-
-        return new NothingSlot()
-                .setValue(value.getNull())
-                .setValueReferenceType(getJavaType(value.getType()));
     }
 
     @Nonnull

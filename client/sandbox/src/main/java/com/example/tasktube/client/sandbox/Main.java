@@ -22,6 +22,7 @@ import com.example.tasktube.client.sdk.slot.SlotArgumentDeserializer;
 import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
 import com.example.tasktube.client.sdk.task.Constant;
 import com.example.tasktube.client.sdk.task.TaskConfiguration;
+import com.example.tasktube.client.sdk.task.Value;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

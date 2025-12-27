@@ -1,5 +1,7 @@
 package com.example.tasktube.server.domain.values.slot;
 
+import com.example.tasktube.server.domain.port.out.IArgumentFiller;
+
 public final class ConstantSlot extends Slot {
     private Object value;
     private String valueReferenceType;
@@ -24,5 +26,10 @@ public final class ConstantSlot extends Slot {
     public Slot setValueReferenceType(final String valueTypeReference) {
         this.valueReferenceType = valueTypeReference;
         return this;
+    }
+
+    @Override
+    public Slot fill(final IArgumentFiller argumentFiller) {
+        return argumentFiller.fill(this);
     }
 }

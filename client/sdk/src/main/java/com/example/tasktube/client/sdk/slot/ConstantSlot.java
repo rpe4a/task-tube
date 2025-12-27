@@ -3,7 +3,7 @@ package com.example.tasktube.client.sdk.slot;
 import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
 
-public sealed class ConstantSlot extends Slot<ConstantSlot> permits NothingSlot {
+public final class ConstantSlot extends Slot<ConstantSlot> {
     private Object value;
     private String valueReferenceType;
 
@@ -11,7 +11,7 @@ public sealed class ConstantSlot extends Slot<ConstantSlot> permits NothingSlot 
         this(SlotType.CONSTANT);
     }
 
-    protected ConstantSlot(final SlotType type) {
+    private ConstantSlot(final SlotType type) {
         super(type);
     }
 

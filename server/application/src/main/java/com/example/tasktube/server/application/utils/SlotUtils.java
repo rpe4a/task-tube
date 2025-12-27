@@ -1,7 +1,7 @@
 package com.example.tasktube.server.application.utils;
 
 import com.example.tasktube.server.domain.values.slot.Slot;
-import com.example.tasktube.server.domain.values.slot.SlotList;
+import com.example.tasktube.server.domain.values.slot.ListSlot;
 import com.example.tasktube.server.domain.values.slot.TaskSlot;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ public class SlotUtils {
         taskIdList.addAll(slots
                 .stream()
                 .filter(s -> Slot.SlotType.LIST.equals(s.getType()))
-                .map(s -> (SlotList) s)
+                .map(s -> (ListSlot) s)
                 .flatMap(s -> getTaskIdList(s.values).stream())
                 .toList());
 

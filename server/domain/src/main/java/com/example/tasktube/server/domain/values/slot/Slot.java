@@ -1,14 +1,12 @@
 package com.example.tasktube.server.domain.values.slot;
 
+import com.example.tasktube.server.domain.port.out.IArgumentFiller;
+
 import java.util.Map;
 
-public abstract sealed class Slot permits NothingSlot, ConstantSlot, TaskSlot, SlotList {
+public abstract sealed class Slot permits ConstantSlot, TaskSlot, ListSlot {
     private final SlotType type;
     private Map<String, Object> metadata;
-
-    public Slot() {
-        type = null;
-    }
 
     protected Slot(final SlotType type) {
         this.type = type;
@@ -27,8 +25,9 @@ public abstract sealed class Slot permits NothingSlot, ConstantSlot, TaskSlot, S
         return type;
     }
 
+    public abstract Slot fill(final IArgumentFiller argumentFiller);
+
     public enum SlotType {
-        NOTHING,
         CONSTANT,
         TASK,
         LIST

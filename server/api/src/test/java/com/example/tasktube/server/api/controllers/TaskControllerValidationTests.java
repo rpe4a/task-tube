@@ -6,8 +6,10 @@ import com.example.tasktube.server.api.requests.FinishTaskRequest;
 import com.example.tasktube.server.api.requests.ProcessTaskRequest;
 import com.example.tasktube.server.api.requests.StartTaskRequest;
 import com.example.tasktube.server.application.port.in.ITaskService;
+import com.example.tasktube.server.domain.values.slot.ConstantSlot;
 import com.example.tasktube.server.domain.values.slot.Slot;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -162,7 +164,7 @@ class TaskControllerValidationTests {
 
     @Test
     void shouldFinishTaskWithNullClientReturnBadRequest() throws Exception {
-        final FinishTaskRequest request = new FinishTaskRequest(null, new Slot(), null, Instant.now());
+        final FinishTaskRequest request = new FinishTaskRequest(null, new ConstantSlot(), null, Instant.now());
         final String taskId = UUID.randomUUID().toString();
 
         mockMvc.perform(post("/api/v1/task/" + taskId + "/finish")
@@ -173,7 +175,7 @@ class TaskControllerValidationTests {
 
     @Test
     void shouldFinishTaskWithEmptyClientReturnBadRequest() throws Exception {
-        final FinishTaskRequest request = new FinishTaskRequest(null, new Slot(), "", Instant.now());
+        final FinishTaskRequest request = new FinishTaskRequest(null, new ConstantSlot(), "", Instant.now());
         final String taskId = UUID.randomUUID().toString();
 
         mockMvc.perform(post("/api/v1/task/" + taskId + "/finish")
@@ -195,7 +197,7 @@ class TaskControllerValidationTests {
 
     @Test
     void shouldFinishTaskWithNullFinishedAtReturnBadRequest() throws Exception {
-        final FinishTaskRequest request = new FinishTaskRequest(null, new Slot(), "test-client", null);
+        final FinishTaskRequest request = new FinishTaskRequest(null, new ConstantSlot(), "test-client", null);
         final String taskId = UUID.randomUUID().toString();
 
         mockMvc.perform(post("/api/v1/task/" + taskId + "/finish")
@@ -206,7 +208,7 @@ class TaskControllerValidationTests {
 
     @Test
     void shouldFinishTaskReturnNoContent() throws Exception {
-        final FinishTaskRequest request = new FinishTaskRequest(null, new Slot(), "test-client", Instant.now());
+        final FinishTaskRequest request = new FinishTaskRequest(null, new ConstantSlot(), "test-client", Instant.now());
         final String taskId = UUID.randomUUID().toString();
 
         Mockito.doNothing().when(mockTaskService).finishTask(Mockito.any());

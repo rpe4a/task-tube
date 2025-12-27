@@ -1,6 +1,7 @@
 package com.example.tasktube.server.infrastructure.configuration;
 
 import com.example.tasktube.server.application.services.TaskSlotArgumentFiller;
+import com.example.tasktube.server.domain.port.out.IArgumentFiller;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -21,7 +22,7 @@ public class ServiceConfiguration {
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public TaskSlotArgumentFiller registerSlotArgumentMapper(
+    public IArgumentFiller registerArgumentFiller(
             final ITaskRepository taskRepository
     ) {
         return new TaskSlotArgumentFiller(taskRepository);

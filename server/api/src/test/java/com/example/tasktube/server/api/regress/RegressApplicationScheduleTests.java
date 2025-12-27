@@ -6,6 +6,7 @@ import com.example.tasktube.server.application.models.PushTaskDto;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.values.Lock;
+import com.example.tasktube.server.domain.values.slot.ConstantSlot;
 import com.example.tasktube.server.domain.values.slot.Slot;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -59,7 +60,7 @@ class RegressApplicationScheduleTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        assertThatThrownBy(() -> taskService.finishTask(new FinishTaskDto(taskId, null, new Slot(), CLIENT, Instant.now())));
+        assertThatThrownBy(() -> taskService.finishTask(new FinishTaskDto(taskId, null, new ConstantSlot(), CLIENT, Instant.now())));
     }
 
     @Test

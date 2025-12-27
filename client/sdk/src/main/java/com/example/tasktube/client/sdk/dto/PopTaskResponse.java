@@ -13,7 +13,7 @@ public record PopTaskResponse(
         @Nonnull String name,
         @Nonnull String tube,
         @Nonnull String correlationId,
-        @Nullable List<Slot> args,
+        @Nullable List<Slot<?>> args,
         @Nonnull TaskSettings settings
 ) {
 }

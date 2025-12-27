@@ -15,7 +15,7 @@ public class TaskInput {
     private final String name;
     private final String tube;
     private final String correlationId;
-    private final List<Slot> args;
+    private final List<Slot<?>> args;
     private final TaskSettings settings;
 
     public TaskInput(
@@ -23,7 +23,7 @@ public class TaskInput {
             @Nonnull final String name,
             @Nonnull final String tube,
             @Nonnull final String correlationId,
-            @Nonnull final List<Slot> args,
+            @Nonnull final List<Slot<?>> args,
             @Nonnull final TaskSettings settings
     ) {
         this.id = id;
@@ -63,7 +63,7 @@ public class TaskInput {
     }
 
     @Nullable
-    public List<Slot> getArgs() {
+    public List<Slot<?>> getArgs() {
         return args;
     }
 

@@ -7,6 +7,7 @@ import com.example.tasktube.server.application.port.in.ITubeService;
 import com.example.tasktube.server.application.utils.SlotUtils;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
+import com.example.tasktube.server.domain.port.out.IArgumentFiller;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
 import com.example.tasktube.server.domain.values.slot.Slot;
@@ -29,16 +30,16 @@ public class TubeService implements ITubeService {
 
     private final ITubeRepository tubeRepository;
     private final IBarrierRepository barrierRepository;
-    private final TaskSlotArgumentFiller taskSlotArgumentFiller;
+    private final IArgumentFiller argumentFiller;
 
     public TubeService(
             final ITubeRepository tubeRepository,
             final IBarrierRepository barrierRepository,
-            final TaskSlotArgumentFiller taskSlotArgumentFiller
+            final IArgumentFiller argumentFiller
     ) {
         this.tubeRepository = Objects.requireNonNull(tubeRepository);
         this.barrierRepository = Objects.requireNonNull(barrierRepository);
-        this.taskSlotArgumentFiller = taskSlotArgumentFiller;
+        this.argumentFiller = argumentFiller;
     }
 
     @Override
@@ -120,7 +121,7 @@ public class TubeService implements ITubeService {
         final List<Slot> arguments = new LinkedList<>();
 
         for (final Slot slot : poppedTask.getInput()) {
-            arguments.add(taskSlotArgumentFiller.fill(slot));
+            arguments.add(slot.fill(argumentFiller));
         }
 
         return new PopTaskDto(
