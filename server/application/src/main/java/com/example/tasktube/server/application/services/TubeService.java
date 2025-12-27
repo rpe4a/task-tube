@@ -107,7 +107,7 @@ public class TubeService implements ITubeService {
         LOGGER.info("Pop '{}' tasks from '{}' by '{}' client.", count, tube, client);
 
         final List<Task> poppedTasks = tubeRepository.popList(tube, client, count);
-        LOGGER.info("Popped '{}' tasks from '{}' by '{}' client.", count, tube, client);
+        LOGGER.info("Popped '{}' tasks from '{}' by '{}' client.", poppedTasks.size(), tube, client);
 
         final List<PopTaskDto> results = new ArrayList<>(poppedTasks.size());
         for (final Task poppedTask : poppedTasks) {

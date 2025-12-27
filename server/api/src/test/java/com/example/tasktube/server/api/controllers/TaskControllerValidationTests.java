@@ -7,9 +7,9 @@ import com.example.tasktube.server.api.requests.ProcessTaskRequest;
 import com.example.tasktube.server.api.requests.StartTaskRequest;
 import com.example.tasktube.server.application.port.in.ITaskService;
 import com.example.tasktube.server.domain.values.slot.ConstantSlot;
-import com.example.tasktube.server.domain.values.slot.Slot;
+import com.example.tasktube.server.infrastructure.configuration.deserializer.TaskTubeModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.checkerframework.checker.units.qual.C;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +39,11 @@ class TaskControllerValidationTests {
 
     @MockitoBean
     private ITaskService mockTaskService;
+
+    @BeforeEach
+    public void setUp() {
+        objectMapper.registerModule(new TaskTubeModule());
+    }
 
     @Test
     void shouldStartTaskWithNullReturnBadRequest() throws Exception {
