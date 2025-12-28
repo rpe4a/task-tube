@@ -1,13 +1,13 @@
 package com.example.tasktube.client.sandbox;
 
-import com.example.tasktube.client.sandbox.workflow.ParentTaskReturnString0String;
+import com.example.tasktube.client.sandbox.tube.ParentTaskReturnString0String;
 import com.example.tasktube.client.sdk.InstanceIdProvider;
-import com.example.tasktube.client.sdk.InstanceIdProviderImpl;
-import com.example.tasktube.client.sdk.TaskTubeClient;
-import com.example.tasktube.client.sdk.TaskTubeClientSettings;
+import com.example.tasktube.client.sdk.impl.ClientInstanceIdProvider;
+import com.example.tasktube.client.sdk.http.TaskTubeClient;
+import com.example.tasktube.client.sdk.http.TaskTubeClientSettings;
 import com.example.tasktube.client.sdk.impl.TaskTubeHttpClient;
 import com.example.tasktube.client.sdk.module.TaskTubeModule;
-import com.example.tasktube.client.sdk.poller.ReflectionTaskFactory;
+import com.example.tasktube.client.sdk.impl.ReflectionTaskFactory;
 import com.example.tasktube.client.sdk.poller.TaskTubePoller;
 import com.example.tasktube.client.sdk.poller.TaskTubePollerSettings;
 import com.example.tasktube.client.sdk.poller.middleware.ExceptionMiddleware;
@@ -18,11 +18,10 @@ import com.example.tasktube.client.sdk.poller.middleware.Middleware;
 import com.example.tasktube.client.sdk.poller.middleware.TaskHandlerMiddleware;
 import com.example.tasktube.client.sdk.publisher.TaskTubePublisher;
 import com.example.tasktube.client.sdk.publisher.TaskTubePublisherFactory;
-import com.example.tasktube.client.sdk.slot.SlotArgumentDeserializer;
-import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
+import com.example.tasktube.client.sdk.task.argument.ArgumentDeserializer;
+import com.example.tasktube.client.sdk.task.slot.SlotValueSerializer;
 import com.example.tasktube.client.sdk.task.Constant;
 import com.example.tasktube.client.sdk.task.TaskConfiguration;
-import com.example.tasktube.client.sdk.task.Value;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -40,10 +39,10 @@ public class Main {
         objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 
         final SlotValueSerializer slotValueSerializer = new SlotValueSerializer(objectMapper);
-        final SlotArgumentDeserializer slotArgumentDeserializer = new SlotArgumentDeserializer(objectMapper);
+        final ArgumentDeserializer argumentDeserializer = new ArgumentDeserializer(objectMapper);
         final TaskTubeClientSettings settings = new TaskTubeClientSettings(30, "http://localhost:8080/");
         final TaskTubeClient taskTubeClient = new TaskTubeHttpClient(objectMapper, settings);
-        final InstanceIdProvider instanceIdProvider = new InstanceIdProviderImpl("sandbox-client");
+        final InstanceIdProvider instanceIdProvider = new ClientInstanceIdProvider("sandbox-client");
         final ReflectionTaskFactory taskFactory = new ReflectionTaskFactory();
         final TaskTubePollerSettings pollerSettings = new TaskTubePollerSettings();
         final List<Middleware> middlewares = List.of(
@@ -70,7 +69,7 @@ public class Main {
                 taskFactory,
                 instanceIdProvider,
                 middlewares,
-                slotArgumentDeserializer,
+                argumentDeserializer,
                 slotValueSerializer,
                 pollerSettings
         );

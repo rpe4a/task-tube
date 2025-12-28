@@ -141,7 +141,7 @@ class RegressApplicationPushPopTests extends AbstractRegressApplicationTests {
         assertThat(popTask.get().id()).isEqualTo(pushTask.get().getId());
         assertThat(popTask.get().name()).isEqualTo(pushTask.get().getName());
         assertThat(popTask.get().tube()).isEqualTo(pushTask.get().getTube());
-        assertThat(popTask.get().args()).isEqualTo(pushTask.get().getInput());
+        assertThat(popTask.get().arguments()).isEqualTo(pushTask.get().getInput());
 
         final Optional<Task> taskScheduled = taskRepository.get(popTask.get().id());
         assertThat(taskScheduled.isEmpty()).isFalse();

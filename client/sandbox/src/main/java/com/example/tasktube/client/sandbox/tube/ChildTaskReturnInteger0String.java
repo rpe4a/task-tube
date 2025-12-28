@@ -1,4 +1,4 @@
-package com.example.tasktube.client.sandbox.workflow;
+package com.example.tasktube.client.sandbox.tube;
 
 import com.example.tasktube.client.sdk.task.Task1;
 import com.example.tasktube.client.sdk.task.Value;

@@ -1,7 +1,7 @@
 package com.example.tasktube.server.api.requests;
 
 import com.example.tasktube.server.application.models.PopTaskDto;
-import com.example.tasktube.server.domain.values.slot.Slot;
+import com.example.tasktube.server.domain.values.argument.Argument;
 import com.example.tasktube.server.domain.values.TaskSettings;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
@@ -15,11 +15,11 @@ public record PopTaskResponse(
         @NotBlank String name,
         @NotBlank String tube,
         @NotBlank String correlationId,
-        @Nullable List<Slot> args,
+        @Nullable List<Argument> arguments,
         @NotNull TaskSettings settings
 ) {
     public static PopTaskResponse from(final PopTaskDto task) {
-        return new PopTaskResponse(task.id(), task.name(), task.tube(), task.correlationId(), task.args(), task.settings());
+        return new PopTaskResponse(task.id(), task.name(), task.tube(), task.correlationId(), task.arguments(), task.settings());
     }
 }
 

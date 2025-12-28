@@ -1,6 +1,7 @@
 package com.example.tasktube.server.domain.values.slot;
 
 import com.example.tasktube.server.domain.port.out.IArgumentFiller;
+import com.example.tasktube.server.domain.values.argument.Argument;
 
 import java.util.UUID;
 
@@ -21,7 +22,7 @@ public final class TaskSlot extends Slot {
     }
 
     @Override
-    public Slot fill(final IArgumentFiller argumentFiller) {
+    public Argument fill(final IArgumentFiller argumentFiller) {
         return argumentFiller.fill(this);
     }
 }

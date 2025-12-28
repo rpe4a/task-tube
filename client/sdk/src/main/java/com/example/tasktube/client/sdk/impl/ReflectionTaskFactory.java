@@ -1,5 +1,6 @@
-package com.example.tasktube.client.sdk.poller;
+package com.example.tasktube.client.sdk.impl;
 
+import com.example.tasktube.client.sdk.poller.TaskFactory;
 import com.example.tasktube.client.sdk.task.Task;
 
 import java.lang.reflect.Constructor;

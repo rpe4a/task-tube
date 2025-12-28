@@ -1,7 +1,7 @@
-package com.example.tasktube.client.sdk.dto;
+package com.example.tasktube.client.sdk.http.dto;
 
-import com.example.tasktube.client.sdk.slot.Slot;
 import com.example.tasktube.client.sdk.task.TaskSettings;
+import com.example.tasktube.client.sdk.task.argument.Argument;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
@@ -13,7 +13,7 @@ public record PopTaskResponse(
         @Nonnull String name,
         @Nonnull String tube,
         @Nonnull String correlationId,
-        @Nullable List<Slot<?>> args,
+        @Nullable List<Argument> arguments,
         @Nonnull TaskSettings settings
 ) {
 }

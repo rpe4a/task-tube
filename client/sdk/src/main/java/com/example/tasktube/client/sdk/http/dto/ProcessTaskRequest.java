@@ -1,4 +1,4 @@
-package com.example.tasktube.client.sdk.dto;
+package com.example.tasktube.client.sdk.http.dto;
 
 import jakarta.annotation.Nonnull;
 

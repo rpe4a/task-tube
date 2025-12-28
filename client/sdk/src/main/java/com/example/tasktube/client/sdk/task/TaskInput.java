@@ -1,7 +1,7 @@
 package com.example.tasktube.client.sdk.task;
 
-import com.example.tasktube.client.sdk.dto.PopTaskResponse;
-import com.example.tasktube.client.sdk.slot.Slot;
+import com.example.tasktube.client.sdk.http.dto.PopTaskResponse;
+import com.example.tasktube.client.sdk.task.argument.Argument;
 import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -15,7 +15,7 @@ public class TaskInput {
     private final String name;
     private final String tube;
     private final String correlationId;
-    private final List<Slot<?>> args;
+    private final List<Argument> arguments;
     private final TaskSettings settings;
 
     public TaskInput(
@@ -23,14 +23,14 @@ public class TaskInput {
             @Nonnull final String name,
             @Nonnull final String tube,
             @Nonnull final String correlationId,
-            @Nonnull final List<Slot<?>> args,
+            @Nonnull final List<Argument> arguments,
             @Nonnull final TaskSettings settings
     ) {
         this.id = id;
         this.name = name;
         this.tube = tube;
         this.correlationId = correlationId;
-        this.args = args;
+        this.arguments = arguments;
         this.settings = settings;
     }
 
@@ -42,7 +42,7 @@ public class TaskInput {
                 response.name(),
                 response.tube(),
                 response.correlationId(),
-                Objects.isNull(response.args()) ? List.of() : response.args(),
+                Objects.isNull(response.arguments()) ? List.of() : response.arguments(),
                 response.settings()
         );
     }
@@ -63,8 +63,8 @@ public class TaskInput {
     }
 
     @Nullable
-    public List<Slot<?>> getArgs() {
-        return args;
+    public List<Argument> getArguments() {
+        return arguments;
     }
 
     @Nonnull

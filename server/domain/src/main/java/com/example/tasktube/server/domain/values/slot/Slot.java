@@ -1,6 +1,7 @@
 package com.example.tasktube.server.domain.values.slot;
 
 import com.example.tasktube.server.domain.port.out.IArgumentFiller;
+import com.example.tasktube.server.domain.values.argument.Argument;
 
 import java.util.Map;
 
@@ -25,7 +26,7 @@ public abstract sealed class Slot permits ConstantSlot, TaskSlot, ListSlot {
         return type;
     }
 
-    public abstract Slot fill(final IArgumentFiller argumentFiller);
+    public abstract Argument fill(final IArgumentFiller argumentFiller);
 
     public enum SlotType {
         CONSTANT,

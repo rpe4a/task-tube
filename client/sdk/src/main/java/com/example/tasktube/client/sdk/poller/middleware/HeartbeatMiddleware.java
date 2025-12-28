@@ -1,8 +1,8 @@
 package com.example.tasktube.client.sdk.poller.middleware;
 
 import com.example.tasktube.client.sdk.InstanceIdProvider;
-import com.example.tasktube.client.sdk.TaskTubeClient;
-import com.example.tasktube.client.sdk.dto.ProcessTaskRequest;
+import com.example.tasktube.client.sdk.http.TaskTubeClient;
+import com.example.tasktube.client.sdk.http.dto.ProcessTaskRequest;
 import com.example.tasktube.client.sdk.poller.TaskTubePoller;
 import com.example.tasktube.client.sdk.poller.TaskTubePollerSettings;
 import com.example.tasktube.client.sdk.poller.TaskTubePollerUtils;

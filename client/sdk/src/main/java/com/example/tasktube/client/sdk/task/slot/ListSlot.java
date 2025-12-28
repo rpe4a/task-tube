@@ -1,5 +1,6 @@
-package com.example.tasktube.client.sdk.slot;
+package com.example.tasktube.client.sdk.task.slot;
 
+import com.example.tasktube.client.sdk.task.argument.ArgumentDeserializer;
 import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
 
@@ -23,12 +24,5 @@ public final class ListSlot extends Slot<ListSlot> {
 
         values = slots;
         return this;
-    }
-
-    @Override
-    public Object deserialize(@Nonnull final SlotArgumentDeserializer slotDeserializer) {
-        Preconditions.checkNotNull(slotDeserializer);
-
-        return slotDeserializer.deserialize(this);
     }
 }

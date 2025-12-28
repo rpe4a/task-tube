@@ -1,6 +1,6 @@
 package com.example.tasktube.server.application.models;
 
-import com.example.tasktube.server.domain.values.slot.Slot;
+import com.example.tasktube.server.domain.values.argument.Argument;
 import com.example.tasktube.server.domain.values.TaskSettings;
 import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
@@ -13,7 +13,7 @@ public record PopTaskDto(
         @NonNull String name,
         @NonNull String tube,
         @NonNull String correlationId,
-        @Nullable List<Slot> args,
+        @Nullable List<Argument> arguments,
         @NonNull TaskSettings settings
 ) {
 }

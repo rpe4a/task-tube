@@ -1,9 +1,9 @@
 package com.example.tasktube.client.sdk.poller;
 
 import com.example.tasktube.client.sdk.InstanceIdProvider;
-import com.example.tasktube.client.sdk.TaskTubeClient;
-import com.example.tasktube.client.sdk.dto.PopTaskResponse;
-import com.example.tasktube.client.sdk.dto.PopTasksRequest;
+import com.example.tasktube.client.sdk.http.TaskTubeClient;
+import com.example.tasktube.client.sdk.http.dto.PopTaskResponse;
+import com.example.tasktube.client.sdk.http.dto.PopTasksRequest;
 import com.example.tasktube.client.sdk.task.TaskInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

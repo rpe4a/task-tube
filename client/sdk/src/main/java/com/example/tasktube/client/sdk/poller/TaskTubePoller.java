@@ -1,10 +1,10 @@
 package com.example.tasktube.client.sdk.poller;
 
 import com.example.tasktube.client.sdk.InstanceIdProvider;
-import com.example.tasktube.client.sdk.TaskTubeClient;
+import com.example.tasktube.client.sdk.http.TaskTubeClient;
 import com.example.tasktube.client.sdk.poller.middleware.Middleware;
-import com.example.tasktube.client.sdk.slot.SlotArgumentDeserializer;
-import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
+import com.example.tasktube.client.sdk.task.argument.ArgumentDeserializer;
+import com.example.tasktube.client.sdk.task.slot.SlotValueSerializer;
 import com.example.tasktube.client.sdk.task.TaskInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,7 +37,7 @@ public final class TaskTubePoller {
     private final TaskFactory taskFactory;
     private final InstanceIdProvider instanceIdProvider;
     private final List<Middleware> middlewares;
-    private final SlotArgumentDeserializer slotDeserializer;
+    private final ArgumentDeserializer slotDeserializer;
     private final SlotValueSerializer slotValueSerializer;
 
     public TaskTubePoller(
@@ -45,7 +45,7 @@ public final class TaskTubePoller {
             final TaskFactory taskFactory,
             final InstanceIdProvider instanceIdProvider,
             final List<Middleware> middlewares,
-            final SlotArgumentDeserializer slotDeserializer,
+            final ArgumentDeserializer slotDeserializer,
             final SlotValueSerializer slotValueSerializer,
             final TaskTubePollerSettings settings
     ) {

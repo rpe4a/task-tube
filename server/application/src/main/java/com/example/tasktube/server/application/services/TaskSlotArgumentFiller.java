@@ -4,6 +4,9 @@ import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IArgumentFiller;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
+import com.example.tasktube.server.domain.values.argument.Argument;
+import com.example.tasktube.server.domain.values.argument.ConstantArgument;
+import com.example.tasktube.server.domain.values.argument.ListArgument;
 import com.example.tasktube.server.domain.values.slot.ConstantSlot;
 import com.example.tasktube.server.domain.values.slot.ListSlot;
 import com.example.tasktube.server.domain.values.slot.Slot;
@@ -23,12 +26,15 @@ public class TaskSlotArgumentFiller implements IArgumentFiller {
     }
 
     @Override
-    public Slot fill(final ConstantSlot slot) {
-        return slot;
+    public Argument fill(final ConstantSlot slot) {
+        return new ConstantArgument()
+                .setValue(slot.getValue())
+                .setValueReferenceType(slot.getValueReferenceType())
+                .setMetadata(slot.getMetadata());
     }
 
     @Override
-    public Slot fill(final TaskSlot slot) {
+    public Argument fill(final TaskSlot slot) {
         final UUID taskId = slot.getTaskReference();
         final Task task = taskRepository.get(taskId).get();
         if (!task.isCompleted()) {
@@ -39,8 +45,8 @@ public class TaskSlotArgumentFiller implements IArgumentFiller {
     }
 
     @Override
-    public Slot fill(final ListSlot slot) {
-        final List<Slot> slots =
+    public Argument fill(final ListSlot slot) {
+        final List<Argument> arguments =
                 (
                         slot.values.size() <= MAX_PARALLEL_VALUES_COUNT
                                 ? slot.values.stream()
@@ -48,11 +54,12 @@ public class TaskSlotArgumentFiller implements IArgumentFiller {
                 )
                         .map(this::fill)
                         .toList();
-        return new ListSlot()
-                .setValues(slots);
+        return new ListArgument()
+                .setValues(arguments)
+                .setMetadata(slot.getMetadata());
     }
 
-    private Slot fill(final Slot slot) {
+    private Argument fill(final Slot slot) {
         return slot.fill(this);
     }
 }

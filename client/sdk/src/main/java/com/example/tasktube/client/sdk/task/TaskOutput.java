@@ -1,7 +1,7 @@
 package com.example.tasktube.client.sdk.task;
 
-import com.example.tasktube.client.sdk.dto.TaskRequest;
-import com.example.tasktube.client.sdk.slot.Slot;
+import com.example.tasktube.client.sdk.http.dto.TaskRequest;
+import com.example.tasktube.client.sdk.task.slot.Slot;
 import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;

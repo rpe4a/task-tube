@@ -1,10 +1,8 @@
 package com.example.tasktube.client.sdk.poller;
 
-import com.example.tasktube.client.sdk.InstanceIdProvider;
-import com.example.tasktube.client.sdk.TaskTubeClient;
 import com.example.tasktube.client.sdk.poller.middleware.Middleware;
-import com.example.tasktube.client.sdk.slot.SlotArgumentDeserializer;
-import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
+import com.example.tasktube.client.sdk.task.argument.ArgumentDeserializer;
+import com.example.tasktube.client.sdk.task.slot.SlotValueSerializer;
 import com.example.tasktube.client.sdk.task.TaskInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +19,7 @@ final class ConsumerInspector implements Runnable {
     private final TaskFactory taskFactory;
     private final BlockingQueue<TaskInput> queue;
     private final ExecutorService consumerPool;
-    private final SlotArgumentDeserializer slotDeserializer;
+    private final ArgumentDeserializer slotDeserializer;
     private final SlotValueSerializer slotValueSerializer;
     private final TaskTubePollerSettings settings;
     private final List<Middleware> middlewares;
@@ -31,7 +29,7 @@ final class ConsumerInspector implements Runnable {
             final BlockingQueue<TaskInput> queue,
             final ExecutorService consumerPool,
             final List<Middleware> middlewares,
-            final SlotArgumentDeserializer slotDeserializer,
+            final ArgumentDeserializer slotDeserializer,
             final SlotValueSerializer slotValueSerializer,
             final TaskTubePollerSettings settings
     ) {

@@ -1,4 +1,4 @@
-package com.example.tasktube.client.sdk.slot;
+package com.example.tasktube.client.sdk.task.slot;
 
 import com.example.tasktube.client.sdk.task.Constant;
 import com.example.tasktube.client.sdk.task.TaskResult;

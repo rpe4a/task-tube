@@ -1,13 +1,13 @@
-package com.example.tasktube.client.sdk;
+package com.example.tasktube.client.sdk.http;
 
-import com.example.tasktube.client.sdk.dto.FailTaskRequest;
-import com.example.tasktube.client.sdk.dto.FinishTaskRequest;
-import com.example.tasktube.client.sdk.dto.PopTaskRequest;
-import com.example.tasktube.client.sdk.dto.PopTaskResponse;
-import com.example.tasktube.client.sdk.dto.PopTasksRequest;
-import com.example.tasktube.client.sdk.dto.ProcessTaskRequest;
-import com.example.tasktube.client.sdk.dto.StartTaskRequest;
-import com.example.tasktube.client.sdk.dto.TaskRequest;
+import com.example.tasktube.client.sdk.http.dto.FailTaskRequest;
+import com.example.tasktube.client.sdk.http.dto.FinishTaskRequest;
+import com.example.tasktube.client.sdk.http.dto.PopTaskRequest;
+import com.example.tasktube.client.sdk.http.dto.PopTaskResponse;
+import com.example.tasktube.client.sdk.http.dto.PopTasksRequest;
+import com.example.tasktube.client.sdk.http.dto.ProcessTaskRequest;
+import com.example.tasktube.client.sdk.http.dto.StartTaskRequest;
+import com.example.tasktube.client.sdk.http.dto.TaskRequest;
 import jakarta.annotation.Nonnull;
 
 import java.util.List;

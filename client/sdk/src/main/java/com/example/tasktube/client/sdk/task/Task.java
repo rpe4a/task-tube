@@ -1,8 +1,9 @@
 package com.example.tasktube.client.sdk.task;
 
-import com.example.tasktube.client.sdk.slot.Slot;
-import com.example.tasktube.client.sdk.slot.SlotArgumentDeserializer;
-import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
+import com.example.tasktube.client.sdk.task.argument.Argument;
+import com.example.tasktube.client.sdk.task.slot.Slot;
+import com.example.tasktube.client.sdk.task.argument.ArgumentDeserializer;
+import com.example.tasktube.client.sdk.task.slot.SlotValueSerializer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
@@ -28,7 +29,7 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
     private String correlationId;
     private TaskSettings settings;
 
-    private SlotArgumentDeserializer slotDeserializer;
+    private ArgumentDeserializer slotDeserializer;
     private SlotValueSerializer slotSerializer;
 
     @Nonnull
@@ -72,7 +73,7 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
         this.correlationId = correlationId;
     }
 
-    private void setSlotDeserializer(final SlotArgumentDeserializer slotDeserializer) {
+    private void setSlotDeserializer(final ArgumentDeserializer slotDeserializer) {
         this.slotDeserializer = slotDeserializer;
     }
 
@@ -201,7 +202,7 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
     private void execute(
             @Nonnull final TaskInput input,
             @Nonnull final TaskOutput output,
-            @Nonnull final SlotArgumentDeserializer slotDeserializer,
+            @Nonnull final ArgumentDeserializer slotDeserializer,
             @Nonnull final SlotValueSerializer slotValueSerializer
     ) {
         Preconditions.checkNotNull(slotDeserializer);
@@ -218,7 +219,7 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
         setCorrelationId(input.getCorrelationId());
         setSettings(input.getSettings());
 
-        final Value<TResult> result = executeRunMethod(input.getArgs()).orElseGet(this::nothing);
+        final Value<TResult> result = executeRunMethod(input.getArguments()).orElseGet(this::nothing);
 
         output.setResult(result.serialize(slotSerializer));
         output.setChildren(
@@ -228,13 +229,13 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
         );
     }
 
-    private Optional<Value<TResult>> executeRunMethod(final List<Slot<?>> slots) {
+    private Optional<Value<TResult>> executeRunMethod(final List<Argument> arguments) {
         try {
             final Method run = getRunMethod();
             final Parameter[] parameters = run.getParameters();
             final Object[] args = new Object[parameters.length];
             for (int i = 0; i < parameters.length; i++) {
-                args[i] = slots.get(i).deserialize(slotDeserializer);
+                args[i] = arguments.get(i).deserialize(slotDeserializer);
             }
             return Optional.ofNullable((Value<TResult>) run.invoke(this, args));
         } catch (final InvocationTargetException | IllegalAccessException e) {
@@ -287,7 +288,7 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
         public void invoke(
                 final TaskInput input,
                 final TaskOutput output,
-                final SlotArgumentDeserializer slotDeserializer,
+                final ArgumentDeserializer slotDeserializer,
                 final SlotValueSerializer slotSerializer
         ) {
             try {
@@ -305,7 +306,7 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
             try {
                 return clazz
                         .getSuperclass()
-                        .getDeclaredMethod(EXECUTE_METHOD_NAME, TaskInput.class, TaskOutput.class, SlotArgumentDeserializer.class, SlotValueSerializer.class);
+                        .getDeclaredMethod(EXECUTE_METHOD_NAME, TaskInput.class, TaskOutput.class, ArgumentDeserializer.class, SlotValueSerializer.class);
             } catch (final NoSuchMethodException e) {
                 return findExecuteMethod(clazz.getSuperclass());
             }

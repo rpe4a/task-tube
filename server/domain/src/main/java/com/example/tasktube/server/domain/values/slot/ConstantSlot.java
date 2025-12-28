@@ -1,6 +1,7 @@
 package com.example.tasktube.server.domain.values.slot;
 
 import com.example.tasktube.server.domain.port.out.IArgumentFiller;
+import com.example.tasktube.server.domain.values.argument.Argument;
 
 public final class ConstantSlot extends Slot {
     private Object value;
@@ -29,7 +30,7 @@ public final class ConstantSlot extends Slot {
     }
 
     @Override
-    public Slot fill(final IArgumentFiller argumentFiller) {
+    public Argument fill(final IArgumentFiller argumentFiller) {
         return argumentFiller.fill(this);
     }
 }

@@ -10,6 +10,7 @@ import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IArgumentFiller;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
+import com.example.tasktube.server.domain.values.argument.Argument;
 import com.example.tasktube.server.domain.values.slot.Slot;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -39,7 +40,7 @@ public class TubeService implements ITubeService {
     ) {
         this.tubeRepository = Objects.requireNonNull(tubeRepository);
         this.barrierRepository = Objects.requireNonNull(barrierRepository);
-        this.argumentFiller = argumentFiller;
+        this.argumentFiller = Objects.requireNonNull(argumentFiller);
     }
 
     @Override
@@ -106,31 +107,31 @@ public class TubeService implements ITubeService {
         }
         LOGGER.info("Pop '{}' tasks from '{}' by '{}' client.", count, tube, client);
 
-        final List<Task> poppedTasks = tubeRepository.popList(tube, client, count);
-        LOGGER.info("Popped '{}' tasks from '{}' by '{}' client.", poppedTasks.size(), tube, client);
+        final List<Task> tasks = tubeRepository.popList(tube, client, count);
+        LOGGER.info("Popped '{}' tasks from '{}' by '{}' client.", tasks.size(), tube, client);
 
-        final List<PopTaskDto> results = new ArrayList<>(poppedTasks.size());
-        for (final Task poppedTask : poppedTasks) {
-            results.add(getPopTaskDto(poppedTask));
+        final List<PopTaskDto> results = new ArrayList<>(tasks.size());
+        for (final Task task : tasks) {
+            results.add(getPopTaskDto(task));
         }
 
         return results;
     }
 
-    private PopTaskDto getPopTaskDto(final Task poppedTask) {
-        final List<Slot> arguments = new LinkedList<>();
+    private PopTaskDto getPopTaskDto(final Task task) {
+        final List<Argument> arguments = new LinkedList<>();
 
-        for (final Slot slot : poppedTask.getInput()) {
+        for (final Slot slot : task.getInput()) {
             arguments.add(slot.fill(argumentFiller));
         }
 
         return new PopTaskDto(
-                poppedTask.getId(),
-                poppedTask.getName(),
-                poppedTask.getTube(),
-                poppedTask.getCorrelationId(),
+                task.getId(),
+                task.getName(),
+                task.getTube(),
+                task.getCorrelationId(),
                 arguments,
-                poppedTask.getSettings()
+                task.getSettings()
         );
     }
 }

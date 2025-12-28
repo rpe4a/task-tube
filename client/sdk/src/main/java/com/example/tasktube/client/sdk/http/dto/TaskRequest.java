@@ -1,6 +1,6 @@
-package com.example.tasktube.client.sdk.dto;
+package com.example.tasktube.client.sdk.http.dto;
 
-import com.example.tasktube.client.sdk.slot.Slot;
+import com.example.tasktube.client.sdk.task.slot.Slot;
 import com.example.tasktube.client.sdk.task.TaskSettings;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;

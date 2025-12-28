@@ -1,7 +1,7 @@
 package com.example.tasktube.client.sdk.publisher;
 
-import com.example.tasktube.client.sdk.TaskTubeClient;
-import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
+import com.example.tasktube.client.sdk.http.TaskTubeClient;
+import com.example.tasktube.client.sdk.task.slot.SlotValueSerializer;
 import com.example.tasktube.client.sdk.task.Constant;
 import com.example.tasktube.client.sdk.task.Task;
 import com.example.tasktube.client.sdk.task.Task0;

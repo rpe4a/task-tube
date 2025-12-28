@@ -1,9 +1,9 @@
 package com.example.tasktube.client.sdk.poller.middleware;
 
 import com.example.tasktube.client.sdk.InstanceIdProvider;
-import com.example.tasktube.client.sdk.TaskTubeClient;
-import com.example.tasktube.client.sdk.dto.FinishTaskRequest;
-import com.example.tasktube.client.sdk.dto.StartTaskRequest;
+import com.example.tasktube.client.sdk.http.TaskTubeClient;
+import com.example.tasktube.client.sdk.http.dto.FinishTaskRequest;
+import com.example.tasktube.client.sdk.http.dto.StartTaskRequest;
 import com.example.tasktube.client.sdk.task.TaskInput;
 import com.example.tasktube.client.sdk.task.TaskOutput;
 import jakarta.annotation.Nonnull;

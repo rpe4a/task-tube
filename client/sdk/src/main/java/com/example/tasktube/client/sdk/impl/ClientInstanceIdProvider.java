@@ -1,12 +1,14 @@
-package com.example.tasktube.client.sdk;
+package com.example.tasktube.client.sdk.impl;
+
+import com.example.tasktube.client.sdk.InstanceIdProvider;
 
 import java.util.UUID;
 
-public class InstanceIdProviderImpl implements InstanceIdProvider {
+public class ClientInstanceIdProvider implements InstanceIdProvider {
     private final String instanceId = Integer.toHexString(UUID.randomUUID().hashCode());
     private final String appName;
 
-    public InstanceIdProviderImpl(final String appName) {
+    public ClientInstanceIdProvider(final String appName) {
         this.appName = appName;
     }
 

@@ -3,8 +3,8 @@ package com.example.tasktube.client.sdk.poller;
 import com.example.tasktube.client.sdk.poller.middleware.Middleware;
 import com.example.tasktube.client.sdk.poller.middleware.Pipeline;
 import com.example.tasktube.client.sdk.poller.middleware.PipelineBuilder;
-import com.example.tasktube.client.sdk.slot.SlotArgumentDeserializer;
-import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
+import com.example.tasktube.client.sdk.task.argument.ArgumentDeserializer;
+import com.example.tasktube.client.sdk.task.slot.SlotValueSerializer;
 import com.example.tasktube.client.sdk.task.Task;
 import com.example.tasktube.client.sdk.task.TaskInput;
 import com.example.tasktube.client.sdk.task.TaskOutput;
@@ -21,7 +21,7 @@ final class TaskTubeConsumer implements Runnable {
     private final BlockingQueue<TaskInput> queue;
     private final TaskFactory taskFactory;
     private final ConsumerInspector inspector;
-    private final SlotArgumentDeserializer slotDeserializer;
+    private final ArgumentDeserializer slotDeserializer;
     private final SlotValueSerializer slotValueSerializer;
     private final TaskTubePollerSettings settings;
     private final List<Middleware> middlewares;
@@ -31,7 +31,7 @@ final class TaskTubeConsumer implements Runnable {
             final BlockingQueue<TaskInput> queue,
             final ConsumerInspector inspector,
             final List<Middleware> middlewares,
-            final SlotArgumentDeserializer slotDeserializer,
+            final ArgumentDeserializer slotDeserializer,
             final SlotValueSerializer slotValueSerializer,
             final TaskTubePollerSettings settings
     ) {

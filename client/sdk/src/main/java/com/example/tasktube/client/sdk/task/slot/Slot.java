@@ -1,5 +1,6 @@
-package com.example.tasktube.client.sdk.slot;
+package com.example.tasktube.client.sdk.task.slot;
 
+import com.example.tasktube.client.sdk.task.argument.ArgumentDeserializer;
 import jakarta.annotation.Nonnull;
 
 import java.util.Map;
@@ -24,8 +25,6 @@ public abstract sealed class Slot<T extends Slot<?>> permits ConstantSlot, ListS
     public SlotType getType() {
         return type;
     }
-
-    public abstract Object deserialize(@Nonnull final SlotArgumentDeserializer slotDeserializer);
 
     public enum SlotType {
         CONSTANT,

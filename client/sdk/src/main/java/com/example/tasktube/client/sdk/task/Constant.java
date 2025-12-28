@@ -1,7 +1,7 @@
 package com.example.tasktube.client.sdk.task;
 
-import com.example.tasktube.client.sdk.slot.Slot;
-import com.example.tasktube.client.sdk.slot.SlotValueSerializer;
+import com.example.tasktube.client.sdk.task.slot.Slot;
+import com.example.tasktube.client.sdk.task.slot.SlotValueSerializer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
@@ -19,12 +19,12 @@ public final class Constant<T> implements Value<T> {
     }
 
     public Constant(@Nullable final T data, @Nonnull final TypeReference<T> typeReference) {
-        this(data, Objects.requireNonNull(typeReference).getType());
+        this(data,typeReference.getType());
     }
 
     public Constant(@Nullable final T data, @Nonnull final Type type) {
         this.data = data;
-        this.type = type;
+        this.type =  Objects.requireNonNull(type);
     }
 
     @Nullable
