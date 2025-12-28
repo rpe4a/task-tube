@@ -2,8 +2,8 @@ package com.example.tasktube.server.domain.enties;
 
 import com.example.tasktube.server.domain.exceptions.ValidationDomainException;
 import com.example.tasktube.server.domain.values.Lock;
-import com.example.tasktube.server.domain.values.slot.Slot;
 import com.example.tasktube.server.domain.values.TaskSettings;
+import com.example.tasktube.server.domain.values.slot.Slot;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -38,6 +38,7 @@ public class Task {
     private String failedReason;
     private Lock lock;
     private TaskSettings settings;
+    private String handledBy;
 
     public Task(final UUID id,
                 final String name,
@@ -63,7 +64,8 @@ public class Task {
                 final int failures,
                 final String failedReason,
                 final Lock lock,
-                final TaskSettings settings
+                final TaskSettings settings,
+                final String handledBy
     ) {
         this.id = id;
         this.name = name;
@@ -89,6 +91,7 @@ public class Task {
         this.failures = failures;
         this.failedReason = failedReason;
         this.lock = lock;
+        this.handledBy = handledBy;
         this.settings = Optional
                 .ofNullable(settings)
                 .orElse(TaskSettings.getDefault());
@@ -299,6 +302,7 @@ public class Task {
         setFinishedAt(finishedAt);
         setStatus(Status.FINISHED);
         setOutput(output);
+        setHandledBy(client);
         unlock();
     }
 
@@ -495,6 +499,14 @@ public class Task {
 
     public void setCanceledAt(final Instant canceledAt) {
         this.canceledAt = canceledAt;
+    }
+
+    public String getHandledBy() {
+        return handledBy;
+    }
+
+    public void setHandledBy(final String handledBy) {
+        this.handledBy = handledBy;
     }
 
     public void unlock() {

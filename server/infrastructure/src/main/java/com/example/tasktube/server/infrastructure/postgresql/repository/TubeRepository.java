@@ -65,7 +65,8 @@ public class TubeRepository implements ITubeRepository {
                         locked_at,
                         locked,
                         locked_by,
-                        settings
+                        settings,
+                        handled_by
                     ) VALUES (
                         :id,
                         :name,
@@ -93,7 +94,8 @@ public class TubeRepository implements ITubeRepository {
                         :locked_at,
                         :locked,
                         :locked_by,
-                        :settings::jsonb
+                        :settings::jsonb,
+                        :handled_by
                     )
                 """;
     }

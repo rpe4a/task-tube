@@ -99,6 +99,7 @@ public class TaskRepository implements ITaskRepository {
                     SET name = :name,
                         tube = :tube,
                         status = :status,
+                        correlation_id = :correlation_id,
                         parent_id = :parent_id,
                         input = :input::jsonb,
                         output = :output::jsonb,
@@ -120,7 +121,8 @@ public class TaskRepository implements ITaskRepository {
                         locked_at = :locked_at,
                         locked = :locked,
                         locked_by = :locked_by,
-                        settings = :settings::jsonb
+                        settings = :settings::jsonb,
+                        handled_by = :handled_by
                     WHERE id = :id
                 """;
 

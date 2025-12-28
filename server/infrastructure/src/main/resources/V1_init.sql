@@ -18,7 +18,7 @@ CREATE TABLE tasks
     name           varchar(1024) NOT NULL,               -- имя задачи
     tube           varchar(512)  NOT NULL,               -- очередь, к которой принадлежит
     status         varchar(32)   NOT NULL,               -- статус
-    correlation_id varchar(256)  NULL,                   -- идентификатор корреляции
+    correlation_id varchar(256)  NOT NULL,               -- идентификатор корреляции
     parent_id      UUID,                                 -- id родительской таски
     input          JSONB,                                -- входные данные (Map<String, Object>)
     output         JSONB,                                -- результат выполнения (Map<String, Object>)
@@ -40,5 +40,6 @@ CREATE TABLE tasks
     locked_at      TIMESTAMPTZ,                          -- когда задача была заблокирована
     locked         BOOLEAN       NULL,                   -- заблокирована ли
     locked_by      varchar(256),                         -- кем заблокирована
-    settings       JSONB                                 -- настройки
+    settings       JSONB,                                -- настройки
+    handled_by     varchar(256)                          -- кем обработана
 );
