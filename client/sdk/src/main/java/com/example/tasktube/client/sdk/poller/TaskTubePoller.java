@@ -6,6 +6,7 @@ import com.example.tasktube.client.sdk.poller.middleware.Middleware;
 import com.example.tasktube.client.sdk.task.TaskInput;
 import com.example.tasktube.client.sdk.task.argument.ArgumentDeserializer;
 import com.example.tasktube.client.sdk.task.slot.SlotValueSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
@@ -40,20 +41,20 @@ public final class TaskTubePoller {
     private final TaskFactory taskFactory;
     private final InstanceIdProvider instanceIdProvider;
     private final List<Middleware> middlewares;
-    private final ArgumentDeserializer slotDeserializer;
+    private final ObjectMapper objectMapper;
 
     public TaskTubePoller(
+            @Nonnull final ObjectMapper objectMapper,
             @Nonnull final TaskTubeClient taskTubeClient,
             @Nonnull final TaskFactory taskFactory,
             @Nonnull final InstanceIdProvider instanceIdProvider,
             @Nonnull final List<Middleware> middlewares,
-            @Nonnull final ArgumentDeserializer slotDeserializer,
             @Nonnull final TaskTubePollerSettings settings
     ) {
         Objects.requireNonNull(taskTubeClient);
         Objects.requireNonNull(instanceIdProvider);
         Objects.requireNonNull(middlewares);
-        Objects.requireNonNull(slotDeserializer);
+        Objects.requireNonNull(objectMapper);
         Objects.requireNonNull(taskFactory);
         Objects.requireNonNull(settings);
 
@@ -66,9 +67,9 @@ public final class TaskTubePoller {
         consumerThreadGroup = new ThreadGroup(CONSUMER_THREAD_GROUP);
         final ThreadFactory consumerThreadFactory = TaskTubePollerUtils.getThreadFactory(consumerThreadGroup);
 
+        this.objectMapper = objectMapper;
         this.taskTubeClient = taskTubeClient;
         this.middlewares = middlewares;
-        this.slotDeserializer = slotDeserializer;
         this.instanceIdProvider = instanceIdProvider;
         this.settings = settings;
         this.taskFactory = taskFactory;
@@ -87,11 +88,11 @@ public final class TaskTubePoller {
         LOGGER.info("Task poller start with the settings: {}", settings);
 
         final ConsumerInspector inspector = new ConsumerInspector(
+                objectMapper,
                 taskFactory,
                 clientQueue,
                 consumerPool,
                 middlewares,
-                slotDeserializer,
                 settings
         );
 

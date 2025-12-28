@@ -4,6 +4,7 @@ import com.example.tasktube.client.sdk.poller.middleware.Middleware;
 import com.example.tasktube.client.sdk.task.argument.ArgumentDeserializer;
 import com.example.tasktube.client.sdk.task.slot.SlotValueSerializer;
 import com.example.tasktube.client.sdk.task.TaskInput;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -24,18 +25,18 @@ final class ConsumerInspector implements Runnable {
     private final List<Middleware> middlewares;
 
     ConsumerInspector(
+            final ObjectMapper objectMapper,
             final TaskFactory taskFactory,
             final BlockingQueue<TaskInput> queue,
             final ExecutorService consumerPool,
             final List<Middleware> middlewares,
-            final ArgumentDeserializer slotDeserializer,
             final TaskTubePollerSettings settings
     ) {
         this.taskFactory = Objects.requireNonNull(taskFactory);
         this.queue = Objects.requireNonNull(queue);
         this.consumerPool = Objects.requireNonNull(consumerPool);
         this.middlewares = Objects.requireNonNull(middlewares);
-        this.slotDeserializer = Objects.requireNonNull(slotDeserializer);
+        this.slotDeserializer = new ArgumentDeserializer(Objects.requireNonNull(objectMapper));
         this.settings = Objects.requireNonNull(settings);
 
         // add default consumers
