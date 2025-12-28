@@ -1,8 +1,8 @@
 package com.example.tasktube.client.sdk.task.slot;
 
 import com.example.tasktube.client.sdk.task.Constant;
-import com.example.tasktube.client.sdk.task.TaskResult;
 import com.example.tasktube.client.sdk.task.ListValue;
+import com.example.tasktube.client.sdk.task.TaskResult;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
@@ -19,32 +19,28 @@ public class SlotValueSerializer {
     }
 
     @Nonnull
-    public Slot  serialize(@Nonnull final Constant<?> value) {
+    public Slot serialize(@Nonnull final Constant<?> value) {
         Preconditions.checkNotNull(value);
 
-        return new ConstantSlot()
-                .setValue(value.getData())
-                .setValueReferenceType(getJavaType(value.getType()));
+        return new ConstantSlot(value.getData(), getJavaType(value.getType()));
     }
 
     @Nonnull
     public Slot serialize(@Nonnull final TaskResult<?> value) {
         Preconditions.checkNotNull(value);
 
-        return new TaskSlot(value.getId())
-                .setTaskReference(value.getId());
+        return new TaskSlot(value.getId());
     }
 
     @Nonnull
-    public Slot  serialize(@Nonnull final ListValue<?> value) {
+    public Slot serialize(@Nonnull final ListValue<?> value) {
         Preconditions.checkNotNull(value);
 
         final List<? extends Slot> slots = value.get().stream()
                 .map(v -> v.serialize(this))
                 .toList();
 
-        return new ListSlot()
-                .setValues(slots);
+        return new ListSlot(slots);
     }
 
     private String getJavaType(final Type type) {

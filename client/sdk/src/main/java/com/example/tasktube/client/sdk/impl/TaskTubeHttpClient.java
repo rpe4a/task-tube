@@ -32,6 +32,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class TaskTubeHttpClient implements TaskTubeClient {
+    public static final int BAD_REQUEST_HTTP_CODE = 400;
+    public static final int NO_CONTENT_HTTP_CODE = 204;
     private final HttpClient client;
     private final ObjectMapper objectMapper;
     private final TaskTubeClientSettings settings;
@@ -152,11 +154,11 @@ public class TaskTubeHttpClient implements TaskTubeClient {
     private <T> Optional<T> send(final HttpRequest httpRequest, final TypeReference<T> typeReference) {
         try {
             final HttpResponse<String> response = client.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-            if (response.statusCode() >= 400) {
+            if (response.statusCode() >= BAD_REQUEST_HTTP_CODE) {
                 throw new TaskTubeApiException(response.body());
             }
 
-            if (response.statusCode() == 204) {
+            if (response.statusCode() == NO_CONTENT_HTTP_CODE) {
                 return Optional.empty();
             }
 

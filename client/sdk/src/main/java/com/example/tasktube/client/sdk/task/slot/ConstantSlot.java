@@ -9,15 +9,11 @@ public final class ConstantSlot extends Slot {
     private Object value;
     private String valueReferenceType;
 
-    public ConstantSlot() {
-        this(SlotType.CONSTANT, null, Object.class.getCanonicalName());
-    }
-
     public ConstantSlot(@Nullable final Object value, @Nonnull final String valueReferenceType) {
         this(SlotType.CONSTANT, value, valueReferenceType);
     }
 
-    private ConstantSlot(@Nonnull final SlotType type, @Nullable final Object value, @Nullable final String valueReferenceType) {
+    private ConstantSlot(@Nonnull final SlotType type, @Nullable final Object value, @Nonnull final String valueReferenceType) {
         super(type);
         this.value = value;
         this.valueReferenceType = Objects.requireNonNull(valueReferenceType);
