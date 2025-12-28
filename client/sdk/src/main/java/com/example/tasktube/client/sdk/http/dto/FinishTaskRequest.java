@@ -5,10 +5,9 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 import java.time.Instant;
-import java.util.List;
 
 public record FinishTaskRequest(
-        @Nullable List<TaskRequest> children,
+        @Nullable TaskRequest[] children,
         @Nonnull Slot output,
         @Nonnull String client,
         @Nonnull Instant finishedAt

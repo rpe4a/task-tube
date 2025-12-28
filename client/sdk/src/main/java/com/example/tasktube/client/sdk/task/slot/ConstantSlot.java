@@ -1,7 +1,5 @@
 package com.example.tasktube.client.sdk.task.slot;
 
-import com.example.tasktube.client.sdk.task.argument.ArgumentDeserializer;
-import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
@@ -12,7 +10,17 @@ public final class ConstantSlot extends Slot {
     private String valueReferenceType;
 
     public ConstantSlot() {
-        super(SlotType.CONSTANT);
+        this(SlotType.CONSTANT, null, Object.class.getCanonicalName());
+    }
+
+    public ConstantSlot(@Nullable final Object value, @Nonnull final String valueReferenceType) {
+        this(SlotType.CONSTANT, value, valueReferenceType);
+    }
+
+    private ConstantSlot(@Nonnull final SlotType type, @Nullable final Object value, @Nullable final String valueReferenceType) {
+        super(type);
+        this.value = value;
+        this.valueReferenceType = Objects.requireNonNull(valueReferenceType);
     }
 
     @Nullable

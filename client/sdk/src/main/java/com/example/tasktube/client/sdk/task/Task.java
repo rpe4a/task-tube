@@ -6,6 +6,7 @@ import com.example.tasktube.client.sdk.task.slot.SlotValueSerializer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -28,7 +29,7 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
     private String correlationId;
     private TaskSettings settings;
 
-    private ArgumentDeserializer slotDeserializer;
+    private ArgumentDeserializer argumentDeserializer;
     private SlotValueSerializer slotSerializer;
 
     @Nonnull
@@ -36,8 +37,8 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
         return id;
     }
 
-    private void setId(final UUID id) {
-        this.id = id;
+    private void setId(@Nonnull final UUID id) {
+        this.id = Objects.requireNonNull(id);
     }
 
     @Nonnull
@@ -50,8 +51,8 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
         return settings;
     }
 
-    private void setSettings(final TaskSettings settings) {
-        this.settings = settings;
+    private void setSettings(@Nonnull final TaskSettings settings) {
+        this.settings = Objects.requireNonNull(settings);
     }
 
     @Nonnull
@@ -59,7 +60,8 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
         return tube;
     }
 
-    private void setTube(final String tube) {
+    private void setTube(@Nonnull final String tube) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(tube));
         this.tube = tube;
     }
 
@@ -68,16 +70,17 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
         return correlationId;
     }
 
-    private void setCorrelationId(final String correlationId) {
+    private void setCorrelationId(@Nonnull final String correlationId) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(tube));
         this.correlationId = correlationId;
     }
 
-    private void setSlotDeserializer(final ArgumentDeserializer slotDeserializer) {
-        this.slotDeserializer = slotDeserializer;
+    private void setArgumentDeserializer(@Nonnull final ArgumentDeserializer argumentDeserializer) {
+        this.argumentDeserializer = Objects.requireNonNull(argumentDeserializer);
     }
 
-    private void setSlotValueSerializer(final SlotValueSerializer slotValueSerializer) {
-        this.slotSerializer = slotValueSerializer;
+    private void setSlotValueSerializer(@Nonnull final SlotValueSerializer slotValueSerializer) {
+        this.slotSerializer = Objects.requireNonNull(slotValueSerializer);
     }
 
     @Nonnull
@@ -87,32 +90,23 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
 
     @Nonnull
     public final <V> Constant<V> constant(@Nonnull final V value) {
-        Preconditions.checkNotNull(value);
-
-        return new Constant<>(value);
+        return new Constant<>(Objects.requireNonNull(value));
     }
 
     @Nonnull
     public final <V> Constant<V> constant(@Nonnull final V value, @Nonnull final TypeReference<V> typeReference) {
-        Preconditions.checkNotNull(value);
-        Preconditions.checkNotNull(typeReference);
-
-        return new Constant<>(value, typeReference);
+        return new Constant<>(Objects.requireNonNull(value), Objects.requireNonNull(typeReference));
     }
 
     @Nonnull
     public final <V> ListValue<V> list(@Nonnull final List<Value<V>> values) {
-        Preconditions.checkNotNull(values);
-
-        return new ListValue<>(values);
+        return new ListValue<>(Objects.requireNonNull(values));
     }
 
     @SafeVarargs
     @Nonnull
     public final <V> ListValue<V> list(@Nonnull final Value<V>... values) {
-        Preconditions.checkNotNull(values);
-
-        return new ListValue<>(Arrays.asList(values));
+        return new ListValue<>(Arrays.asList(Objects.requireNonNull(values)));
     }
 
     @Nonnull
@@ -130,14 +124,14 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
     public final <R, A0> TaskResult<R> pushIn(
             @Nonnull final Task1<R, A0> task,
             @Nonnull final Value<A0> value,
-            final TaskConfiguration... configurations
+            @Nonnull final TaskConfiguration... configurations
     ) {
         Preconditions.checkNotNull(task);
         Preconditions.checkNotNull(value);
         Preconditions.checkNotNull(configurations);
 
         final TaskRecord<R> child = addChild(task, configurations);
-        child.addArg(value);
+        child.addArgument(value);
         return child.getResult();
     }
 
@@ -154,16 +148,14 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
         Preconditions.checkNotNull(configurations);
 
         final TaskRecord<R> child = addChild(task, configurations);
-        child.addArg(value0);
-        child.addArg(value1);
+        child.addArgument(value0);
+        child.addArgument(value1);
         return child.getResult();
     }
 
     @Nonnull
     public final TaskConfiguration waitFor(@Nonnull final TaskResult<Integer> taskResult) {
-        Preconditions.checkNotNull(taskResult);
-
-        return new TaskConfiguration.WaitForTask(taskResult);
+        return new TaskConfiguration.WaitForTask(Objects.requireNonNull(taskResult));
     }
 
     @Nonnull
@@ -210,7 +202,7 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
         Preconditions.checkNotNull(output);
         Preconditions.checkArgument(input.getName().equals(getName()));
 
-        setSlotDeserializer(slotDeserializer);
+        setArgumentDeserializer(slotDeserializer);
         setSlotValueSerializer(slotValueSerializer);
 
         setId(input.getId());
@@ -220,12 +212,12 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
 
         final Value<TResult> result = executeRunMethod(input.getArguments()).orElseGet(this::nothing);
 
-        output.setResult(result.serialize(slotSerializer));
-        output.setChildren(
-                children.stream()
-                        .map(taskRecord -> taskRecord.toRequest(slotSerializer))
-                        .toList()
-        );
+        output.setResult(result.serialize(slotSerializer))
+                .setChildren(
+                        children.stream()
+                                .map(taskRecord -> taskRecord.toRequest(slotSerializer))
+                                .toList()
+                );
     }
 
     private Optional<Value<TResult>> executeRunMethod(final List<Argument> arguments) {
@@ -234,7 +226,7 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
             final Parameter[] parameters = run.getParameters();
             final Object[] args = new Object[parameters.length];
             for (int i = 0; i < parameters.length; i++) {
-                args[i] = arguments.get(i).deserialize(slotDeserializer);
+                args[i] = arguments.get(i).deserialize(argumentDeserializer);
             }
             return Optional.ofNullable((Value<TResult>) run.invoke(this, args));
         } catch (final InvocationTargetException | IllegalAccessException e) {
@@ -285,29 +277,34 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
         }
 
         public void invoke(
-                final TaskInput input,
-                final TaskOutput output,
-                final ArgumentDeserializer slotDeserializer,
-                final SlotValueSerializer slotSerializer
+                @Nonnull final TaskInput input,
+                @Nonnull final TaskOutput output,
+                @Nonnull final ArgumentDeserializer argumentDeserializer,
+                @Nonnull final SlotValueSerializer slotSerializer
         ) {
+            Preconditions.checkNotNull(input);
+            Preconditions.checkNotNull(output);
+            Preconditions.checkNotNull(argumentDeserializer);
+            Preconditions.checkNotNull(slotSerializer);
+
             try {
                 final Method execute = findExecuteMethod(task.getClass());
 
                 execute.setAccessible(true);
 
-                execute.invoke(task, input, output, slotDeserializer, slotSerializer);
+                execute.invoke(task, input, output, argumentDeserializer, slotSerializer);
             } catch (final InvocationTargetException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
         }
 
-        private Method findExecuteMethod(final Class<?> clazz) {
+        private Method findExecuteMethod(final Class<?> taskClazz) {
             try {
-                return clazz
+                return taskClazz
                         .getSuperclass()
                         .getDeclaredMethod(EXECUTE_METHOD_NAME, TaskInput.class, TaskOutput.class, ArgumentDeserializer.class, SlotValueSerializer.class);
             } catch (final NoSuchMethodException e) {
-                return findExecuteMethod(clazz.getSuperclass());
+                return findExecuteMethod(taskClazz.getSuperclass());
             }
         }
     }

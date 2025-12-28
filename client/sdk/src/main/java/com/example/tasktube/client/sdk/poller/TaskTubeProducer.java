@@ -5,6 +5,7 @@ import com.example.tasktube.client.sdk.http.TaskTubeClient;
 import com.example.tasktube.client.sdk.http.dto.PopTaskResponse;
 import com.example.tasktube.client.sdk.http.dto.PopTasksRequest;
 import com.example.tasktube.client.sdk.task.TaskInput;
+import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,11 +24,11 @@ final class TaskTubeProducer implements Runnable {
     private final TaskTubePollerSettings settings;
 
     TaskTubeProducer(
-            final TaskTubeClient taskTubeClient,
-            final BlockingQueue<TaskInput> clientQueue,
-            final String tube,
-            final InstanceIdProvider instanceIdProvider,
-            final TaskTubePollerSettings settings
+            @Nonnull final TaskTubeClient taskTubeClient,
+            @Nonnull final BlockingQueue<TaskInput> clientQueue,
+            @Nonnull final String tube,
+            @Nonnull final InstanceIdProvider instanceIdProvider,
+            @Nonnull final TaskTubePollerSettings settings
     ) {
         this.taskTubeClient = Objects.requireNonNull(taskTubeClient);
         this.clientQueue = Objects.requireNonNull(clientQueue);

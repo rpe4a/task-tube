@@ -2,37 +2,42 @@ package com.example.tasktube.client.sdk.task;
 
 import jakarta.annotation.Nonnull;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public interface TaskConfiguration {
-    static TaskConfiguration waitFor(final TaskResult<?> taskResult) {
+    @Nonnull
+    static TaskConfiguration waitFor(@Nonnull final TaskResult<?> taskResult) {
         return new WaitForTask(taskResult);
     }
 
+    @Nonnull
     static TaskConfiguration maxCountOfFailures(final int value) {
         return new MaxCountOfFailures(value);
     }
 
+    @Nonnull
     static TaskConfiguration failureRetryTimeoutSeconds(final int value) {
         return new FailureRetryTimeoutSeconds(value);
     }
 
-    void applyTo(TaskRecord<?> taskRecord);
+    void applyTo(@Nonnull TaskRecord<?> taskRecord);
 
     final class WaitForTask implements TaskConfiguration {
         private final UUID id;
 
-        public WaitForTask(final TaskResult<?> taskResult) {
-            this.id = taskResult.getId();
+        public WaitForTask(@Nonnull final TaskResult<?> taskResult) {
+            this.id = Objects.requireNonNull(taskResult).getId();
         }
 
+        @Nonnull
         public UUID getId() {
             return id;
         }
 
         @Override
         public void applyTo(@Nonnull final TaskRecord<?> taskRecord) {
-            taskRecord.waitFor(id);
+            Objects.requireNonNull(taskRecord).waitFor(id);
         }
     }
 
@@ -49,7 +54,7 @@ public interface TaskConfiguration {
 
         @Override
         public void applyTo(@Nonnull final TaskRecord<?> taskRecord) {
-            taskRecord.getSetting().setMaxFailures(value);
+            Objects.requireNonNull(taskRecord).getSetting().setMaxFailures(value);
         }
     }
 
@@ -66,7 +71,7 @@ public interface TaskConfiguration {
 
         @Override
         public void applyTo(@Nonnull final TaskRecord<?> taskRecord) {
-            taskRecord.getSetting().setFailureRetryTimeoutSeconds(value);
+            Objects.requireNonNull(taskRecord).getSetting().setFailureRetryTimeoutSeconds(value);
         }
     }
 
@@ -83,7 +88,7 @@ public interface TaskConfiguration {
 
         @Override
         public void applyTo(@Nonnull final TaskRecord<?> taskRecord) {
-            taskRecord.getSetting().setTimeoutSeconds(value);
+            Objects.requireNonNull(taskRecord).getSetting().setTimeoutSeconds(value);
         }
     }
 
@@ -100,7 +105,7 @@ public interface TaskConfiguration {
 
         @Override
         public void applyTo(@Nonnull final TaskRecord<?> taskRecord) {
-            taskRecord.getSetting().setHeartbeatTimeoutSeconds(value);
+            Objects.requireNonNull(taskRecord).getSetting().setHeartbeatTimeoutSeconds(value);
         }
     }
 }

@@ -3,15 +3,19 @@ package com.example.tasktube.client.sdk.task;
 import com.example.tasktube.client.sdk.http.dto.TaskRequest;
 import com.example.tasktube.client.sdk.task.slot.Slot;
 import com.example.tasktube.client.sdk.task.slot.SlotValueSerializer;
+import com.google.common.base.Preconditions;
+import jakarta.annotation.Nonnull;
+import org.apache.commons.lang3.StringUtils;
 
 import java.time.Instant;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class TaskRecord<TResult> {
 
-    private final List<Value<?>> args = new LinkedList<>();
+    private final List<Value<?>> arguments = new LinkedList<>();
     private final List<UUID> waitForTasks = new LinkedList<>();
     private final TaskSettings setting = TaskSettings.DEFAULT();
     private UUID id;
@@ -21,83 +25,91 @@ public class TaskRecord<TResult> {
     private String correlationId;
 
     private TaskRecord() {
-        setId(UUID.randomUUID());
+        this(UUID.randomUUID());
     }
 
-    private TaskRecord(final UUID id) {
-        this.id = id;
+    private TaskRecord(@Nonnull final UUID id) {
+        this.id = Objects.requireNonNull(id);
     }
 
+    @Nonnull
     public TaskSettings getSetting() {
         return setting;
     }
 
+    @Nonnull
     public UUID getId() {
         return id;
     }
 
-    void setId(final UUID id) {
+    private void setId(@Nonnull final UUID id) {
         this.id = id;
     }
 
+    @Nonnull
     public String getName() {
         return name;
     }
 
-    void setName(final String name) {
+    private void setName(@Nonnull final String name) {
         this.name = name;
     }
 
+    @Nonnull
     public TaskResult<TResult> getResult() {
         return new TaskResult<>(id);
     }
 
-    void addArg(final Value<?> value) {
-        args.add(value);
+    void addArgument(@Nonnull final Value<?> value) {
+        arguments.add(Objects.requireNonNull(value));
     }
 
-    void waitFor(final UUID taskId) {
-        waitForTasks.add(taskId);
+    void waitFor(@Nonnull final UUID taskId) {
+        waitForTasks.add(Objects.requireNonNull(taskId));
     }
 
-
-    public void configure(final TaskConfiguration[] configurations) {
-        for (final TaskConfiguration configuration : configurations) {
-            configuration.applyTo(this);
+    public void configure(@Nonnull final TaskConfiguration[] configurations) {
+        for (final TaskConfiguration configuration : Objects.requireNonNull(configurations)) {
+            Objects.requireNonNull(configuration).applyTo(this);
         }
     }
 
+    @Nonnull
     public UUID getParentId() {
         return parentId;
     }
 
-    void setParentId(final UUID parentId) {
+    private void setParentId(@Nonnull final UUID parentId) {
         this.parentId = parentId;
     }
 
+    @Nonnull
     public String getTube() {
         return tube;
     }
 
-    void setTube(final String tube) {
+    private void setTube(@Nonnull final String tube) {
         this.tube = tube;
     }
 
+    @Nonnull
     public String getCorrelationId() {
         return correlationId;
     }
 
-    void setCorrelationId(final String correlationId) {
+    private void setCorrelationId(@Nonnull final String correlationId) {
         this.correlationId = correlationId;
     }
 
-    public TaskRequest toRequest(final SlotValueSerializer slotSerializer) {
+    @Nonnull
+    public TaskRequest toRequest(@Nonnull final SlotValueSerializer slotSerializer) {
+        Preconditions.checkNotNull(slotSerializer);
         return new TaskRequest(
                 getId(),
                 getName(),
                 getTube(),
                 getCorrelationId(),
-                args.stream()
+                arguments.stream()
                         .map(v -> v.serialize(slotSerializer))
                         .toList()
                         .toArray(new Slot[0]),
@@ -114,36 +126,46 @@ public class TaskRecord<TResult> {
             this.taskRecord = new TaskRecord<>();
         }
 
-        public Builder<TResult> setId(final UUID id) {
+        @Nonnull
+        public Builder<TResult> setId(@Nonnull final UUID id) {
             taskRecord.setId(id);
             return this;
         }
 
-        public Builder<TResult> setName(final String name) {
+        @Nonnull
+        public Builder<TResult> setName(@Nonnull final String name) {
+            Preconditions.checkArgument(StringUtils.isNotBlank(name));
             taskRecord.setName(name);
             return this;
         }
 
-        public Builder<TResult> setTube(final String tube) {
+        @Nonnull
+        public Builder<TResult> setTube(@Nonnull final String tube) {
+            Preconditions.checkArgument(StringUtils.isNotBlank(tube));
             taskRecord.setTube(tube);
             return this;
         }
 
-        public Builder<TResult> setParent(final UUID parentId) {
-            taskRecord.setParentId(parentId);
+        @Nonnull
+        public Builder<TResult> setParent(@Nonnull final UUID parentId) {
+            taskRecord.setParentId(Objects.requireNonNull(parentId));
             return this;
         }
 
-        public Builder<TResult> setArg(final Value<?> arg0) {
-            taskRecord.addArg(arg0);
+        @Nonnull
+        public Builder<TResult> setArgument(@Nonnull final Value<?> arg) {
+            taskRecord.addArgument(Objects.requireNonNull(arg));
             return this;
         }
 
-        public Builder<TResult> setCorrelationId(final String correlationId) {
+        @Nonnull
+        public Builder<TResult> setCorrelationId(@Nonnull final String correlationId) {
+            Preconditions.checkArgument(StringUtils.isNotBlank(correlationId));
             taskRecord.setCorrelationId(correlationId);
             return this;
         }
 
+        @Nonnull
         public TaskRecord<TResult> build() {
             return taskRecord;
         }

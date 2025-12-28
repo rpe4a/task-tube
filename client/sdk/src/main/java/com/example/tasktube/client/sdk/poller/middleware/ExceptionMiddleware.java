@@ -20,7 +20,9 @@ public final class ExceptionMiddleware extends AbstractMiddleware {
     private final TaskTubeClient taskTubeClient;
     private final InstanceIdProvider instanceIdProvider;
 
-    public ExceptionMiddleware(final TaskTubeClient taskTubeClient, final InstanceIdProvider instanceIdProvider) {
+    public ExceptionMiddleware(
+            @Nonnull final TaskTubeClient taskTubeClient,
+            @Nonnull final InstanceIdProvider instanceIdProvider) {
         this.taskTubeClient = Objects.requireNonNull(taskTubeClient);
         this.instanceIdProvider = Objects.requireNonNull(instanceIdProvider);
     }

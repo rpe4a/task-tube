@@ -3,9 +3,12 @@ package com.example.tasktube.client.sdk.poller;
 import com.example.tasktube.client.sdk.InstanceIdProvider;
 import com.example.tasktube.client.sdk.http.TaskTubeClient;
 import com.example.tasktube.client.sdk.poller.middleware.Middleware;
+import com.example.tasktube.client.sdk.task.TaskInput;
 import com.example.tasktube.client.sdk.task.argument.ArgumentDeserializer;
 import com.example.tasktube.client.sdk.task.slot.SlotValueSerializer;
-import com.example.tasktube.client.sdk.task.TaskInput;
+import com.google.common.base.Preconditions;
+import jakarta.annotation.Nonnull;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,13 +44,13 @@ public final class TaskTubePoller {
     private final SlotValueSerializer slotValueSerializer;
 
     public TaskTubePoller(
-            final TaskTubeClient taskTubeClient,
-            final TaskFactory taskFactory,
-            final InstanceIdProvider instanceIdProvider,
-            final List<Middleware> middlewares,
-            final ArgumentDeserializer slotDeserializer,
-            final SlotValueSerializer slotValueSerializer,
-            final TaskTubePollerSettings settings
+            @Nonnull final TaskTubeClient taskTubeClient,
+            @Nonnull final TaskFactory taskFactory,
+            @Nonnull final InstanceIdProvider instanceIdProvider,
+            @Nonnull final List<Middleware> middlewares,
+            @Nonnull final ArgumentDeserializer slotDeserializer,
+            @Nonnull final SlotValueSerializer slotValueSerializer,
+            @Nonnull final TaskTubePollerSettings settings
     ) {
         Objects.requireNonNull(taskTubeClient);
         Objects.requireNonNull(instanceIdProvider);
@@ -82,7 +85,9 @@ public final class TaskTubePoller {
     /**
      * Start inner consumer/producer pools
      */
-    public void start(final String tube) {
+    public void start(@Nonnull final String tube) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(tube));
+
         LOGGER.info("Task poller start with the settings: {}", settings);
 
         final ConsumerInspector inspector = new ConsumerInspector(

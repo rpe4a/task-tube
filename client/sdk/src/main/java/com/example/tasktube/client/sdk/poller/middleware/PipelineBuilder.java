@@ -2,6 +2,7 @@ package com.example.tasktube.client.sdk.poller.middleware;
 
 import com.example.tasktube.client.sdk.task.TaskInput;
 import com.example.tasktube.client.sdk.task.TaskOutput;
+import jakarta.annotation.Nonnull;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -13,7 +14,8 @@ import java.util.function.Function;
 public final class PipelineBuilder {
     private final List<Function<Pipeline, Pipeline>> middlewares = new LinkedList<>();
 
-    public PipelineBuilder add(final Middleware middleware) {
+    @Nonnull
+    public PipelineBuilder add(@Nonnull final Middleware middleware) {
         Objects.requireNonNull(middleware);
 
         middlewares.add((Pipeline next) -> (TaskInput input, TaskOutput output) -> middleware.invoke(input, output, next));
@@ -21,7 +23,8 @@ public final class PipelineBuilder {
         return this;
     }
 
-    public PipelineBuilder add(final List<Middleware> middlewares) {
+    @Nonnull
+    public PipelineBuilder add(@Nonnull final List<Middleware> middlewares) {
         Objects.requireNonNull(middlewares);
 
         middlewares.stream()
@@ -33,7 +36,8 @@ public final class PipelineBuilder {
         return this;
     }
 
-    public Pipeline createInstance(final Pipeline runnable) {
+    @Nonnull
+    public Pipeline createInstance(@Nonnull final Pipeline runnable) {
         Pipeline pipeline = Objects.requireNonNull(runnable);
 
         for (int i = middlewares.size() - 1; i >= 0; i--) {

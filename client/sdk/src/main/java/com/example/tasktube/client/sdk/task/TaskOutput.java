@@ -1,12 +1,14 @@
 package com.example.tasktube.client.sdk.task;
 
 import com.example.tasktube.client.sdk.http.dto.TaskRequest;
+import com.example.tasktube.client.sdk.task.slot.ConstantSlot;
 import com.example.tasktube.client.sdk.task.slot.Slot;
 import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class TaskOutput {
@@ -24,12 +26,14 @@ public class TaskOutput {
             @Nonnull final String tube,
             @Nonnull final String correlationId
     ) {
-        this.id = id;
-        this.name = name;
-        this.tube = tube;
-        this.correlationId = correlationId;
+        this.id = Objects.requireNonNull(id);
+        this.name = Objects.requireNonNull(name);
+        this.tube = Objects.requireNonNull(tube);
+        this.correlationId = Objects.requireNonNull(correlationId);
+        this.result = new ConstantSlot();
     }
 
+    @Nonnull
     public static TaskOutput createInstance(@Nonnull final TaskInput input) {
         Preconditions.checkNotNull(input);
 
@@ -66,10 +70,9 @@ public class TaskOutput {
         return result;
     }
 
+    @Nonnull
     public TaskOutput setResult(@Nonnull final Slot result) {
-        Preconditions.checkNotNull(result);
-
-        this.result = result;
+        this.result = Objects.requireNonNull(result);
         return this;
     }
 
@@ -78,22 +81,20 @@ public class TaskOutput {
         return failureMessage;
     }
 
+    @Nonnull
     public TaskOutput setFailureMessage(@Nonnull final String failureMessage) {
-        Preconditions.checkNotNull(failureMessage);
-
-        this.failureMessage = failureMessage;
+        this.failureMessage = Objects.requireNonNull(failureMessage);
         return this;
     }
 
     @Nullable
     public List<TaskRequest> getChildren() {
-        return List.copyOf(children);
+        return children;
     }
 
-    public TaskOutput setChildren(final List<TaskRequest> children) {
-        Preconditions.checkNotNull(children);
-
-        this.children = List.copyOf(children);
+    @Nonnull
+    public TaskOutput setChildren(@Nonnull final List<TaskRequest> children) {
+        this.children = List.copyOf(Objects.requireNonNull(children));
         return this;
     }
 

@@ -13,16 +13,14 @@ public final class TaskTubePollerSettings {
     private static final int DEFAULT_MAX_CONSUMERS_COUNT = 1;
     private static final int DEFAULT_MIN_CONSUMERS_COUNT = 1;
     private static final int DEFAULT_CONSUMER_EMPTY_QUEUE_SLEEP_TIME_OUT_MILLISECONDS = 100;
-    private static final double DEFAULT_TASK_LEASE_DURATION_FACTOR = 0.5;
+    private static final double DEFAULT_HEARTBEAT_DURATION_FACTOR = 0.5;
     private static final int DEFAULT_MAX_BATCH_REQUESTED_TASK_COUNT = 16;
     private static final int DEFAULT_QUEUE_SIZE = 32;
-    private static final String DEFAULT_USER_QUEUE_PREFIX = "com.cloudaware";
     private int inputPayloadKb;
     private int inputMaxPayloadKb;
     private int outputPayloadKb;
     private int outputMaxPayloadKb;
-    private double taskLeaseDurationFactor;
-    private String userQueuePrefix;
+    private double heartbeatDurationFactor;
     private int producerPollingIntervalMilliseconds;
     private int shutdownAwaitTerminationSeconds;
     private int maxConsumersCount;
@@ -41,8 +39,7 @@ public final class TaskTubePollerSettings {
                 DEFAULT_CONSUMER_EMPTY_QUEUE_SLEEP_TIME_OUT_MILLISECONDS,
                 DEFAULT_INSPECTOR_INTERVAL_MILLISECONDS,
                 DEFAULT_MAX_BATCH_REQUESTED_TASK_COUNT,
-                DEFAULT_USER_QUEUE_PREFIX,
-                DEFAULT_TASK_LEASE_DURATION_FACTOR,
+                DEFAULT_HEARTBEAT_DURATION_FACTOR,
                 DEFAULT_INPUT_PAYLOAD_KB,
                 DEFAULT_INPUT_MAX_PAYLOAD_KB,
                 DEFAULT_OUTPUT_PAYLOAD_KB,
@@ -59,8 +56,7 @@ public final class TaskTubePollerSettings {
             final int consumerEmptyQueueSleepTimeoutMilliseconds,
             final int inspectorPollingIntervalMilliseconds,
             final int maxBatchRequestedTasksCount,
-            final String userQueuePrefix,
-            final double taskLeaseDurationFactor,
+            final double heartbeatDurationFactor,
             final int inputPayloadKb,
             final int inputMaxPayloadKb,
             final int outputPayloadKb,
@@ -88,12 +84,9 @@ public final class TaskTubePollerSettings {
         this.maxBatchRequestedTasksCount = maxBatchRequestedTasksCount == 0
                 ? DEFAULT_MAX_BATCH_REQUESTED_TASK_COUNT
                 : maxBatchRequestedTasksCount;
-        this.userQueuePrefix = userQueuePrefix == null || userQueuePrefix.isEmpty()
-                ? DEFAULT_USER_QUEUE_PREFIX
-                : userQueuePrefix;
-        this.taskLeaseDurationFactor = taskLeaseDurationFactor == 0
-                ? DEFAULT_TASK_LEASE_DURATION_FACTOR
-                : taskLeaseDurationFactor;
+        this.heartbeatDurationFactor = heartbeatDurationFactor == 0
+                ? DEFAULT_HEARTBEAT_DURATION_FACTOR
+                : heartbeatDurationFactor;
         this.inputPayloadKb = inputPayloadKb == 0
                 ? DEFAULT_INPUT_PAYLOAD_KB
                 : inputPayloadKb;
@@ -171,84 +164,12 @@ public final class TaskTubePollerSettings {
         this.maxBatchRequestedTasksCount = maxBatchRequestedTasksCount;
     }
 
-    public String getUserQueuePrefix() {
-        return userQueuePrefix;
+    public double getHeartbeatDurationFactor() {
+        return heartbeatDurationFactor;
     }
 
-    public void setUserQueuePrefix(final String userQueuePrefix) {
-        this.userQueuePrefix = userQueuePrefix;
-    }
-
-    public double getTaskLeaseDurationFactor() {
-        return taskLeaseDurationFactor;
-    }
-
-    public void setTaskLeaseDurationFactor(final double taskLeaseDurationFactor) {
-        this.taskLeaseDurationFactor = taskLeaseDurationFactor;
-    }
-
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        final TaskTubePollerSettings that = (TaskTubePollerSettings) o;
-        return inputPayloadKb == that.inputPayloadKb
-                && inputMaxPayloadKb == that.inputMaxPayloadKb
-                && outputPayloadKb == that.outputPayloadKb
-                && outputMaxPayloadKb == that.outputMaxPayloadKb
-                && Double.compare(taskLeaseDurationFactor, that.taskLeaseDurationFactor) == 0
-                && producerPollingIntervalMilliseconds == that.producerPollingIntervalMilliseconds
-                && shutdownAwaitTerminationSeconds == that.shutdownAwaitTerminationSeconds
-                && maxConsumersCount == that.maxConsumersCount
-                && minConsumersCount == that.minConsumersCount
-                && consumerEmptyQueueSleepTimeoutMilliseconds == that.consumerEmptyQueueSleepTimeoutMilliseconds
-                && inspectorPollingIntervalMilliseconds == that.inspectorPollingIntervalMilliseconds
-                && maxBatchRequestedTasksCount == that.maxBatchRequestedTasksCount
-                && queueSize == that.queueSize
-                && Objects.equals(userQueuePrefix, that.userQueuePrefix);
-    }
-
-    @Override
-    public String toString() {
-        return "TaskPollerSettings{" + "inputPayloadKb=" + inputPayloadKb
-                + ", inputMaxPayloadKb=" + inputMaxPayloadKb
-                + ", outputPayloadKb=" + outputPayloadKb
-                + ", outputMaxPayloadKb=" + outputMaxPayloadKb
-                + ", taskLeaseDurationFactor=" + taskLeaseDurationFactor
-                + ", userQueuePrefix='" + userQueuePrefix + '\''
-                + ", producerPollingIntervalMilliseconds=" + producerPollingIntervalMilliseconds
-                + ", shutdownAwaitTerminationSeconds=" + shutdownAwaitTerminationSeconds
-                + ", maxConsumersCount=" + maxConsumersCount
-                + ", minConsumersCount=" + minConsumersCount
-                + ", consumerEmptyQueueSleepTimeoutMilliseconds=" + consumerEmptyQueueSleepTimeoutMilliseconds
-                + ", inspectorPollingIntervalMilliseconds=" + inspectorPollingIntervalMilliseconds
-                + ", maxBatchRequestedTasksCount=" + maxBatchRequestedTasksCount
-                + ", queueSize=" + queueSize
-                + '}';
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(
-                inputPayloadKb,
-                inputMaxPayloadKb,
-                outputPayloadKb,
-                outputMaxPayloadKb,
-                taskLeaseDurationFactor,
-                userQueuePrefix,
-                producerPollingIntervalMilliseconds,
-                shutdownAwaitTerminationSeconds,
-                maxConsumersCount,
-                minConsumersCount,
-                consumerEmptyQueueSleepTimeoutMilliseconds,
-                inspectorPollingIntervalMilliseconds,
-                maxBatchRequestedTasksCount,
-                queueSize
-        );
+    public void setHeartbeatDurationFactor(final double heartbeatDurationFactor) {
+        this.heartbeatDurationFactor = heartbeatDurationFactor;
     }
 
     public int getInputPayloadKb() {
@@ -298,4 +219,66 @@ public final class TaskTubePollerSettings {
     public void setQueueSize(final int queueSize) {
         this.queueSize = queueSize;
     }
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final TaskTubePollerSettings that = (TaskTubePollerSettings) o;
+        return inputPayloadKb == that.inputPayloadKb
+                && inputMaxPayloadKb == that.inputMaxPayloadKb
+                && outputPayloadKb == that.outputPayloadKb
+                && outputMaxPayloadKb == that.outputMaxPayloadKb
+                && Double.compare(heartbeatDurationFactor, that.heartbeatDurationFactor) == 0
+                && producerPollingIntervalMilliseconds == that.producerPollingIntervalMilliseconds
+                && shutdownAwaitTerminationSeconds == that.shutdownAwaitTerminationSeconds
+                && maxConsumersCount == that.maxConsumersCount
+                && minConsumersCount == that.minConsumersCount
+                && consumerEmptyQueueSleepTimeoutMilliseconds == that.consumerEmptyQueueSleepTimeoutMilliseconds
+                && inspectorPollingIntervalMilliseconds == that.inspectorPollingIntervalMilliseconds
+                && maxBatchRequestedTasksCount == that.maxBatchRequestedTasksCount
+                && queueSize == that.queueSize;
+    }
+
+    @Override
+    public String toString() {
+        return "TaskPollerSettings{" + "inputPayloadKb=" + inputPayloadKb
+                + ", inputMaxPayloadKb=" + inputMaxPayloadKb
+                + ", outputPayloadKb=" + outputPayloadKb
+                + ", outputMaxPayloadKb=" + outputMaxPayloadKb
+                + ", taskLeaseDurationFactor=" + heartbeatDurationFactor
+                + ", producerPollingIntervalMilliseconds=" + producerPollingIntervalMilliseconds
+                + ", shutdownAwaitTerminationSeconds=" + shutdownAwaitTerminationSeconds
+                + ", maxConsumersCount=" + maxConsumersCount
+                + ", minConsumersCount=" + minConsumersCount
+                + ", consumerEmptyQueueSleepTimeoutMilliseconds=" + consumerEmptyQueueSleepTimeoutMilliseconds
+                + ", inspectorPollingIntervalMilliseconds=" + inspectorPollingIntervalMilliseconds
+                + ", maxBatchRequestedTasksCount=" + maxBatchRequestedTasksCount
+                + ", queueSize=" + queueSize
+                + '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                inputPayloadKb,
+                inputMaxPayloadKb,
+                outputPayloadKb,
+                outputMaxPayloadKb,
+                heartbeatDurationFactor,
+                producerPollingIntervalMilliseconds,
+                shutdownAwaitTerminationSeconds,
+                maxConsumersCount,
+                minConsumersCount,
+                consumerEmptyQueueSleepTimeoutMilliseconds,
+                inspectorPollingIntervalMilliseconds,
+                maxBatchRequestedTasksCount,
+                queueSize
+        );
+    }
+
 }

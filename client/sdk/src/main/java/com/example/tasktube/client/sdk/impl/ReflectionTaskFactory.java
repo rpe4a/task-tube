@@ -2,16 +2,17 @@ package com.example.tasktube.client.sdk.impl;
 
 import com.example.tasktube.client.sdk.poller.TaskFactory;
 import com.example.tasktube.client.sdk.task.Task;
-import jakarta.annotation.Nullable;
+import jakarta.annotation.Nonnull;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 
 public class ReflectionTaskFactory implements TaskFactory {
-    @Nullable
+
+    @Nonnull
     @Override
-    public Task<?> createInstance(@Nullable final String taskName) {
+    public Task<?> createInstance(@Nonnull final String taskName) {
         try {
             final Class<?> clazz = Class.forName(Objects.requireNonNull(taskName));
             final Constructor<?> constructor = clazz.getDeclaredConstructor();

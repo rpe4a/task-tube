@@ -12,6 +12,19 @@ public final class TaskSlot extends Slot {
         super(SlotType.TASK);
     }
 
+    public TaskSlot(@Nonnull final UUID taskReference) {
+        this(SlotType.TASK, Objects.requireNonNull(taskReference.toString()));
+    }
+
+    public TaskSlot(@Nonnull final String taskReference) {
+        this(SlotType.TASK, taskReference);
+    }
+
+    private TaskSlot(@Nonnull final SlotType type, @Nonnull final String taskReference) {
+        super(type);
+        this.taskReference = Objects.requireNonNull(taskReference);
+    }
+
     @Nonnull
     public String getTaskReference() {
         return taskReference;

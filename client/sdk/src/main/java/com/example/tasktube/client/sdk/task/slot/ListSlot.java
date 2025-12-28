@@ -7,10 +7,19 @@ import java.util.List;
 import java.util.Objects;
 
 public final class ListSlot extends Slot {
-    public List<? extends Slot> values = new LinkedList<>();
+    public List<? extends Slot> values;
+
+    ListSlot(@Nonnull final List<? extends Slot> values) {
+        this(SlotType.LIST, values);
+    }
 
     ListSlot() {
-        super(SlotType.LIST);
+        this(SlotType.LIST, new LinkedList<>());
+    }
+
+    private ListSlot(@Nonnull final SlotType type, @Nonnull final List<? extends Slot> values) {
+        super(type);
+        this.values = List.copyOf(Objects.requireNonNull(values));
     }
 
     @Nonnull

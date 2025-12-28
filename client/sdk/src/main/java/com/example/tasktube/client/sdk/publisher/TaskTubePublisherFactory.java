@@ -49,7 +49,7 @@ public final class TaskTubePublisherFactory {
     ) {
         final TaskRecord.Builder<R> builder = createBuilder(Objects.requireNonNull(task));
 
-        builder.setArg(Objects.requireNonNull(arg0));
+        builder.setArgument(Objects.requireNonNull(arg0));
 
         return new TaskTubePublisher(
                 client,
@@ -68,8 +68,8 @@ public final class TaskTubePublisherFactory {
     ) {
         final TaskRecord.Builder<R> builder = createBuilder(Objects.requireNonNull(task));
 
-        builder.setArg(Objects.requireNonNull(arg0))
-                .setArg(Objects.requireNonNull(arg1));
+        builder.setArgument(Objects.requireNonNull(arg0))
+                .setArgument(Objects.requireNonNull(arg1));
 
         return new TaskTubePublisher(
                 client,

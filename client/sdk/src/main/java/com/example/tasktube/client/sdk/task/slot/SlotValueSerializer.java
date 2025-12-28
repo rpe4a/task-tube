@@ -31,7 +31,7 @@ public class SlotValueSerializer {
     public Slot serialize(@Nonnull final TaskResult<?> value) {
         Preconditions.checkNotNull(value);
 
-        return new TaskSlot()
+        return new TaskSlot(value.getId())
                 .setTaskReference(value.getId());
     }
 

@@ -4,6 +4,7 @@ import com.example.tasktube.client.sdk.InstanceIdProvider;
 import com.example.tasktube.client.sdk.http.TaskTubeClient;
 import com.example.tasktube.client.sdk.http.dto.FinishTaskRequest;
 import com.example.tasktube.client.sdk.http.dto.StartTaskRequest;
+import com.example.tasktube.client.sdk.http.dto.TaskRequest;
 import com.example.tasktube.client.sdk.task.TaskInput;
 import com.example.tasktube.client.sdk.task.TaskOutput;
 import jakarta.annotation.Nonnull;
@@ -17,8 +18,8 @@ public final class TaskHandlerMiddleware extends AbstractMiddleware {
     private final InstanceIdProvider instanceIdProvider;
 
     public TaskHandlerMiddleware(
-            final TaskTubeClient taskTubeClient,
-            final InstanceIdProvider instanceIdProvider
+            @Nonnull final TaskTubeClient taskTubeClient,
+            @Nonnull final InstanceIdProvider instanceIdProvider
     ) {
         this.taskTubeClient = Objects.requireNonNull(taskTubeClient);
         this.instanceIdProvider = Objects.requireNonNull(instanceIdProvider);
@@ -44,7 +45,9 @@ public final class TaskHandlerMiddleware extends AbstractMiddleware {
         taskTubeClient.finishTask(
                 output.getId(),
                 new FinishTaskRequest(
-                        output.getChildren(),
+                        Objects.isNull(output.getChildren())
+                                ? new TaskRequest[0]
+                                : output.getChildren().toArray(new TaskRequest[0]),
                         output.getResult(),
                         instanceIdProvider.get(),
                         Instant.now()

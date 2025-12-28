@@ -6,6 +6,8 @@ import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -26,15 +28,16 @@ public class TaskInput {
             @Nonnull final List<Argument> arguments,
             @Nonnull final TaskSettings settings
     ) {
-        this.id = id;
-        this.name = name;
-        this.tube = tube;
-        this.correlationId = correlationId;
-        this.arguments = arguments;
-        this.settings = settings;
+        this.id = Objects.requireNonNull(id);
+        this.name = Objects.requireNonNull(name);
+        this.tube = Objects.requireNonNull(tube);
+        this.correlationId = Objects.requireNonNull(correlationId);
+        this.arguments = Objects.requireNonNull(List.copyOf(arguments));
+        this.settings = Objects.requireNonNull(settings);
     }
 
-    public static @Nonnull TaskInput from(@Nonnull final PopTaskResponse response) {
+    @Nonnull
+    public static TaskInput from(@Nonnull final PopTaskResponse response) {
         Preconditions.checkNotNull(response);
 
         return new TaskInput(
@@ -42,7 +45,7 @@ public class TaskInput {
                 response.name(),
                 response.tube(),
                 response.correlationId(),
-                Objects.isNull(response.arguments()) ? List.of() : response.arguments(),
+                Arrays.asList(response.arguments()),
                 response.settings()
         );
     }
@@ -62,7 +65,7 @@ public class TaskInput {
         return tube;
     }
 
-    @Nullable
+    @Nonnull
     public List<Argument> getArguments() {
         return arguments;
     }

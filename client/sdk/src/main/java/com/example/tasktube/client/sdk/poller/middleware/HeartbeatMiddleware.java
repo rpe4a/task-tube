@@ -27,16 +27,15 @@ import java.util.concurrent.TimeoutException;
 @Order(5)
 public final class HeartbeatMiddleware extends AbstractMiddleware {
     private static final String TASK_HANDLER_GROUP = "task-handler";
-    private static final double HEARTBEAT_FACTOR = 0.5;
     private final TaskTubeClient taskTubeClient;
     private final InstanceIdProvider instanceIdProvider;
     private final TaskTubePollerSettings settings;
     private final ExecutorService taskHandlerPool;
 
     public HeartbeatMiddleware(
-            final TaskTubeClient taskTubeClient,
-            final InstanceIdProvider instanceIdProvider,
-            final TaskTubePollerSettings settings
+            @Nonnull final TaskTubeClient taskTubeClient,
+            @Nonnull final InstanceIdProvider instanceIdProvider,
+            @Nonnull final TaskTubePollerSettings settings
     ) {
         this.taskTubeClient = Objects.requireNonNull(taskTubeClient);
         this.instanceIdProvider = Objects.requireNonNull(instanceIdProvider);
@@ -70,7 +69,7 @@ public final class HeartbeatMiddleware extends AbstractMiddleware {
                     .orTimeout(input.getSettings().getTimeoutSeconds(), TimeUnit.SECONDS);
         }
 
-        final long period = Math.round(input.getSettings().getHeartbeatTimeoutSeconds() * HEARTBEAT_FACTOR);
+        final long period = Math.round(input.getSettings().getHeartbeatTimeoutSeconds() * settings.getHeartbeatDurationFactor());
         final ScheduledExecutorService heartBeatPool = Executors.newSingleThreadScheduledExecutor();
         final ScheduledFuture<?> heartBeatFuture =
                 heartBeatPool.scheduleAtFixedRate(

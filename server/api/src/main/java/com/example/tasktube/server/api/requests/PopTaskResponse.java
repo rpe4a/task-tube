@@ -15,7 +15,7 @@ public record PopTaskResponse(
         @NotBlank String name,
         @NotBlank String tube,
         @NotBlank String correlationId,
-        @Nullable List<Argument> arguments,
+        @NotNull  List<Argument> arguments,
         @NotNull TaskSettings settings
 ) {
     public static PopTaskResponse from(final PopTaskDto task) {

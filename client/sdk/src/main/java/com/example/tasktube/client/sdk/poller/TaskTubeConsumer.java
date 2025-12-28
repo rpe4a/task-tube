@@ -8,6 +8,7 @@ import com.example.tasktube.client.sdk.task.slot.SlotValueSerializer;
 import com.example.tasktube.client.sdk.task.Task;
 import com.example.tasktube.client.sdk.task.TaskInput;
 import com.example.tasktube.client.sdk.task.TaskOutput;
+import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,13 +28,13 @@ final class TaskTubeConsumer implements Runnable {
     private final List<Middleware> middlewares;
 
     TaskTubeConsumer(
-            final TaskFactory taskFactory,
-            final BlockingQueue<TaskInput> queue,
-            final ConsumerInspector inspector,
-            final List<Middleware> middlewares,
-            final ArgumentDeserializer slotDeserializer,
-            final SlotValueSerializer slotValueSerializer,
-            final TaskTubePollerSettings settings
+            @Nonnull final TaskFactory taskFactory,
+            @Nonnull final BlockingQueue<TaskInput> queue,
+            @Nonnull final ConsumerInspector inspector,
+            @Nonnull final List<Middleware> middlewares,
+            @Nonnull final ArgumentDeserializer slotDeserializer,
+            @Nonnull final SlotValueSerializer slotValueSerializer,
+            @Nonnull final TaskTubePollerSettings settings
     ) {
         this.middlewares = Objects.requireNonNull(middlewares);
         this.queue = Objects.requireNonNull(queue);
