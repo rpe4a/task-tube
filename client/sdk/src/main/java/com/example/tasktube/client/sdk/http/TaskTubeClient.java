@@ -24,8 +24,10 @@ public interface TaskTubeClient {
 
     void failTask(@Nonnull UUID taskId, @Nonnull FailTaskRequest request);
 
+    @Nonnull
     Optional<UUID> pushTask(@Nonnull String tubeName, @Nonnull TaskRequest request);
 
+    @Nonnull
     Optional<PopTaskResponse> popTask(@Nonnull String tubeName, @Nonnull PopTaskRequest request);
 
     @Nonnull

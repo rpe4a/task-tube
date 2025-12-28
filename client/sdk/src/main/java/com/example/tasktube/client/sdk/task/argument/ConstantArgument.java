@@ -1,7 +1,7 @@
 package com.example.tasktube.client.sdk.task.argument;
 
 import jakarta.annotation.Nonnull;
-import org.jspecify.annotations.NonNull;
+import jakarta.annotation.Nullable;
 
 import java.util.Objects;
 
@@ -13,12 +13,13 @@ public final class ConstantArgument extends Argument {
         super(ArgumentType.CONSTANT);
     }
 
-    @Nonnull
+    @Nullable
     public Object getValue() {
         return value;
     }
 
-    public ConstantArgument setValue(@Nonnull final Object value) {
+    @Nonnull
+    public ConstantArgument setValue(@Nullable final Object value) {
         this.value = Objects.requireNonNull(value);
         return this;
     }
@@ -28,12 +29,13 @@ public final class ConstantArgument extends Argument {
         return valueReferenceType;
     }
 
-    public ConstantArgument setValueReferenceType(final String valueTypeReference) {
+    @Nonnull
+    public ConstantArgument setValueReferenceType(@Nonnull final String valueTypeReference) {
         this.valueReferenceType = Objects.requireNonNull(valueTypeReference);
         return this;
     }
 
-    @NonNull
+    @Nonnull
     @Override
     public Object deserialize(@Nonnull final ArgumentDeserializer argumentDeserializer) {
         return Objects.requireNonNull(argumentDeserializer).deserialize(this);

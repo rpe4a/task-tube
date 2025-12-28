@@ -37,8 +37,8 @@ public class TaskTubeHttpClient implements TaskTubeClient {
     private final TaskTubeClientSettings settings;
 
     public TaskTubeHttpClient(
-            final ObjectMapper objectMapper,
-            final TaskTubeClientSettings settings
+            @Nonnull final ObjectMapper objectMapper,
+            @Nonnull final TaskTubeClientSettings settings
     ) {
         this.objectMapper = Objects.requireNonNull(objectMapper);
         this.settings = Objects.requireNonNull(settings);
@@ -101,6 +101,7 @@ public class TaskTubeHttpClient implements TaskTubeClient {
         send(httpRequest);
     }
 
+    @Nonnull
     @Override
     public Optional<UUID> pushTask(@Nonnull final String tubeName, @Nonnull final TaskRequest request) {
         Preconditions.checkArgument(StringUtils.isNotBlank(tubeName));
@@ -114,6 +115,7 @@ public class TaskTubeHttpClient implements TaskTubeClient {
         return send(httpRequest, new TypeReference<>() {});
     }
 
+    @Nonnull
     @Override
     public Optional<PopTaskResponse> popTask(@Nonnull final String tubeName, @Nonnull final PopTaskRequest request) {
         Preconditions.checkArgument(StringUtils.isNotBlank(tubeName));
@@ -127,8 +129,8 @@ public class TaskTubeHttpClient implements TaskTubeClient {
         return send(httpRequest, new TypeReference<>() {});
     }
 
-    @Override
     @Nonnull
+    @Override
     public List<PopTaskResponse> popTasks(@Nonnull final String tubeName, @Nonnull final PopTasksRequest request) {
         Preconditions.checkArgument(StringUtils.isNotBlank(tubeName));
         Preconditions.checkNotNull(request);

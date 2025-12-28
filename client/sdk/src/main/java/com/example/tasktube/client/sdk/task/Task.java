@@ -1,7 +1,6 @@
 package com.example.tasktube.client.sdk.task;
 
 import com.example.tasktube.client.sdk.task.argument.Argument;
-import com.example.tasktube.client.sdk.task.slot.Slot;
 import com.example.tasktube.client.sdk.task.argument.ArgumentDeserializer;
 import com.example.tasktube.client.sdk.task.slot.SlotValueSerializer;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -102,18 +101,18 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
     }
 
     @Nonnull
-    public final <V> ValueList<V> list(@Nonnull final List<Value<V>> values) {
+    public final <V> ListValue<V> list(@Nonnull final List<Value<V>> values) {
         Preconditions.checkNotNull(values);
 
-        return new ValueList<>(values);
+        return new ListValue<>(values);
     }
 
     @SafeVarargs
     @Nonnull
-    public final <V> ValueList<V> list(@Nonnull final Value<V>... values) {
+    public final <V> ListValue<V> list(@Nonnull final Value<V>... values) {
         Preconditions.checkNotNull(values);
 
-        return new ValueList<>(Arrays.asList(values));
+        return new ListValue<>(Arrays.asList(values));
     }
 
     @Nonnull

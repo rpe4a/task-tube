@@ -1,27 +1,31 @@
 package com.example.tasktube.client.sdk.task.slot;
 
-import com.example.tasktube.client.sdk.task.argument.ArgumentDeserializer;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 import java.util.Map;
+import java.util.Objects;
 
-public abstract sealed class Slot<T extends Slot<?>> permits ConstantSlot, ListSlot, TaskSlot {
+public abstract sealed class Slot permits ConstantSlot, ListSlot, TaskSlot {
     private final SlotType type;
     private Map<String, Object> metadata;
 
-    protected Slot(final SlotType type) {
-        this.type = type;
+    protected Slot(@Nonnull final SlotType type) {
+        this.type = Objects.requireNonNull(type);
     }
 
+    @Nullable
     public Map<String, Object> getMetadata() {
         return metadata;
     }
 
-    public T setMetadata(final Map<String, Object> metadata) {
+    @Nonnull
+    public Slot setMetadata(@Nullable final Map<String, Object> metadata) {
         this.metadata = metadata;
-        return (T) this;
+        return this;
     }
 
+    @Nonnull
     public SlotType getType() {
         return type;
     }

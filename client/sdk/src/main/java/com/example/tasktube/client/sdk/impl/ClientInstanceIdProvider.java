@@ -1,18 +1,21 @@
 package com.example.tasktube.client.sdk.impl;
 
 import com.example.tasktube.client.sdk.InstanceIdProvider;
+import jakarta.annotation.Nonnull;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class ClientInstanceIdProvider implements InstanceIdProvider {
     private final String instanceId = Integer.toHexString(UUID.randomUUID().hashCode());
-    private final String appName;
+    private final String client;
 
-    public ClientInstanceIdProvider(final String appName) {
-        this.appName = appName;
+    public ClientInstanceIdProvider(@Nonnull final String client) {
+        this.client = Objects.requireNonNull(client);
     }
 
+    @Nonnull
     public String get() {
-        return appName + "-" + instanceId;
+        return client + "-" + instanceId;
     }
 }

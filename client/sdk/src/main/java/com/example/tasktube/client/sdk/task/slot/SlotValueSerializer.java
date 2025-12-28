@@ -2,7 +2,7 @@ package com.example.tasktube.client.sdk.task.slot;
 
 import com.example.tasktube.client.sdk.task.Constant;
 import com.example.tasktube.client.sdk.task.TaskResult;
-import com.example.tasktube.client.sdk.task.ValueList;
+import com.example.tasktube.client.sdk.task.ListValue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
@@ -14,12 +14,12 @@ import java.util.Objects;
 public class SlotValueSerializer {
     private final ObjectMapper objectMapper;
 
-    public SlotValueSerializer(final ObjectMapper objectMapper) {
+    public SlotValueSerializer(@Nonnull final ObjectMapper objectMapper) {
         this.objectMapper = Objects.requireNonNull(objectMapper);
     }
 
     @Nonnull
-    public Slot<?>  serialize(@Nonnull final Constant<?> value) {
+    public Slot  serialize(@Nonnull final Constant<?> value) {
         Preconditions.checkNotNull(value);
 
         return new ConstantSlot()
@@ -28,7 +28,7 @@ public class SlotValueSerializer {
     }
 
     @Nonnull
-    public Slot<?>  serialize(@Nonnull final TaskResult<?> value) {
+    public Slot serialize(@Nonnull final TaskResult<?> value) {
         Preconditions.checkNotNull(value);
 
         return new TaskSlot()
@@ -36,10 +36,10 @@ public class SlotValueSerializer {
     }
 
     @Nonnull
-    public Slot<?>  serialize(@Nonnull final ValueList<?> value) {
+    public Slot  serialize(@Nonnull final ListValue<?> value) {
         Preconditions.checkNotNull(value);
 
-        final List<? extends Slot<?>> slots = value.get().stream()
+        final List<? extends Slot> slots = value.get().stream()
                 .map(v -> v.serialize(this))
                 .toList();
 

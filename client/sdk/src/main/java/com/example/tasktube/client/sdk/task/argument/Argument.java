@@ -1,32 +1,36 @@
 package com.example.tasktube.client.sdk.task.argument;
 
 import jakarta.annotation.Nonnull;
-import org.jspecify.annotations.NonNull;
+import jakarta.annotation.Nullable;
 
 import java.util.Map;
+import java.util.Objects;
 
 public abstract sealed class Argument permits ConstantArgument, ListArgument {
     private final ArgumentType type;
     private Map<String, Object> metadata;
 
-    protected Argument(final ArgumentType type) {
-        this.type = type;
+    protected Argument(@Nonnull final ArgumentType type) {
+        this.type = Objects.requireNonNull(type);
     }
 
+    @Nonnull
     public Map<String, Object> getMetadata() {
         return metadata;
     }
 
-    public Argument setMetadata(final Map<String, Object> metadata) {
+    @Nullable
+    public Argument setMetadata(@Nullable final Map<String, Object> metadata) {
         this.metadata = metadata;
         return this;
     }
 
+    @Nonnull
     public ArgumentType getType() {
         return type;
     }
 
-    @NonNull
+    @Nonnull
     public abstract Object deserialize(@Nonnull final ArgumentDeserializer argumentDeserializer);
 
     public enum ArgumentType {

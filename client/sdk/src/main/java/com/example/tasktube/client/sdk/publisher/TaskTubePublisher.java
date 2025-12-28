@@ -19,10 +19,10 @@ public final class TaskTubePublisher {
     private final TaskConfiguration[] configurations;
 
     TaskTubePublisher(
-            final TaskTubeClient client,
-            final SlotValueSerializer slotSerializer,
-            final TaskRecord.Builder<?> builder,
-            final TaskConfiguration[] configurations
+            @Nonnull final TaskTubeClient client,
+            @Nonnull final SlotValueSerializer slotSerializer,
+            @Nonnull final TaskRecord.Builder<?> builder,
+            @Nonnull final TaskConfiguration[] configurations
     ) {
         this.client = Objects.requireNonNull(client);
         this.slotSerializer = Objects.requireNonNull(slotSerializer);

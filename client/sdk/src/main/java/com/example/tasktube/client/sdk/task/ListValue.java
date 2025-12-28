@@ -4,19 +4,19 @@ import com.example.tasktube.client.sdk.task.slot.Slot;
 import com.example.tasktube.client.sdk.task.slot.SlotValueSerializer;
 import jakarta.annotation.Nonnull;
 
+import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
-public class TaskResult<T> implements Value<T> {
-    private final UUID id;
+public final class ListValue<T> implements Value<List<T>> {
+    private final List<? extends Value<T>> values;
 
-    TaskResult(@Nonnull final UUID id) {
-        this.id = Objects.requireNonNull(id);
+    ListValue(@Nonnull final List<? extends Value<T>> values) {
+        this.values = List.copyOf(Objects.requireNonNull(values));
     }
 
     @Nonnull
-    public UUID getId() {
-        return id;
+    public List<? extends Value<T>> get() {
+        return values;
     }
 
     @Nonnull

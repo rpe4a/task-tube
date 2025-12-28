@@ -22,8 +22,9 @@ public final class ListArgument extends Argument {
         return values;
     }
 
+    @Nonnull
     public ListArgument setValues(@Nonnull final List<Argument> arguments) {
-        values = Objects.requireNonNull(arguments);
+        values = List.copyOf(Objects.requireNonNull(arguments));
         return this;
     }
 

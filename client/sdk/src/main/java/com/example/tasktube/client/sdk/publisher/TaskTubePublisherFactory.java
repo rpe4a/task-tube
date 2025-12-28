@@ -18,7 +18,10 @@ public final class TaskTubePublisherFactory {
     private final TaskTubeClient client;
     private final SlotValueSerializer slotSerializer;
 
-    public TaskTubePublisherFactory(final TaskTubeClient client, final SlotValueSerializer slotSerializer) {
+    public TaskTubePublisherFactory(
+            @Nonnull final TaskTubeClient client,
+            @Nonnull final SlotValueSerializer slotSerializer
+    ) {
         this.client = Objects.requireNonNull(client);
         this.slotSerializer = Objects.requireNonNull(slotSerializer);
     }
@@ -28,7 +31,7 @@ public final class TaskTubePublisherFactory {
             @Nonnull final Task0<R> task,
             @Nonnull final TaskConfiguration... configurations
     ) {
-        final TaskRecord.Builder<R> builder = createBuilder(task);
+        final TaskRecord.Builder<R> builder = createBuilder(Objects.requireNonNull(task));
 
         return new TaskTubePublisher(
                 client,
@@ -44,9 +47,9 @@ public final class TaskTubePublisherFactory {
             @Nonnull final Constant<A0> arg0,
             @Nonnull final TaskConfiguration... configurations
     ) {
-        final TaskRecord.Builder<R> builder = createBuilder(task);
+        final TaskRecord.Builder<R> builder = createBuilder(Objects.requireNonNull(task));
 
-        builder.setArg(arg0);
+        builder.setArg(Objects.requireNonNull(arg0));
 
         return new TaskTubePublisher(
                 client,
@@ -63,10 +66,10 @@ public final class TaskTubePublisherFactory {
             @Nonnull final Constant<A1> arg1,
             @Nonnull final TaskConfiguration... configurations
     ) {
-        final TaskRecord.Builder<R> builder = createBuilder(task);
+        final TaskRecord.Builder<R> builder = createBuilder(Objects.requireNonNull(task));
 
-        builder.setArg(arg0)
-                .setArg(arg1);
+        builder.setArg(Objects.requireNonNull(arg0))
+                .setArg(Objects.requireNonNull(arg1));
 
         return new TaskTubePublisher(
                 client,
@@ -76,7 +79,8 @@ public final class TaskTubePublisherFactory {
         );
     }
 
-    private <R> TaskRecord.Builder<R> createBuilder(final Task<?> task) {
+    @Nonnull
+    private <R> TaskRecord.Builder<R> createBuilder(@Nonnull final Task<?> task) {
         return new TaskRecord.Builder<R>()
                 .setId(UUID.randomUUID())
                 .setName(task.getName())
