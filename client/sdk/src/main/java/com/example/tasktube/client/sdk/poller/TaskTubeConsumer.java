@@ -23,7 +23,6 @@ final class TaskTubeConsumer implements Runnable {
     private final TaskFactory taskFactory;
     private final ConsumerInspector inspector;
     private final ArgumentDeserializer slotDeserializer;
-    private final SlotValueSerializer slotValueSerializer;
     private final TaskTubePollerSettings settings;
     private final List<Middleware> middlewares;
 
@@ -33,7 +32,6 @@ final class TaskTubeConsumer implements Runnable {
             @Nonnull final ConsumerInspector inspector,
             @Nonnull final List<Middleware> middlewares,
             @Nonnull final ArgumentDeserializer slotDeserializer,
-            @Nonnull final SlotValueSerializer slotValueSerializer,
             @Nonnull final TaskTubePollerSettings settings
     ) {
         this.middlewares = Objects.requireNonNull(middlewares);
@@ -41,7 +39,6 @@ final class TaskTubeConsumer implements Runnable {
         this.taskFactory = Objects.requireNonNull(taskFactory);
         this.inspector = Objects.requireNonNull(inspector);
         this.slotDeserializer = Objects.requireNonNull(slotDeserializer);
-        this.slotValueSerializer = Objects.requireNonNull(slotValueSerializer);
         this.settings = Objects.requireNonNull(settings);
     }
 
@@ -75,7 +72,7 @@ final class TaskTubeConsumer implements Runnable {
                 .add(middlewares)
                 .createInstance(
                         (i, o) ->
-                                new Task.Executor(task).invoke(i, o, slotDeserializer, slotValueSerializer)
+                                new Task.Executor(task).invoke(i, o, slotDeserializer)
                 );
 
         pipeline.handle(input, TaskOutput.createInstance(input));

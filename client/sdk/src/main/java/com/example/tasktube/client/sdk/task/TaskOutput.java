@@ -1,6 +1,5 @@
 package com.example.tasktube.client.sdk.task;
 
-import com.example.tasktube.client.sdk.http.dto.TaskRequest;
 import com.example.tasktube.client.sdk.task.slot.ConstantSlot;
 import com.example.tasktube.client.sdk.task.slot.Slot;
 import com.google.common.base.Preconditions;
@@ -16,9 +15,9 @@ public class TaskOutput {
     private final String name;
     private final String tube;
     private final String correlationId;
-    private Slot result;
+    private Value<?> result;
     private String failureMessage;
-    private List<TaskRequest> children;
+    private TaskRecord<?>[] children;
 
     private TaskOutput(
             @Nonnull final UUID id,
@@ -30,7 +29,7 @@ public class TaskOutput {
         this.name = Objects.requireNonNull(name);
         this.tube = Objects.requireNonNull(tube);
         this.correlationId = Objects.requireNonNull(correlationId);
-        this.result = new ConstantSlot();
+        this.result = new Constant<>(null, Object.class);
     }
 
     @Nonnull
@@ -66,12 +65,12 @@ public class TaskOutput {
     }
 
     @Nonnull
-    public Slot getResult() {
+    public Value<?> getResult() {
         return result;
     }
 
     @Nonnull
-    public TaskOutput setResult(@Nonnull final Slot result) {
+    public TaskOutput setResult(@Nonnull final Value<?> result) {
         this.result = Objects.requireNonNull(result);
         return this;
     }
@@ -88,13 +87,13 @@ public class TaskOutput {
     }
 
     @Nullable
-    public List<TaskRequest> getChildren() {
+    public TaskRecord<?>[] getChildren() {
         return children;
     }
 
     @Nonnull
-    public TaskOutput setChildren(@Nonnull final List<TaskRequest> children) {
-        this.children = List.copyOf(Objects.requireNonNull(children));
+    public TaskOutput setChildren(@Nonnull final List<TaskRecord<?>> children) {
+        this.children = Objects.requireNonNull(children).toArray(new TaskRecord<?>[0]);
         return this;
     }
 

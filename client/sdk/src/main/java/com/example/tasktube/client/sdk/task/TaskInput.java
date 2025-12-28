@@ -17,7 +17,7 @@ public class TaskInput {
     private final String name;
     private final String tube;
     private final String correlationId;
-    private final List<Argument> arguments;
+    private final Argument[] arguments;
     private final TaskSettings settings;
 
     public TaskInput(
@@ -25,14 +25,14 @@ public class TaskInput {
             @Nonnull final String name,
             @Nonnull final String tube,
             @Nonnull final String correlationId,
-            @Nonnull final List<Argument> arguments,
+            @Nonnull final Argument[] arguments,
             @Nonnull final TaskSettings settings
     ) {
         this.id = Objects.requireNonNull(id);
         this.name = Objects.requireNonNull(name);
         this.tube = Objects.requireNonNull(tube);
         this.correlationId = Objects.requireNonNull(correlationId);
-        this.arguments = Objects.requireNonNull(List.copyOf(arguments));
+        this.arguments = Objects.requireNonNull(arguments);
         this.settings = Objects.requireNonNull(settings);
     }
 
@@ -45,7 +45,7 @@ public class TaskInput {
                 response.name(),
                 response.tube(),
                 response.correlationId(),
-                Arrays.asList(response.arguments()),
+                response.arguments(),
                 response.settings()
         );
     }
@@ -66,7 +66,7 @@ public class TaskInput {
     }
 
     @Nonnull
-    public List<Argument> getArguments() {
+    public Argument[] getArguments() {
         return arguments;
     }
 

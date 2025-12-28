@@ -49,7 +49,7 @@ public class Main {
                 new MDCMiddleware(),
                 new InformationMiddleware(),
                 new ExceptionMiddleware(taskTubeClient, instanceIdProvider),
-                new TaskHandlerMiddleware(taskTubeClient, instanceIdProvider),
+                new TaskHandlerMiddleware(taskTubeClient, instanceIdProvider, slotValueSerializer),
                 new HeartbeatMiddleware(taskTubeClient, instanceIdProvider, pollerSettings)
         );
 
@@ -70,7 +70,6 @@ public class Main {
                 instanceIdProvider,
                 middlewares,
                 argumentDeserializer,
-                slotValueSerializer,
                 pollerSettings
         );
 

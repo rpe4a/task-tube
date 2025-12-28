@@ -18,7 +18,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
+public abstract sealed class Task<TResult> permits Task0, Task1, Task2, Task3, Task4, Task5, Task6, Task7 {
     private static final String CANNOT_FIND_METHOD_RUN = "Cannot find method run.";
     private static final String DEFAULT_METHOD_NAME = "run";
 
@@ -30,7 +30,6 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
     private TaskSettings settings;
 
     private ArgumentDeserializer argumentDeserializer;
-    private SlotValueSerializer slotSerializer;
 
     @Nonnull
     public UUID getId() {
@@ -79,10 +78,6 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
         this.argumentDeserializer = Objects.requireNonNull(argumentDeserializer);
     }
 
-    private void setSlotValueSerializer(@Nonnull final SlotValueSerializer slotValueSerializer) {
-        this.slotSerializer = Objects.requireNonNull(slotValueSerializer);
-    }
-
     @Nonnull
     public final <V> Constant<V> nothing() {
         return new Constant<>(null, Object.class);
@@ -107,6 +102,16 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
     @Nonnull
     public final <V> ListValue<V> list(@Nonnull final Value<V>... values) {
         return new ListValue<>(Arrays.asList(Objects.requireNonNull(values)));
+    }
+
+    @Nonnull
+    public final TaskConfiguration waitFor(@Nonnull final TaskResult<Integer> taskResult) {
+        return new TaskConfiguration.WaitForTask(Objects.requireNonNull(taskResult));
+    }
+
+    @Nonnull
+    public final TaskConfigurationInternal configure() {
+        return new TaskConfigurationInternal();
     }
 
     @Nonnull
@@ -154,13 +159,138 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
     }
 
     @Nonnull
-    public final TaskConfiguration waitFor(@Nonnull final TaskResult<Integer> taskResult) {
-        return new TaskConfiguration.WaitForTask(Objects.requireNonNull(taskResult));
+    public final <R, A0, A1, A2> TaskResult<R> pushIn(
+            @Nonnull final Task3<R, A0, A1, A2> task,
+            @Nonnull final Value<A0> value0,
+            @Nonnull final Value<A1> value1,
+            @Nonnull final Value<A2> value2,
+            @Nonnull final TaskConfiguration... configurations
+    ) {
+        Preconditions.checkNotNull(task);
+        Preconditions.checkNotNull(value0);
+        Preconditions.checkNotNull(value1);
+        Preconditions.checkNotNull(value2);
+        Preconditions.checkNotNull(configurations);
+
+        final TaskRecord<R> child = addChild(task, configurations);
+        child.addArgument(value0);
+        child.addArgument(value1);
+        child.addArgument(value2);
+        return child.getResult();
     }
 
     @Nonnull
-    public final TaskConfigurationInternal configure() {
-        return new TaskConfigurationInternal();
+    public final <R, A0, A1, A2, A3> TaskResult<R> pushIn(
+            @Nonnull final Task4<R, A0, A1, A2, A3> task,
+            @Nonnull final Value<A0> value0,
+            @Nonnull final Value<A1> value1,
+            @Nonnull final Value<A2> value2,
+            @Nonnull final Value<A3> value3,
+            @Nonnull final TaskConfiguration... configurations
+    ) {
+        Preconditions.checkNotNull(task);
+        Preconditions.checkNotNull(value0);
+        Preconditions.checkNotNull(value1);
+        Preconditions.checkNotNull(value2);
+        Preconditions.checkNotNull(value3);
+        Preconditions.checkNotNull(configurations);
+
+        final TaskRecord<R> child = addChild(task, configurations);
+        child.addArgument(value0);
+        child.addArgument(value1);
+        child.addArgument(value2);
+        child.addArgument(value3);
+        return child.getResult();
+    }
+
+    @Nonnull
+    public final <R, A0, A1, A2, A3, A4> TaskResult<R> pushIn(
+            @Nonnull final Task5<R, A0, A1, A2, A3, A4> task,
+            @Nonnull final Value<A0> value0,
+            @Nonnull final Value<A1> value1,
+            @Nonnull final Value<A2> value2,
+            @Nonnull final Value<A3> value3,
+            @Nonnull final Value<A4> value4,
+            @Nonnull final TaskConfiguration... configurations
+    ) {
+        Preconditions.checkNotNull(task);
+        Preconditions.checkNotNull(value0);
+        Preconditions.checkNotNull(value1);
+        Preconditions.checkNotNull(value2);
+        Preconditions.checkNotNull(value3);
+        Preconditions.checkNotNull(value4);
+        Preconditions.checkNotNull(configurations);
+
+        final TaskRecord<R> child = addChild(task, configurations);
+        child.addArgument(value0);
+        child.addArgument(value1);
+        child.addArgument(value2);
+        child.addArgument(value3);
+        child.addArgument(value4);
+        return child.getResult();
+    }
+
+    @Nonnull
+    public final <R, A0, A1, A2, A3, A4, A5> TaskResult<R> pushIn(
+            @Nonnull final Task6<R, A0, A1, A2, A3, A4, A5> task,
+            @Nonnull final Value<A0> value0,
+            @Nonnull final Value<A1> value1,
+            @Nonnull final Value<A2> value2,
+            @Nonnull final Value<A3> value3,
+            @Nonnull final Value<A4> value4,
+            @Nonnull final Value<A5> value5,
+            @Nonnull final TaskConfiguration... configurations
+    ) {
+        Preconditions.checkNotNull(task);
+        Preconditions.checkNotNull(value0);
+        Preconditions.checkNotNull(value1);
+        Preconditions.checkNotNull(value2);
+        Preconditions.checkNotNull(value3);
+        Preconditions.checkNotNull(value4);
+        Preconditions.checkNotNull(value5);
+        Preconditions.checkNotNull(configurations);
+
+        final TaskRecord<R> child = addChild(task, configurations);
+        child.addArgument(value0);
+        child.addArgument(value1);
+        child.addArgument(value2);
+        child.addArgument(value3);
+        child.addArgument(value4);
+        child.addArgument(value5);
+        return child.getResult();
+    }
+
+    @Nonnull
+    public final <R, A0, A1, A2, A3, A4, A5, A6> TaskResult<R> pushIn(
+            @Nonnull final Task7<R, A0, A1, A2, A3, A4, A5, A6> task,
+            @Nonnull final Value<A0> value0,
+            @Nonnull final Value<A1> value1,
+            @Nonnull final Value<A2> value2,
+            @Nonnull final Value<A3> value3,
+            @Nonnull final Value<A4> value4,
+            @Nonnull final Value<A5> value5,
+            @Nonnull final Value<A6> value6,
+            @Nonnull final TaskConfiguration... configurations
+    ) {
+        Preconditions.checkNotNull(task);
+        Preconditions.checkNotNull(value0);
+        Preconditions.checkNotNull(value1);
+        Preconditions.checkNotNull(value2);
+        Preconditions.checkNotNull(value3);
+        Preconditions.checkNotNull(value4);
+        Preconditions.checkNotNull(value5);
+        Preconditions.checkNotNull(value6);
+        Preconditions.checkNotNull(configurations);
+
+        final TaskRecord<R> child = addChild(task, configurations);
+        child.addArgument(value0);
+        child.addArgument(value1);
+        child.addArgument(value2);
+        child.addArgument(value3);
+        child.addArgument(value4);
+        child.addArgument(value5);
+        child.addArgument(value6);
+        return child.getResult();
     }
 
     private <R> TaskRecord<R> addChild(final Task<R> task, final TaskConfiguration[] configurations) {
@@ -193,17 +323,14 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
     private void execute(
             @Nonnull final TaskInput input,
             @Nonnull final TaskOutput output,
-            @Nonnull final ArgumentDeserializer slotDeserializer,
-            @Nonnull final SlotValueSerializer slotValueSerializer
+            @Nonnull final ArgumentDeserializer slotDeserializer
     ) {
         Preconditions.checkNotNull(slotDeserializer);
-        Preconditions.checkNotNull(slotValueSerializer);
         Preconditions.checkNotNull(input);
         Preconditions.checkNotNull(output);
         Preconditions.checkArgument(input.getName().equals(getName()));
 
         setArgumentDeserializer(slotDeserializer);
-        setSlotValueSerializer(slotValueSerializer);
 
         setId(input.getId());
         setTube(input.getTube());
@@ -212,21 +339,17 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
 
         final Value<TResult> result = executeRunMethod(input.getArguments()).orElseGet(this::nothing);
 
-        output.setResult(result.serialize(slotSerializer))
-                .setChildren(
-                        children.stream()
-                                .map(taskRecord -> taskRecord.toRequest(slotSerializer))
-                                .toList()
-                );
+        output.setResult(result);
+        output.setChildren(children);
     }
 
-    private Optional<Value<TResult>> executeRunMethod(final List<Argument> arguments) {
+    private Optional<Value<TResult>> executeRunMethod(final Argument[] arguments) {
         try {
             final Method run = getRunMethod();
             final Parameter[] parameters = run.getParameters();
             final Object[] args = new Object[parameters.length];
             for (int i = 0; i < parameters.length; i++) {
-                args[i] = arguments.get(i).deserialize(argumentDeserializer);
+                args[i] = arguments[i].deserialize(argumentDeserializer);
             }
             return Optional.ofNullable((Value<TResult>) run.invoke(this, args));
         } catch (final InvocationTargetException | IllegalAccessException e) {
@@ -279,20 +402,18 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
         public void invoke(
                 @Nonnull final TaskInput input,
                 @Nonnull final TaskOutput output,
-                @Nonnull final ArgumentDeserializer argumentDeserializer,
-                @Nonnull final SlotValueSerializer slotSerializer
+                @Nonnull final ArgumentDeserializer argumentDeserializer
         ) {
             Preconditions.checkNotNull(input);
             Preconditions.checkNotNull(output);
             Preconditions.checkNotNull(argumentDeserializer);
-            Preconditions.checkNotNull(slotSerializer);
 
             try {
                 final Method execute = findExecuteMethod(task.getClass());
 
                 execute.setAccessible(true);
 
-                execute.invoke(task, input, output, argumentDeserializer, slotSerializer);
+                execute.invoke(task, input, output, argumentDeserializer);
             } catch (final InvocationTargetException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
@@ -302,7 +423,7 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2 {
             try {
                 return taskClazz
                         .getSuperclass()
-                        .getDeclaredMethod(EXECUTE_METHOD_NAME, TaskInput.class, TaskOutput.class, ArgumentDeserializer.class, SlotValueSerializer.class);
+                        .getDeclaredMethod(EXECUTE_METHOD_NAME, TaskInput.class, TaskOutput.class, ArgumentDeserializer.class);
             } catch (final NoSuchMethodException e) {
                 return findExecuteMethod(taskClazz.getSuperclass());
             }

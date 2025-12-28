@@ -20,7 +20,6 @@ final class ConsumerInspector implements Runnable {
     private final BlockingQueue<TaskInput> queue;
     private final ExecutorService consumerPool;
     private final ArgumentDeserializer slotDeserializer;
-    private final SlotValueSerializer slotValueSerializer;
     private final TaskTubePollerSettings settings;
     private final List<Middleware> middlewares;
 
@@ -30,7 +29,6 @@ final class ConsumerInspector implements Runnable {
             final ExecutorService consumerPool,
             final List<Middleware> middlewares,
             final ArgumentDeserializer slotDeserializer,
-            final SlotValueSerializer slotValueSerializer,
             final TaskTubePollerSettings settings
     ) {
         this.taskFactory = Objects.requireNonNull(taskFactory);
@@ -38,7 +36,6 @@ final class ConsumerInspector implements Runnable {
         this.consumerPool = Objects.requireNonNull(consumerPool);
         this.middlewares = Objects.requireNonNull(middlewares);
         this.slotDeserializer = Objects.requireNonNull(slotDeserializer);
-        this.slotValueSerializer = Objects.requireNonNull(slotValueSerializer);
         this.settings = Objects.requireNonNull(settings);
 
         // add default consumers
@@ -85,7 +82,7 @@ final class ConsumerInspector implements Runnable {
 
     private void addConsumer() {
         consumersCount.incrementAndGet();
-        consumerPool.execute(new TaskTubeConsumer(taskFactory, queue, this, middlewares, slotDeserializer, slotValueSerializer, settings));
+        consumerPool.execute(new TaskTubeConsumer(taskFactory, queue, this, middlewares, slotDeserializer, settings));
     }
 
     private void removeConsumer() {

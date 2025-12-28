@@ -41,7 +41,6 @@ public final class TaskTubePoller {
     private final InstanceIdProvider instanceIdProvider;
     private final List<Middleware> middlewares;
     private final ArgumentDeserializer slotDeserializer;
-    private final SlotValueSerializer slotValueSerializer;
 
     public TaskTubePoller(
             @Nonnull final TaskTubeClient taskTubeClient,
@@ -49,14 +48,12 @@ public final class TaskTubePoller {
             @Nonnull final InstanceIdProvider instanceIdProvider,
             @Nonnull final List<Middleware> middlewares,
             @Nonnull final ArgumentDeserializer slotDeserializer,
-            @Nonnull final SlotValueSerializer slotValueSerializer,
             @Nonnull final TaskTubePollerSettings settings
     ) {
         Objects.requireNonNull(taskTubeClient);
         Objects.requireNonNull(instanceIdProvider);
         Objects.requireNonNull(middlewares);
         Objects.requireNonNull(slotDeserializer);
-        Objects.requireNonNull(slotValueSerializer);
         Objects.requireNonNull(taskFactory);
         Objects.requireNonNull(settings);
 
@@ -72,7 +69,6 @@ public final class TaskTubePoller {
         this.taskTubeClient = taskTubeClient;
         this.middlewares = middlewares;
         this.slotDeserializer = slotDeserializer;
-        this.slotValueSerializer = slotValueSerializer;
         this.instanceIdProvider = instanceIdProvider;
         this.settings = settings;
         this.taskFactory = taskFactory;
@@ -96,7 +92,6 @@ public final class TaskTubePoller {
                 consumerPool,
                 middlewares,
                 slotDeserializer,
-                slotValueSerializer,
                 settings
         );
 
