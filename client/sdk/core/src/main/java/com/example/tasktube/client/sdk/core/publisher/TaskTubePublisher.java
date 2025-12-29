@@ -1,6 +1,6 @@
 package com.example.tasktube.client.sdk.core.publisher;
 
-import com.example.tasktube.client.sdk.core.http.TaskTubeClient;
+import com.example.tasktube.client.sdk.core.http.ITaskTubeClient;
 import com.example.tasktube.client.sdk.core.task.slot.SlotValueSerializer;
 import com.example.tasktube.client.sdk.core.task.TaskConfiguration;
 import com.example.tasktube.client.sdk.core.task.TaskRecord;
@@ -13,13 +13,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 public final class TaskTubePublisher {
-    private final TaskTubeClient client;
+    private final ITaskTubeClient client;
     private final SlotValueSerializer slotSerializer;
     private final TaskRecord.Builder<?> builder;
     private final TaskConfiguration[] configurations;
 
     TaskTubePublisher(
-            @Nonnull final TaskTubeClient client,
+            @Nonnull final ITaskTubeClient client,
             @Nonnull final SlotValueSerializer slotSerializer,
             @Nonnull final TaskRecord.Builder<?> builder,
             @Nonnull final TaskConfiguration[] configurations

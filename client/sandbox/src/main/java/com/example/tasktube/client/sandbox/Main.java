@@ -1,11 +1,11 @@
 package com.example.tasktube.client.sandbox;
 
 import com.example.tasktube.client.sandbox.tube.regress.StartPointTaskReturnNothing;
-import com.example.tasktube.client.sdk.core.InstanceIdProvider;
-import com.example.tasktube.client.sdk.core.http.TaskTubeClient;
+import com.example.tasktube.client.sdk.core.IInstanceIdProvider;
+import com.example.tasktube.client.sdk.core.http.ITaskTubeClient;
 import com.example.tasktube.client.sdk.core.http.TaskTubeClientSettings;
-import com.example.tasktube.client.sdk.core.impl.ClientInstanceIdProvider;
-import com.example.tasktube.client.sdk.core.impl.ReflectionTaskFactory;
+import com.example.tasktube.client.sdk.core.impl.ClientIInstanceIdProvider;
+import com.example.tasktube.client.sdk.core.impl.ReflectionITaskFactory;
 import com.example.tasktube.client.sdk.core.impl.TaskTubeHttpClient;
 import com.example.tasktube.client.sdk.core.module.TaskTubeModule;
 import com.example.tasktube.client.sdk.core.poller.TaskTubePoller;
@@ -39,19 +39,19 @@ public class Main {
 
         final SlotValueSerializer slotValueSerializer = new SlotValueSerializer(objectMapper);
         final TaskTubeClientSettings settings = new TaskTubeClientSettings(30, "http://localhost:8080/");
-        final TaskTubeClient taskTubeClient = new TaskTubeHttpClient(objectMapper, settings);
-        final InstanceIdProvider instanceIdProvider = new ClientInstanceIdProvider("sandbox-client");
-        final ReflectionTaskFactory taskFactory = new ReflectionTaskFactory();
+        final ITaskTubeClient ITaskTubeClient = new TaskTubeHttpClient(objectMapper, settings);
+        final IInstanceIdProvider IInstanceIdProvider = new ClientIInstanceIdProvider("sandbox-client");
+        final ReflectionITaskFactory taskFactory = new ReflectionITaskFactory();
         final TaskTubePollerSettings pollerSettings = new TaskTubePollerSettings();
         final List<Middleware> middlewares = List.of(
                 new MDCMiddleware(),
                 new InformationMiddleware(),
-                new ExceptionMiddleware(taskTubeClient, instanceIdProvider),
-                new TaskHandlerMiddleware(taskTubeClient, instanceIdProvider, slotValueSerializer),
-                new HeartbeatMiddleware(taskTubeClient, instanceIdProvider, pollerSettings)
+                new ExceptionMiddleware(ITaskTubeClient, IInstanceIdProvider),
+                new TaskHandlerMiddleware(ITaskTubeClient, IInstanceIdProvider, slotValueSerializer),
+                new HeartbeatMiddleware(ITaskTubeClient, IInstanceIdProvider, pollerSettings)
         );
 
-        final TaskTubePublisherFactory publisherFactory = new TaskTubePublisherFactory(taskTubeClient, slotValueSerializer);
+        final TaskTubePublisherFactory publisherFactory = new TaskTubePublisherFactory(ITaskTubeClient, slotValueSerializer);
         final TaskTubePublisher publisher = publisherFactory
                 .create(
                         new StartPointTaskReturnNothing(),
@@ -63,9 +63,9 @@ public class Main {
 
         final TaskTubePoller taskPoller = new TaskTubePoller(
                 objectMapper,
-                taskTubeClient,
+                ITaskTubeClient,
                 taskFactory,
-                instanceIdProvider,
+                IInstanceIdProvider,
                 middlewares,
                 pollerSettings
         );

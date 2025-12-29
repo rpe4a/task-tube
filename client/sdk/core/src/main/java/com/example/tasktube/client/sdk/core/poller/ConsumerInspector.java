@@ -1,6 +1,7 @@
 package com.example.tasktube.client.sdk.core.poller;
 
 import com.example.tasktube.client.sdk.core.poller.middleware.Middleware;
+import com.example.tasktube.client.sdk.core.task.ITaskFactory;
 import com.example.tasktube.client.sdk.core.task.TaskInput;
 import com.example.tasktube.client.sdk.core.task.argument.ArgumentDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -17,7 +18,7 @@ final class ConsumerInspector implements Runnable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ConsumerInspector.class);
     private final AtomicInteger consumersCount = new AtomicInteger(0);
-    private final TaskFactory taskFactory;
+    private final ITaskFactory ITaskFactory;
     private final BlockingQueue<TaskInput> queue;
     private final ExecutorService consumerPool;
     private final ArgumentDeserializer slotDeserializer;
@@ -26,13 +27,13 @@ final class ConsumerInspector implements Runnable {
 
     ConsumerInspector(
             final ObjectMapper objectMapper,
-            final TaskFactory taskFactory,
+            final ITaskFactory ITaskFactory,
             final BlockingQueue<TaskInput> queue,
             final ExecutorService consumerPool,
             final List<Middleware> middlewares,
             final TaskTubePollerSettings settings
     ) {
-        this.taskFactory = Objects.requireNonNull(taskFactory);
+        this.ITaskFactory = Objects.requireNonNull(ITaskFactory);
         this.queue = Objects.requireNonNull(queue);
         this.consumerPool = Objects.requireNonNull(consumerPool);
         this.middlewares = Objects.requireNonNull(middlewares);
@@ -83,7 +84,7 @@ final class ConsumerInspector implements Runnable {
 
     private void addConsumer() {
         consumersCount.incrementAndGet();
-        consumerPool.execute(new TaskTubeConsumer(taskFactory, queue, this, middlewares, slotDeserializer, settings));
+        consumerPool.execute(new TaskTubeConsumer(ITaskFactory, queue, this, middlewares, slotDeserializer, settings));
     }
 
     private void removeConsumer() {

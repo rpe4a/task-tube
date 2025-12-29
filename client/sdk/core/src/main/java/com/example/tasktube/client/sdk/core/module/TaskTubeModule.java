@@ -9,7 +9,7 @@ public class TaskTubeModule extends SimpleModule {
     public void setupModule(final SetupContext context) {
         super.setupModule(context);
         final SimpleDeserializers deserializers = new SimpleDeserializers();
-        deserializers.addDeserializer(Argument.class, new ArgumentDeserializer());
+        deserializers.addDeserializer(Argument.class, new ArgDeserializer());
         context.addDeserializers(deserializers);
     }
 }

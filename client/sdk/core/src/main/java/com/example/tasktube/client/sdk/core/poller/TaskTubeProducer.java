@@ -1,7 +1,7 @@
 package com.example.tasktube.client.sdk.core.poller;
 
-import com.example.tasktube.client.sdk.core.InstanceIdProvider;
-import com.example.tasktube.client.sdk.core.http.TaskTubeClient;
+import com.example.tasktube.client.sdk.core.IInstanceIdProvider;
+import com.example.tasktube.client.sdk.core.http.ITaskTubeClient;
 import com.example.tasktube.client.sdk.core.http.dto.PopTaskResponse;
 import com.example.tasktube.client.sdk.core.http.dto.PopTasksRequest;
 import com.example.tasktube.client.sdk.core.task.TaskInput;
@@ -17,23 +17,23 @@ import java.util.stream.Collectors;
 final class TaskTubeProducer implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskTubeProducer.class);
 
-    private final TaskTubeClient taskTubeClient;
+    private final ITaskTubeClient ITaskTubeClient;
     private final BlockingQueue<TaskInput> clientQueue;
     private final String tube;
-    private final InstanceIdProvider instanceIdProvider;
+    private final IInstanceIdProvider IInstanceIdProvider;
     private final TaskTubePollerSettings settings;
 
     TaskTubeProducer(
-            @Nonnull final TaskTubeClient taskTubeClient,
+            @Nonnull final ITaskTubeClient ITaskTubeClient,
             @Nonnull final BlockingQueue<TaskInput> clientQueue,
             @Nonnull final String tube,
-            @Nonnull final InstanceIdProvider instanceIdProvider,
+            @Nonnull final IInstanceIdProvider IInstanceIdProvider,
             @Nonnull final TaskTubePollerSettings settings
     ) {
-        this.taskTubeClient = Objects.requireNonNull(taskTubeClient);
+        this.ITaskTubeClient = Objects.requireNonNull(ITaskTubeClient);
         this.clientQueue = Objects.requireNonNull(clientQueue);
         this.tube = Objects.requireNonNull(tube);
-        this.instanceIdProvider = instanceIdProvider;
+        this.IInstanceIdProvider = IInstanceIdProvider;
         this.settings = Objects.requireNonNull(settings);
     }
 
@@ -60,16 +60,16 @@ final class TaskTubeProducer implements Runnable {
             LOGGER.info("Tasks are limited now in '{}' queue.", tube);
         }
 
-        LOGGER.debug("Polling tasks to handle by '{}' client.", instanceIdProvider.get());
+        LOGGER.debug("Polling tasks to handle by '{}' client.", IInstanceIdProvider.get());
         final List<PopTaskResponse> responses =
-                taskTubeClient.popTasks(tube, new PopTasksRequest(instanceIdProvider.get(), taskCount));
+                ITaskTubeClient.popTasks(tube, new PopTasksRequest(IInstanceIdProvider.get(), taskCount));
 
         if (responses.isEmpty()) {
-            LOGGER.info("There is nothing to handle by '{}' client.", instanceIdProvider.get());
+            LOGGER.info("There is nothing to handle by '{}' client.", IInstanceIdProvider.get());
         } else {
             LOGGER.info("There are '{}' tasks to handle by '{}' client. Tasks: {}",
                     responses.size(),
-                    instanceIdProvider.get(),
+                    IInstanceIdProvider.get(),
                     responses.stream().map(r -> r.id().toString()).collect(Collectors.joining(", "))
             );
 

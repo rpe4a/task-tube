@@ -3,10 +3,6 @@ package com.example.tasktube.client.sdk.core.poller;
 import java.util.Objects;
 
 public final class TaskTubePollerSettings {
-    public static final int DEFAULT_INPUT_PAYLOAD_KB = 1024;
-    public static final int DEFAULT_INPUT_MAX_PAYLOAD_KB = 32768;
-    public static final int DEFAULT_OUTPUT_PAYLOAD_KB = 1024;
-    public static final int DEFAULT_OUTPUT_MAX_PAYLOAD_KB = 32768;
     private static final int DEFAULT_POLLING_INTERVAL_MILLISECONDS = 5000;
     private static final int DEFAULT_SHUTDOWN_SECONDS = 60;
     private static final int DEFAULT_INSPECTOR_INTERVAL_MILLISECONDS = 5000;
@@ -16,10 +12,6 @@ public final class TaskTubePollerSettings {
     private static final double DEFAULT_HEARTBEAT_DURATION_FACTOR = 0.5;
     private static final int DEFAULT_MAX_BATCH_REQUESTED_TASK_COUNT = 16;
     private static final int DEFAULT_QUEUE_SIZE = 32;
-    private int inputPayloadKb;
-    private int inputMaxPayloadKb;
-    private int outputPayloadKb;
-    private int outputMaxPayloadKb;
     private double heartbeatDurationFactor;
     private int producerPollingIntervalMilliseconds;
     private int shutdownAwaitTerminationSeconds;
@@ -40,10 +32,6 @@ public final class TaskTubePollerSettings {
                 DEFAULT_INSPECTOR_INTERVAL_MILLISECONDS,
                 DEFAULT_MAX_BATCH_REQUESTED_TASK_COUNT,
                 DEFAULT_HEARTBEAT_DURATION_FACTOR,
-                DEFAULT_INPUT_PAYLOAD_KB,
-                DEFAULT_INPUT_MAX_PAYLOAD_KB,
-                DEFAULT_OUTPUT_PAYLOAD_KB,
-                DEFAULT_OUTPUT_MAX_PAYLOAD_KB,
                 DEFAULT_QUEUE_SIZE
         );
     }
@@ -57,10 +45,6 @@ public final class TaskTubePollerSettings {
             final int inspectorPollingIntervalMilliseconds,
             final int maxBatchRequestedTasksCount,
             final double heartbeatDurationFactor,
-            final int inputPayloadKb,
-            final int inputMaxPayloadKb,
-            final int outputPayloadKb,
-            final int outputMaxPayloadKb,
             final int queueSize
     ) {
         this.producerPollingIntervalMilliseconds = producerPollingIntervalMilliseconds == 0
@@ -87,18 +71,6 @@ public final class TaskTubePollerSettings {
         this.heartbeatDurationFactor = heartbeatDurationFactor == 0
                 ? DEFAULT_HEARTBEAT_DURATION_FACTOR
                 : heartbeatDurationFactor;
-        this.inputPayloadKb = inputPayloadKb == 0
-                ? DEFAULT_INPUT_PAYLOAD_KB
-                : inputPayloadKb;
-        this.inputMaxPayloadKb = inputMaxPayloadKb == 0
-                ? DEFAULT_INPUT_MAX_PAYLOAD_KB
-                : inputMaxPayloadKb;
-        this.outputPayloadKb = outputPayloadKb == 0
-                ? DEFAULT_OUTPUT_PAYLOAD_KB
-                : outputPayloadKb;
-        this.outputMaxPayloadKb = outputMaxPayloadKb == 0
-                ? DEFAULT_OUTPUT_MAX_PAYLOAD_KB
-                : outputMaxPayloadKb;
         this.queueSize = queueSize == 0
                 ? DEFAULT_QUEUE_SIZE
                 : queueSize;
@@ -172,38 +144,6 @@ public final class TaskTubePollerSettings {
         this.heartbeatDurationFactor = heartbeatDurationFactor;
     }
 
-    public int getInputPayloadKb() {
-        return inputPayloadKb;
-    }
-
-    public void setInputPayloadKb(final int inputPayloadKb) {
-        this.inputPayloadKb = inputPayloadKb;
-    }
-
-    public int getInputMaxPayloadKb() {
-        return inputMaxPayloadKb;
-    }
-
-    public void setInputMaxPayloadKb(final int inputMaxPayloadKb) {
-        this.inputMaxPayloadKb = inputMaxPayloadKb;
-    }
-
-    public int getOutputPayloadKb() {
-        return outputPayloadKb;
-    }
-
-    public void setOutputPayloadKb(final int outputPayloadKb) {
-        this.outputPayloadKb = outputPayloadKb;
-    }
-
-    public int getOutputMaxPayloadKb() {
-        return outputMaxPayloadKb;
-    }
-
-    public void setOutputMaxPayloadKb(final int outputMaxPayloadKb) {
-        this.outputMaxPayloadKb = outputMaxPayloadKb;
-    }
-
     public int getMinConsumersCount() {
         return minConsumersCount;
     }
@@ -229,11 +169,7 @@ public final class TaskTubePollerSettings {
             return false;
         }
         final TaskTubePollerSettings that = (TaskTubePollerSettings) o;
-        return inputPayloadKb == that.inputPayloadKb
-                && inputMaxPayloadKb == that.inputMaxPayloadKb
-                && outputPayloadKb == that.outputPayloadKb
-                && outputMaxPayloadKb == that.outputMaxPayloadKb
-                && Double.compare(heartbeatDurationFactor, that.heartbeatDurationFactor) == 0
+        return Double.compare(heartbeatDurationFactor, that.heartbeatDurationFactor) == 0
                 && producerPollingIntervalMilliseconds == that.producerPollingIntervalMilliseconds
                 && shutdownAwaitTerminationSeconds == that.shutdownAwaitTerminationSeconds
                 && maxConsumersCount == that.maxConsumersCount
@@ -246,11 +182,7 @@ public final class TaskTubePollerSettings {
 
     @Override
     public String toString() {
-        return "TaskPollerSettings{" + "inputPayloadKb=" + inputPayloadKb
-                + ", inputMaxPayloadKb=" + inputMaxPayloadKb
-                + ", outputPayloadKb=" + outputPayloadKb
-                + ", outputMaxPayloadKb=" + outputMaxPayloadKb
-                + ", taskLeaseDurationFactor=" + heartbeatDurationFactor
+        return "TaskPollerSettings{" + ", taskLeaseDurationFactor=" + heartbeatDurationFactor
                 + ", producerPollingIntervalMilliseconds=" + producerPollingIntervalMilliseconds
                 + ", shutdownAwaitTerminationSeconds=" + shutdownAwaitTerminationSeconds
                 + ", maxConsumersCount=" + maxConsumersCount
@@ -265,10 +197,6 @@ public final class TaskTubePollerSettings {
     @Override
     public int hashCode() {
         return Objects.hash(
-                inputPayloadKb,
-                inputMaxPayloadKb,
-                outputPayloadKb,
-                outputMaxPayloadKb,
                 heartbeatDurationFactor,
                 producerPollingIntervalMilliseconds,
                 shutdownAwaitTerminationSeconds,

@@ -1,7 +1,7 @@
 package com.example.tasktube.client.sdk.core.poller.middleware;
 
-import com.example.tasktube.client.sdk.core.InstanceIdProvider;
-import com.example.tasktube.client.sdk.core.http.TaskTubeClient;
+import com.example.tasktube.client.sdk.core.IInstanceIdProvider;
+import com.example.tasktube.client.sdk.core.http.ITaskTubeClient;
 import com.example.tasktube.client.sdk.core.http.dto.FailTaskRequest;
 import com.example.tasktube.client.sdk.core.task.TaskInput;
 import com.example.tasktube.client.sdk.core.task.TaskOutput;
@@ -17,14 +17,14 @@ public final class ExceptionMiddleware extends AbstractMiddleware {
     private static final String EXCEPTION_MESSAGE = "Task '%s' has failed. See the inner exception for details.";
     private static final int CAPACITY_BYTES = 1024;
 
-    private final TaskTubeClient taskTubeClient;
-    private final InstanceIdProvider instanceIdProvider;
+    private final ITaskTubeClient ITaskTubeClient;
+    private final IInstanceIdProvider IInstanceIdProvider;
 
     public ExceptionMiddleware(
-            @Nonnull final TaskTubeClient taskTubeClient,
-            @Nonnull final InstanceIdProvider instanceIdProvider) {
-        this.taskTubeClient = Objects.requireNonNull(taskTubeClient);
-        this.instanceIdProvider = Objects.requireNonNull(instanceIdProvider);
+            @Nonnull final ITaskTubeClient ITaskTubeClient,
+            @Nonnull final IInstanceIdProvider IInstanceIdProvider) {
+        this.ITaskTubeClient = Objects.requireNonNull(ITaskTubeClient);
+        this.IInstanceIdProvider = Objects.requireNonNull(IInstanceIdProvider);
     }
 
     @Override
@@ -36,10 +36,10 @@ public final class ExceptionMiddleware extends AbstractMiddleware {
 
             logger.error(String.format(EXCEPTION_MESSAGE, input.getId()), innerException);
 
-            taskTubeClient.failTask(
+            ITaskTubeClient.failTask(
                     input.getId(),
                     new FailTaskRequest(
-                            instanceIdProvider.get(),
+                            IInstanceIdProvider.get(),
                             Instant.now(),
                             """
                                     Exception: %s

@@ -3,6 +3,7 @@ package com.example.tasktube.client.sdk.core.poller;
 import com.example.tasktube.client.sdk.core.poller.middleware.Middleware;
 import com.example.tasktube.client.sdk.core.poller.middleware.Pipeline;
 import com.example.tasktube.client.sdk.core.poller.middleware.PipelineBuilder;
+import com.example.tasktube.client.sdk.core.task.ITaskFactory;
 import com.example.tasktube.client.sdk.core.task.argument.ArgumentDeserializer;
 import com.example.tasktube.client.sdk.core.task.Task;
 import com.example.tasktube.client.sdk.core.task.TaskInput;
@@ -19,14 +20,14 @@ import java.util.concurrent.TimeUnit;
 final class TaskTubeConsumer implements Runnable {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskTubeConsumer.class);
     private final BlockingQueue<TaskInput> queue;
-    private final TaskFactory taskFactory;
+    private final ITaskFactory ITaskFactory;
     private final ConsumerInspector inspector;
     private final ArgumentDeserializer slotDeserializer;
     private final TaskTubePollerSettings settings;
     private final List<Middleware> middlewares;
 
     TaskTubeConsumer(
-            @Nonnull final TaskFactory taskFactory,
+            @Nonnull final ITaskFactory ITaskFactory,
             @Nonnull final BlockingQueue<TaskInput> queue,
             @Nonnull final ConsumerInspector inspector,
             @Nonnull final List<Middleware> middlewares,
@@ -35,7 +36,7 @@ final class TaskTubeConsumer implements Runnable {
     ) {
         this.middlewares = Objects.requireNonNull(middlewares);
         this.queue = Objects.requireNonNull(queue);
-        this.taskFactory = Objects.requireNonNull(taskFactory);
+        this.ITaskFactory = Objects.requireNonNull(ITaskFactory);
         this.inspector = Objects.requireNonNull(inspector);
         this.slotDeserializer = Objects.requireNonNull(slotDeserializer);
         this.settings = Objects.requireNonNull(settings);
@@ -65,7 +66,7 @@ final class TaskTubeConsumer implements Runnable {
             return;
         }
 
-        final Task<?> task = taskFactory.createInstance(input.getName());
+        final Task<?> task = ITaskFactory.createInstance(input.getName());
 
         final Pipeline pipeline = new PipelineBuilder()
                 .add(middlewares)

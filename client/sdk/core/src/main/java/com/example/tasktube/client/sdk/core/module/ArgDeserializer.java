@@ -11,7 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
-public class ArgumentDeserializer extends JsonDeserializer<Argument> {
+public class ArgDeserializer extends JsonDeserializer<Argument> {
     public static final String ARGUMENT_TYPE = "type";
 
     @Override

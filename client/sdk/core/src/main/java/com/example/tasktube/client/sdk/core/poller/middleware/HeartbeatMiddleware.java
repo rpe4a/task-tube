@@ -1,7 +1,7 @@
 package com.example.tasktube.client.sdk.core.poller.middleware;
 
-import com.example.tasktube.client.sdk.core.InstanceIdProvider;
-import com.example.tasktube.client.sdk.core.http.TaskTubeClient;
+import com.example.tasktube.client.sdk.core.IInstanceIdProvider;
+import com.example.tasktube.client.sdk.core.http.ITaskTubeClient;
 import com.example.tasktube.client.sdk.core.http.dto.ProcessTaskRequest;
 import com.example.tasktube.client.sdk.core.poller.TaskTubePoller;
 import com.example.tasktube.client.sdk.core.poller.TaskTubePollerSettings;
@@ -24,21 +24,21 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-@Order(5)
+@Order(Integer.MAX_VALUE)
 public final class HeartbeatMiddleware extends AbstractMiddleware {
     private static final String TASK_HANDLER_GROUP = "task-handler";
-    private final TaskTubeClient taskTubeClient;
-    private final InstanceIdProvider instanceIdProvider;
+    private final ITaskTubeClient ITaskTubeClient;
+    private final IInstanceIdProvider IInstanceIdProvider;
     private final TaskTubePollerSettings settings;
     private final ExecutorService taskHandlerPool;
 
     public HeartbeatMiddleware(
-            @Nonnull final TaskTubeClient taskTubeClient,
-            @Nonnull final InstanceIdProvider instanceIdProvider,
+            @Nonnull final ITaskTubeClient ITaskTubeClient,
+            @Nonnull final IInstanceIdProvider IInstanceIdProvider,
             @Nonnull final TaskTubePollerSettings settings
     ) {
-        this.taskTubeClient = Objects.requireNonNull(taskTubeClient);
-        this.instanceIdProvider = Objects.requireNonNull(instanceIdProvider);
+        this.ITaskTubeClient = Objects.requireNonNull(ITaskTubeClient);
+        this.IInstanceIdProvider = Objects.requireNonNull(IInstanceIdProvider);
         this.settings = Objects.requireNonNull(settings);
 
         this.taskHandlerPool = Executors.newCachedThreadPool(
@@ -98,7 +98,7 @@ public final class HeartbeatMiddleware extends AbstractMiddleware {
                         "Task '%s' of type '%s' executing by client '%s' timed out after %s seconds.".formatted(
                                 input.getId(),
                                 input.getName(),
-                                instanceIdProvider.get(),
+                                IInstanceIdProvider.get(),
                                 input.getSettings().getTimeoutSeconds()),
                         throwable
                 );
@@ -115,9 +115,9 @@ public final class HeartbeatMiddleware extends AbstractMiddleware {
         logger.debug("Let's extend a lease of task '{}' of type '{}' by client '{}'.",
                 input.getId(),
                 input.getName(),
-                instanceIdProvider.get()
+                IInstanceIdProvider.get()
         );
 
-        taskTubeClient.processTask(input.getId(), new ProcessTaskRequest(instanceIdProvider.get(), Instant.now()));
+        ITaskTubeClient.processTask(input.getId(), new ProcessTaskRequest(IInstanceIdProvider.get(), Instant.now()));
     }
 }

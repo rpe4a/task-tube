@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: sandbox-spring
+
+  profiles:
+    default: local
+
+  task-tube:
+    client:
+      connectionTimeoutSeconds: 30
+      taskTubeServerApiHost: http://localhost:8080/
+
+    poller:
+      producerPollingIntervalMilliseconds: 5000
+      shutdownAwaitTerminationSeconds: 60
+      maxConsumersCount: 1
+      minConsumersCount: 1
+      consumerEmptyQueueSleepTimeoutMilliseconds: 100
+      inspectorPollingIntervalMilliseconds: 5000
+      maxBatchRequestedTasksCount: 16
+      heartbeatDurationFactor: 0.5
+      queueSize: 32

@@ -1,8 +1,9 @@
 package com.example.tasktube.client.sdk.core.poller;
 
-import com.example.tasktube.client.sdk.core.InstanceIdProvider;
-import com.example.tasktube.client.sdk.core.http.TaskTubeClient;
+import com.example.tasktube.client.sdk.core.IInstanceIdProvider;
+import com.example.tasktube.client.sdk.core.http.ITaskTubeClient;
 import com.example.tasktube.client.sdk.core.poller.middleware.Middleware;
+import com.example.tasktube.client.sdk.core.task.ITaskFactory;
 import com.example.tasktube.client.sdk.core.task.TaskInput;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
@@ -27,7 +28,7 @@ public final class TaskTubePoller {
     public static final String CONSUMER_THREAD_GROUP = "consumer";
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskTubePoller.class);
     private final BlockingQueue<TaskInput> clientQueue;
-    private final TaskTubeClient taskTubeClient;
+    private final ITaskTubeClient ITaskTubeClient;
     private final TaskTubePollerSettings settings;
 
     private final ScheduledExecutorService inspectorPool;
@@ -36,24 +37,24 @@ public final class TaskTubePoller {
     private final ThreadGroup inspectorThreadGroup;
     private final ThreadGroup producerThreadGroup;
     private final ThreadGroup consumerThreadGroup;
-    private final TaskFactory taskFactory;
-    private final InstanceIdProvider instanceIdProvider;
+    private final ITaskFactory ITaskFactory;
+    private final IInstanceIdProvider IInstanceIdProvider;
     private final List<Middleware> middlewares;
     private final ObjectMapper objectMapper;
 
     public TaskTubePoller(
             @Nonnull final ObjectMapper objectMapper,
-            @Nonnull final TaskTubeClient taskTubeClient,
-            @Nonnull final TaskFactory taskFactory,
-            @Nonnull final InstanceIdProvider instanceIdProvider,
+            @Nonnull final ITaskTubeClient ITaskTubeClient,
+            @Nonnull final ITaskFactory ITaskFactory,
+            @Nonnull final IInstanceIdProvider IInstanceIdProvider,
             @Nonnull final List<Middleware> middlewares,
             @Nonnull final TaskTubePollerSettings settings
     ) {
-        Objects.requireNonNull(taskTubeClient);
-        Objects.requireNonNull(instanceIdProvider);
+        Objects.requireNonNull(ITaskTubeClient);
+        Objects.requireNonNull(IInstanceIdProvider);
         Objects.requireNonNull(middlewares);
         Objects.requireNonNull(objectMapper);
-        Objects.requireNonNull(taskFactory);
+        Objects.requireNonNull(ITaskFactory);
         Objects.requireNonNull(settings);
 
         inspectorThreadGroup = new ThreadGroup(INSPECTOR_THREAD_GROUP);
@@ -66,11 +67,11 @@ public final class TaskTubePoller {
         final ThreadFactory consumerThreadFactory = TaskTubePollerUtils.getThreadFactory(consumerThreadGroup);
 
         this.objectMapper = objectMapper;
-        this.taskTubeClient = taskTubeClient;
+        this.ITaskTubeClient = ITaskTubeClient;
         this.middlewares = middlewares;
-        this.instanceIdProvider = instanceIdProvider;
+        this.IInstanceIdProvider = IInstanceIdProvider;
         this.settings = settings;
-        this.taskFactory = taskFactory;
+        this.ITaskFactory = ITaskFactory;
         this.clientQueue = new ArrayBlockingQueue<>(settings.getQueueSize());
         this.inspectorPool = Executors.newSingleThreadScheduledExecutor(inspectorThreadFactory);
         this.producerPool = Executors.newSingleThreadScheduledExecutor(producerThreadFactory);
@@ -87,7 +88,7 @@ public final class TaskTubePoller {
 
         final ConsumerInspector inspector = new ConsumerInspector(
                 objectMapper,
-                taskFactory,
+                ITaskFactory,
                 clientQueue,
                 consumerPool,
                 middlewares,
@@ -106,14 +107,14 @@ public final class TaskTubePoller {
         LOGGER.info("Inspector pool has started.");
 
         producerPool.scheduleWithFixedDelay(
-                new TaskTubeProducer(taskTubeClient, clientQueue, tube, instanceIdProvider, settings),
+                new TaskTubeProducer(ITaskTubeClient, clientQueue, tube, IInstanceIdProvider, settings),
                 0,
                 settings.getProducerPollingIntervalMilliseconds(),
                 TimeUnit.MILLISECONDS
         );
         LOGGER.info("Producer pool has started.");
 
-        LOGGER.info("Task poller has started successfully. There are '1' producers, '{}' consumers, '1' inspector and '1' monitor.", consumerThreadGroup.activeCount());
+        LOGGER.info("Task poller has started successfully. There are '1' producers, '{}' consumers, '1' inspector.", consumerThreadGroup.activeCount());
     }
 
     /**

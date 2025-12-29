@@ -1,7 +1,7 @@
 package com.example.tasktube.client.sdk.core.poller.middleware;
 
-import com.example.tasktube.client.sdk.core.InstanceIdProvider;
-import com.example.tasktube.client.sdk.core.http.TaskTubeClient;
+import com.example.tasktube.client.sdk.core.IInstanceIdProvider;
+import com.example.tasktube.client.sdk.core.http.ITaskTubeClient;
 import com.example.tasktube.client.sdk.core.http.dto.FinishTaskRequest;
 import com.example.tasktube.client.sdk.core.http.dto.StartTaskRequest;
 import com.example.tasktube.client.sdk.core.http.dto.TaskRequest;
@@ -14,19 +14,19 @@ import java.time.Instant;
 import java.util.Arrays;
 import java.util.Objects;
 
-@Order(4)
+@Order(Integer.MAX_VALUE - 1)
 public final class TaskHandlerMiddleware extends AbstractMiddleware {
-    private final TaskTubeClient taskTubeClient;
-    private final InstanceIdProvider instanceIdProvider;
+    private final ITaskTubeClient ITaskTubeClient;
+    private final IInstanceIdProvider IInstanceIdProvider;
     private final SlotValueSerializer slotValueSerializer;
 
     public TaskHandlerMiddleware(
-            @Nonnull final TaskTubeClient taskTubeClient,
-            @Nonnull final InstanceIdProvider instanceIdProvider,
+            @Nonnull final ITaskTubeClient ITaskTubeClient,
+            @Nonnull final IInstanceIdProvider IInstanceIdProvider,
             @Nonnull final SlotValueSerializer slotValueSerializer
     ) {
-        this.taskTubeClient = Objects.requireNonNull(taskTubeClient);
-        this.instanceIdProvider = Objects.requireNonNull(instanceIdProvider);
+        this.ITaskTubeClient = Objects.requireNonNull(ITaskTubeClient);
+        this.IInstanceIdProvider = Objects.requireNonNull(IInstanceIdProvider);
         this.slotValueSerializer = Objects.requireNonNull(slotValueSerializer);
     }
 
@@ -40,8 +40,8 @@ public final class TaskHandlerMiddleware extends AbstractMiddleware {
     }
 
     private void start(final TaskInput input) {
-        taskTubeClient.startTask(input.getId(), new StartTaskRequest(
-                instanceIdProvider.get(),
+        ITaskTubeClient.startTask(input.getId(), new StartTaskRequest(
+                IInstanceIdProvider.get(),
                 Instant.now()
         ));
     }
@@ -52,12 +52,12 @@ public final class TaskHandlerMiddleware extends AbstractMiddleware {
                         ? new TaskRequest[0]
                         : Arrays.stream(output.getChildren()).map(taskRecord -> taskRecord.toRequest(slotValueSerializer)).toArray(TaskRequest[]::new);
 
-        taskTubeClient.finishTask(
+        ITaskTubeClient.finishTask(
                 output.getId(),
                 new FinishTaskRequest(
                         children,
                         output.getResult().serialize(slotValueSerializer),
-                        instanceIdProvider.get(),
+                        IInstanceIdProvider.get(),
                         Instant.now()
                 )
         );

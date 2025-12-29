@@ -6,7 +6,7 @@ import jakarta.annotation.Nonnull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-abstract class AbstractMiddleware implements Middleware {
+public abstract class AbstractMiddleware implements Middleware {
     private static final String START_INVOKE_MIDDLEWARE = "Start invoking middleware.";
     private static final String MIDDLEWARE_FINISHED = "Middleware has finished.";
 

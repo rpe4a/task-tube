@@ -1,6 +1,6 @@
 package com.example.tasktube.client.sdk.core.impl;
 
-import com.example.tasktube.client.sdk.core.poller.TaskFactory;
+import com.example.tasktube.client.sdk.core.task.ITaskFactory;
 import com.example.tasktube.client.sdk.core.task.Task;
 import jakarta.annotation.Nonnull;
 
@@ -8,7 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 
-public class ReflectionTaskFactory implements TaskFactory {
+public class ReflectionITaskFactory implements ITaskFactory {
 
     @Nonnull
     @Override

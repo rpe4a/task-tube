@@ -12,6 +12,8 @@ import java.util.Objects;
 import java.util.function.Function;
 
 public final class PipelineBuilder {
+
+    private static final int MIN_ORDER_NUMBER = 4;
     private final List<Function<Pipeline, Pipeline>> middlewares = new LinkedList<>();
 
     @Nonnull
@@ -29,7 +31,7 @@ public final class PipelineBuilder {
 
         middlewares.stream()
                 .sorted(Comparator.comparingInt(
-                        m -> Arrays.stream(m.getClass().getAnnotationsByType(Order.class)).findFirst().map(Order::value).orElse(0))
+                        m -> Arrays.stream(m.getClass().getAnnotationsByType(Order.class)).findFirst().map(Order::value).orElse(MIN_ORDER_NUMBER))
                 )
                 .forEach(this::add);
 
@@ -46,7 +48,6 @@ public final class PipelineBuilder {
 
         return pipeline;
     }
-
 
 }
 

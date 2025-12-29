@@ -1,6 +1,6 @@
 package com.example.tasktube.client.sdk.core.impl;
 
-import com.example.tasktube.client.sdk.core.http.TaskTubeClient;
+import com.example.tasktube.client.sdk.core.http.ITaskTubeClient;
 import com.example.tasktube.client.sdk.core.http.TaskTubeClientSettings;
 import com.example.tasktube.client.sdk.core.http.dto.FailTaskRequest;
 import com.example.tasktube.client.sdk.core.http.dto.FinishTaskRequest;
@@ -31,7 +31,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-public class TaskTubeHttpClient implements TaskTubeClient {
+public class TaskTubeHttpClient implements ITaskTubeClient {
     public static final int BAD_REQUEST_HTTP_CODE = 400;
     public static final int NO_CONTENT_HTTP_CODE = 204;
     private final HttpClient client;
