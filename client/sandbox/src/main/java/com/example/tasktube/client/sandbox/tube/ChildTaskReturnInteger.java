@@ -1,7 +1,7 @@
 package com.example.tasktube.client.sandbox.tube;
 
-import com.example.tasktube.client.sdk.task.Task0;
-import com.example.tasktube.client.sdk.task.Value;
+import com.example.tasktube.client.sdk.core.task.Task0;
+import com.example.tasktube.client.sdk.core.task.Value;
 
 public class ChildTaskReturnInteger extends Task0<Integer> {
 

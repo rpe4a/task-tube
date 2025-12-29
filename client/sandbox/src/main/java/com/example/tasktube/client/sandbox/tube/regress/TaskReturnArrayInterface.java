@@ -2,8 +2,8 @@ package com.example.tasktube.client.sandbox.tube.regress;
 
 import com.example.tasktube.client.sandbox.tube.regress.dto.IRegressInterface;
 import com.example.tasktube.client.sandbox.tube.regress.dto.RegressInterfaceImpl;
-import com.example.tasktube.client.sdk.task.Task0;
-import com.example.tasktube.client.sdk.task.Value;
+import com.example.tasktube.client.sdk.core.task.Task0;
+import com.example.tasktube.client.sdk.core.task.Value;
 import com.fasterxml.jackson.core.type.TypeReference;
 import jakarta.annotation.Nonnull;
 

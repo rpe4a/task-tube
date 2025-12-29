@@ -14,8 +14,8 @@
     <version>0.0.1-SNAPSHOT</version>
 
     <modules>
-        <module>sdk</module>
         <module>sandbox</module>
+        <module>sdk</module>
     </modules>
 
     <dependencyManagement>
@@ -24,6 +24,11 @@
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
                 <version>${versions.jackson}</version>
+            </dependency>
+            <dependency>
+                <groupId>jakarta.annotation</groupId>
+                <artifactId>jakarta.annotation-api</artifactId>
+                <version>${versions.jakarta}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.guava</groupId>

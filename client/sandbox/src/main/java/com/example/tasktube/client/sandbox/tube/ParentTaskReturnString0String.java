@@ -1,8 +1,8 @@
 package com.example.tasktube.client.sandbox.tube;
 
-import com.example.tasktube.client.sdk.task.Task1;
-import com.example.tasktube.client.sdk.task.TaskResult;
-import com.example.tasktube.client.sdk.task.Value;
+import com.example.tasktube.client.sdk.core.task.Task1;
+import com.example.tasktube.client.sdk.core.task.TaskResult;
+import com.example.tasktube.client.sdk.core.task.Value;
 
 public class ParentTaskReturnString0String extends Task1<String, String> {
 

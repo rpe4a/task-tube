@@ -3,9 +3,9 @@ package com.example.tasktube.client.sandbox.tube.regress;
 import com.example.tasktube.client.sandbox.tube.regress.dto.IRegressInterface;
 import com.example.tasktube.client.sandbox.tube.regress.dto.RegressDto;
 import com.example.tasktube.client.sandbox.tube.regress.dto.RegressStatus;
-import com.example.tasktube.client.sdk.task.Task0;
-import com.example.tasktube.client.sdk.task.TaskResult;
-import com.example.tasktube.client.sdk.task.Value;
+import com.example.tasktube.client.sdk.core.task.Task0;
+import com.example.tasktube.client.sdk.core.task.TaskResult;
+import com.example.tasktube.client.sdk.core.task.Value;
 import jakarta.annotation.Nonnull;
 
 import java.time.Instant;

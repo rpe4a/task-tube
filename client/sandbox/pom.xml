@@ -19,9 +19,8 @@
     <dependencies>
         <dependency>
             <groupId>com.example.task-tube</groupId>
-            <artifactId>sdk</artifactId>
+            <artifactId>core</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>

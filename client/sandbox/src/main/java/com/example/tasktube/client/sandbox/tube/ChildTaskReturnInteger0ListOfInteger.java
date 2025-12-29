@@ -1,7 +1,7 @@
 package com.example.tasktube.client.sandbox.tube;
 
-import com.example.tasktube.client.sdk.task.Task1;
-import com.example.tasktube.client.sdk.task.Value;
+import com.example.tasktube.client.sdk.core.task.Task1;
+import com.example.tasktube.client.sdk.core.task.Value;
 
 import java.util.List;
 
