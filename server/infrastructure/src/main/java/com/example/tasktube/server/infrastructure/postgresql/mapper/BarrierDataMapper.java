@@ -30,7 +30,7 @@ public class BarrierDataMapper {
         map.put("task_id", barrier.getTaskId());
         map.put("wait_for", ps.execute((ConnectionCallback<Object>) con -> con.createArrayOf("uuid", barrier.getWaitFor().toArray())));
         map.put("type", barrier.getType().name());
-        map.put("released", barrier.isReleased());
+        map.put("status", barrier.getStatus().name());
         map.put("updated_at", barrier.getUpdatedAt() != null ? Timestamp.from(barrier.getUpdatedAt()) : null);
         map.put("created_at", barrier.getCreatedAt() != null ? Timestamp.from(barrier.getCreatedAt()) : null);
         map.put("released_at", barrier.getReleasedAt() != null ? Timestamp.from(barrier.getReleasedAt()) : null);
@@ -53,7 +53,7 @@ public class BarrierDataMapper {
         barrier.setTaskId(rs.getObject("task_Id", UUID.class));
         barrier.setWaitFor(Arrays.asList((UUID[])rs.getArray("wait_For").getArray()));
         barrier.setType(Barrier.Type.valueOf(rs.getString("type")));
-        barrier.setReleased(rs.getBoolean("released"));
+        barrier.setStatus(Barrier.Status.valueOf(rs.getString("status")));
         barrier.setUpdatedAt(Instant.ofEpochMilli(rs.getTimestamp("updated_at").getTime()));
         barrier.setCreatedAt(Instant.ofEpochMilli(rs.getTimestamp("created_at").getTime()));
         barrier.setReleasedAt(rs.getTimestamp("released_at") != null

@@ -7,7 +7,10 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface IBarrierRepository {
-    Optional<Barrier> get(UUID barrierId);
+
+    Optional<Barrier> getById(UUID barrierId);
+
+    List<Barrier> getByTaskId(UUID taskId);
 
     void save(List<Barrier> barriers);
 

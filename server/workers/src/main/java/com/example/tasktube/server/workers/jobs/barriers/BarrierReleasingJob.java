@@ -2,6 +2,7 @@ package com.example.tasktube.server.workers.jobs.barriers;
 
 import com.example.tasktube.server.application.port.in.IBarrierService;
 import com.example.tasktube.server.application.port.in.IJobService;
+import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.infrastructure.configuration.InstanceIdProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,16 +40,16 @@ public class BarrierReleasingJob {
     @Scheduled(fixedDelayString = "${spring.application.jobs.barriers.releasing.delay}")
     public void run() {
         LOGGER.info("Start releasing barriers.");
-        final List<UUID> barrierIdList = jobService.getBarrierIdList(count, instanceId.get());
+        final List<UUID> waitingBarrierIdList = jobService.getBarrierIdList(Barrier.Status.WAITING, count, instanceId.get());
 
-        if (barrierIdList.isEmpty()) {
+        if (waitingBarrierIdList.isEmpty()) {
             LOGGER.info("No barriers found.");
             return;
         }
 
-        LOGGER.info("List of barriers: '{}'.", barrierIdList);
-        for (final UUID barrierId : barrierIdList) {
-            barrierService.releaseBarrier(barrierId, instanceId.get());
+        LOGGER.info("List of barriers: '{}'.", waitingBarrierIdList);
+        for (final UUID barrierId : waitingBarrierIdList) {
+            barrierService.release(barrierId, instanceId.get());
         }
     }
 }

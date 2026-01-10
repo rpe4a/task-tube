@@ -35,8 +35,6 @@ public class TaskDataMapper {
         map.put("input", task.getInput() != null ? toJson(task.getInput()) : null);
         map.put("output", task.getOutput() != null ? toJson(task.getOutput()) : null);
         map.put("is_root", task.isRoot());
-        map.put("start_barrier", task.getStartBarrier());
-        map.put("finish_barrier", task.getFinishBarrier());
         map.put("updated_at", task.getUpdatedAt() != null ? Timestamp.from(task.getUpdatedAt()) : null);
         map.put("created_at", task.getCreatedAt() != null ? Timestamp.from(task.getCreatedAt()) : null);
         map.put("canceled_at", task.getCanceledAt() != null ? Timestamp.from(task.getCanceledAt()) : null);
@@ -81,8 +79,6 @@ public class TaskDataMapper {
         })
                 : null);
         task.setRoot(rs.getBoolean("is_root"));
-        task.setStartBarrier(rs.getObject("start_barrier", UUID.class));
-        task.setFinishBarrier(rs.getObject("finish_barrier", UUID.class));
         task.setUpdatedAt(Instant.ofEpochMilli(rs.getTimestamp("updated_at").getTime()));
         task.setCreatedAt(Instant.ofEpochMilli(rs.getTimestamp("created_at").getTime()));
         task.setCanceledAt(rs.getTimestamp("canceled_at") != null

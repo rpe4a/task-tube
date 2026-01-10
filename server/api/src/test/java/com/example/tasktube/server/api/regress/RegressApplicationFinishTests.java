@@ -28,47 +28,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
     @Test
-    void shouldFinishedTaskSchedule() {
-        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
-
-        final UUID taskId = tubeService.push(pushTaskDto);
-
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
-
-        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
-
-        final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
-
-        taskService.startTask(taskPopped.get().getId(), Instant.now(), CLIENT);
-
-        final Optional<Task> taskProcessing = taskRepository.get(popTask.get().id());
-
-        taskService.processTask(taskProcessing.get().getId(), Instant.now(), CLIENT);
-
-        final Optional<Task> taskHeartbeat = taskRepository.get(taskProcessing.get().getId());
-
-        final FinishTaskDto finishTask = TestUtils.createFinishTaskDto(taskHeartbeat.get().getId(), CLIENT);
-        taskService.finishTask(finishTask);
-
-        final Optional<Task> taskFinished = taskRepository.get(finishTask.taskId());
-        assertThat(taskFinished.isEmpty()).isFalse();
-
-        assertThatThrownBy(() -> taskService.scheduleTask(taskId, Instant.now(), instanceIdProvider.get()));
-    }
-
-    @Test
     void shouldFinishedTaskProcess() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(barrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -97,10 +64,9 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(barrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -129,10 +95,9 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(barrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -161,10 +126,9 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier startBarrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(startBarrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -187,8 +151,12 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
         assertThat(taskFinished.get().getFinishedAt().toEpochMilli()).isEqualTo(finishTask.finishedAt().toEpochMilli());
         assertThat(taskFinished.get().getHeartbeatAt().toEpochMilli()).isEqualTo(taskHeartbeat.get().getHeartbeatAt().toEpochMilli());
         assertThat(taskFinished.get().getUpdatedAt().toEpochMilli()).isGreaterThan(taskHeartbeat.get().getUpdatedAt().toEpochMilli());
-        assertThat(taskFinished.get().getFinishBarrier()).isNull();
         assertThat(taskFinished.get().getLock()).isEqualTo(Lock.free());
+
+        final List<Barrier> barriers = barrierRepository.getByTaskId(taskFinished.get().getId());
+        assertThat(barriers).hasSize(2);
+        assertThat(barriers.getFirst().getStatus()).isEqualTo(Barrier.Status.COMPLETED);
+        assertThat(barriers.getLast().getStatus()).isEqualTo(Barrier.Status.WAITING);
     }
 
     @Test
@@ -197,10 +165,9 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier startBarrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(startBarrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -224,20 +191,18 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
         taskService.finishTask(finishTask);
 
         final Optional<Task> taskFinished = taskRepository.get(finishTask.taskId());
-        assertThat(taskFinished.get().getFinishBarrier()).isNotNull();
 
-        final Optional<Barrier> finishBarrier = barrierRepository.get(taskFinished.get().getFinishBarrier());
-        assertThat(finishBarrier.isPresent()).isTrue();
-        assertThat(finishBarrier.get().getId()).isEqualTo(taskFinished.get().getFinishBarrier());
-        assertThat(finishBarrier.get().getTaskId()).isEqualTo(taskFinished.get().getId());
+        final Barrier finishBarrier = barrierRepository.getByTaskId(taskFinished.get().getId()).get(1);
+
+        assertThat(finishBarrier.getTaskId()).isEqualTo(taskFinished.get().getId());
         final List<UUID> childrenIdList = children.stream().map(x -> x.id()).toList();
-        assertThat(finishBarrier.get().getWaitFor()).isEqualTo(childrenIdList);
-        assertThat(finishBarrier.get().getType()).isEqualTo(Barrier.Type.FINISH);
-        assertThat(finishBarrier.get().isReleased()).isFalse();
-        assertThat(finishBarrier.get().getUpdatedAt()).isNotNull();
-        assertThat(finishBarrier.get().getCreatedAt()).isNotNull();
-        assertThat(finishBarrier.get().getReleasedAt()).isNull();
-        assertThat(finishBarrier.get().getLock()).isEqualTo(Lock.free());
+        assertThat(finishBarrier.getWaitFor()).isEqualTo(childrenIdList);
+        assertThat(finishBarrier.getType()).isEqualTo(Barrier.Type.FINISH);
+        assertThat(finishBarrier.isReleased()).isFalse();
+        assertThat(finishBarrier.getUpdatedAt()).isNotNull();
+        assertThat(finishBarrier.getCreatedAt()).isNotNull();
+        assertThat(finishBarrier.getReleasedAt()).isNull();
+        assertThat(finishBarrier.getLock()).isEqualTo(Lock.free());
 
         final Optional<Task> taskChild = taskRepository.get(child.id());
         assertThat(taskChild.isPresent()).isTrue();
@@ -249,8 +214,6 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
         assertThat(taskChild.get().getInput()).isEqualTo(child.input());
         assertThat(taskChild.get().getOutput()).isNull();
         assertThat(taskChild.get().isRoot()).isFalse();
-        assertThat(taskChild.get().getStartBarrier()).isNull();
-        assertThat(taskChild.get().getFinishBarrier()).isNull();
         assertThat(taskChild.get().getUpdatedAt()).isNotNull();
         assertThat(taskChild.get().getCreatedAt().toEpochMilli()).isEqualTo(child.createdAt().toEpochMilli());
         assertThat(taskChild.get().getScheduledAt()).isNull();
@@ -273,10 +236,9 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier startBarrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(startBarrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -300,26 +262,17 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
         );
         taskService.finishTask(finishTask);
 
-        final Optional<Task> taskFinished = taskRepository.get(finishTask.taskId());
-        assertThat(taskFinished.get().getFinishBarrier()).isNotNull();
-
-        final Optional<Barrier> finishBarrier = barrierRepository.get(taskFinished.get().getFinishBarrier());
-        assertThat(finishBarrier.isPresent()).isTrue();
-
         final Optional<Task> taskChild = taskRepository.get(child.id());
-        assertThat(taskChild.get().getStartBarrier()).isNotNull();
 
-        final Optional<Barrier> startBarrier = barrierRepository.get(taskChild.get().getStartBarrier());
-        assertThat(startBarrier.isPresent()).isTrue();
-        assertThat(startBarrier.get().getId()).isEqualTo(taskChild.get().getStartBarrier());
-        assertThat(startBarrier.get().getTaskId()).isEqualTo(taskChild.get().getId());
-        assertThat(startBarrier.get().getWaitFor()).isEqualTo(List.of(waitTaskId));
-        assertThat(startBarrier.get().getType()).isEqualTo(Barrier.Type.START);
-        assertThat(startBarrier.get().isReleased()).isFalse();
-        assertThat(startBarrier.get().getUpdatedAt()).isNotNull();
-        assertThat(startBarrier.get().getCreatedAt()).isNotNull();
-        assertThat(startBarrier.get().getReleasedAt()).isNull();
-        assertThat(startBarrier.get().getLock()).isEqualTo(Lock.free());
+        final Barrier startChildBarrier = barrierRepository.getByTaskId(taskChild.get().getId()).getFirst();
+        assertThat(startChildBarrier.getTaskId()).isEqualTo(taskChild.get().getId());
+        assertThat(startChildBarrier.getWaitFor()).isEqualTo(List.of(waitTaskId));
+        assertThat(startChildBarrier.getType()).isEqualTo(Barrier.Type.START);
+        assertThat(startChildBarrier.isReleased()).isFalse();
+        assertThat(startChildBarrier.getUpdatedAt()).isNotNull();
+        assertThat(startChildBarrier.getCreatedAt()).isNotNull();
+        assertThat(startChildBarrier.getReleasedAt()).isNull();
+        assertThat(startChildBarrier.getLock()).isEqualTo(Lock.free());
     }
 
     @Test
@@ -328,10 +281,9 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier startBarrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(startBarrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -358,41 +310,33 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
         taskService.finishTask(finishTask);
 
         final Optional<Task> taskFinished = taskRepository.get(finishTask.taskId());
-        assertThat(taskFinished.get().getFinishBarrier()).isNotNull();
 
-        final Optional<Barrier> finishBarrier = barrierRepository.get(taskFinished.get().getFinishBarrier());
-        assertThat(finishBarrier.isPresent()).isTrue();
-        assertThat(finishBarrier.get().getWaitFor()).isEqualTo(List.of(child1.id(), child2.id()));
+        final Barrier finishBarrier = barrierRepository.getByTaskId(taskFinished.get().getId()).getLast();
+        assertThat(finishBarrier.getWaitFor()).isEqualTo(List.of(child1.id(), child2.id()));
 
         final Optional<Task> taskChild1 = taskRepository.get(child1.id());
-        assertThat(taskChild1.get().getStartBarrier()).isNotNull();
 
-        final Optional<Barrier> startBarrier1 = barrierRepository.get(taskChild1.get().getStartBarrier());
-        assertThat(startBarrier1.isPresent()).isTrue();
-        assertThat(startBarrier1.get().getId()).isEqualTo(taskChild1.get().getStartBarrier());
-        assertThat(startBarrier1.get().getTaskId()).isEqualTo(taskChild1.get().getId());
-        assertThat(startBarrier1.get().getWaitFor()).isEqualTo(List.of(waitTaskId1));
-        assertThat(startBarrier1.get().getType()).isEqualTo(Barrier.Type.START);
-        assertThat(startBarrier1.get().isReleased()).isFalse();
-        assertThat(startBarrier1.get().getUpdatedAt()).isNotNull();
-        assertThat(startBarrier1.get().getCreatedAt()).isNotNull();
-        assertThat(startBarrier1.get().getReleasedAt()).isNull();
-        assertThat(startBarrier1.get().getLock()).isEqualTo(Lock.free());
+        final Barrier startChildBarrier1 = barrierRepository.getByTaskId(taskChild1.get().getId()).get(0);
+        assertThat(startChildBarrier1.getTaskId()).isEqualTo(taskChild1.get().getId());
+        assertThat(startChildBarrier1.getWaitFor()).isEqualTo(List.of(waitTaskId1));
+        assertThat(startChildBarrier1.getType()).isEqualTo(Barrier.Type.START);
+        assertThat(startChildBarrier1.isReleased()).isFalse();
+        assertThat(startChildBarrier1.getUpdatedAt()).isNotNull();
+        assertThat(startChildBarrier1.getCreatedAt()).isNotNull();
+        assertThat(startChildBarrier1.getReleasedAt()).isNull();
+        assertThat(startChildBarrier1.getLock()).isEqualTo(Lock.free());
 
         final Optional<Task> taskChild2 = taskRepository.get(child2.id());
-        assertThat(taskChild2.get().getStartBarrier()).isNotNull();
 
-        final Optional<Barrier> startBarrier2 = barrierRepository.get(taskChild2.get().getStartBarrier());
-        assertThat(startBarrier2.isPresent()).isTrue();
-        assertThat(startBarrier2.get().getId()).isEqualTo(taskChild2.get().getStartBarrier());
-        assertThat(startBarrier2.get().getTaskId()).isEqualTo(taskChild2.get().getId());
-        assertThat(startBarrier2.get().getWaitFor()).isEqualTo(List.of(waitTaskId2));
-        assertThat(startBarrier2.get().getType()).isEqualTo(Barrier.Type.START);
-        assertThat(startBarrier2.get().isReleased()).isFalse();
-        assertThat(startBarrier2.get().getUpdatedAt()).isNotNull();
-        assertThat(startBarrier2.get().getCreatedAt()).isNotNull();
-        assertThat(startBarrier2.get().getReleasedAt()).isNull();
-        assertThat(startBarrier2.get().getLock()).isEqualTo(Lock.free());
+        final Barrier startChildBarrier2 = barrierRepository.getByTaskId(taskChild2.get().getId()).get(0);
+        assertThat(startChildBarrier2.getTaskId()).isEqualTo(taskChild2.get().getId());
+        assertThat(startChildBarrier2.getWaitFor()).isEqualTo(List.of(waitTaskId2));
+        assertThat(startChildBarrier2.getType()).isEqualTo(Barrier.Type.START);
+        assertThat(startChildBarrier2.isReleased()).isFalse();
+        assertThat(startChildBarrier2.getUpdatedAt()).isNotNull();
+        assertThat(startChildBarrier2.getCreatedAt()).isNotNull();
+        assertThat(startChildBarrier2.getReleasedAt()).isNull();
+        assertThat(startChildBarrier2.getLock()).isEqualTo(Lock.free());
     }
 
 }

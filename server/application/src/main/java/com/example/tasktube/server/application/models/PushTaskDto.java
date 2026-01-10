@@ -31,8 +31,6 @@ public record PushTaskDto(
                 input,
                 null,
                 isRoot,
-                null,
-                null,
                 Instant.now(),
                 createdAt,
                 null,

@@ -3,6 +3,7 @@ package com.example.tasktube.server.api.regress;
 import com.example.tasktube.server.api.RestApiApplication;
 import com.example.tasktube.server.application.models.PopTaskDto;
 import com.example.tasktube.server.application.models.PushTaskDto;
+import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -28,10 +29,9 @@ class RegressApplicationProcessTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).getFirst();
+        barrierService.release(barrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 

@@ -51,7 +51,7 @@ public class BarrierUnlockingJob {
 
         LOGGER.info("List of barriers: '{}'.", lockedBarrierIdList);
         for (final UUID barrierId : lockedBarrierIdList) {
-            barrierService.unlockBarrier(barrierId, timeoutSeconds);
+            barrierService.unlock(barrierId, timeoutSeconds);
         }
     }
 }

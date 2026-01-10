@@ -52,7 +52,7 @@ public class PostgresqlConfiguration {
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public IJobRepository registerJobRepository(final NamedParameterJdbcTemplate db) {
-        return new JobRepository(db);
+    public IJobRepository registerJobRepository(final NamedParameterJdbcTemplate db, final BarrierDataMapper mapper) {
+        return new JobRepository(db, mapper);
     }
 }

@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class Task {
+
+    public static final String BARRIER_IS_FAILED = "Barrier '%s' has FAILED state.";
     private UUID id;
     private String name;
     private String tube;
@@ -22,8 +24,6 @@ public class Task {
     private List<Slot> input;
     private Slot output;
     private boolean isRoot;
-    private UUID startBarrier;
-    private UUID finishBarrier;
     private Instant updatedAt;
     private Instant createdAt;
     private Instant canceledAt;
@@ -49,8 +49,6 @@ public class Task {
                 final List<Slot> input,
                 final Slot output,
                 final boolean isRoot,
-                final UUID startBarrier,
-                final UUID finishBarrier,
                 final Instant updatedAt,
                 final Instant createdAt,
                 final Instant canceledAt,
@@ -76,8 +74,6 @@ public class Task {
         this.input = input;
         this.output = output;
         this.isRoot = isRoot;
-        this.startBarrier = startBarrier;
-        this.finishBarrier = finishBarrier;
         this.updatedAt = updatedAt;
         this.createdAt = createdAt;
         this.canceledAt = canceledAt;
@@ -98,12 +94,6 @@ public class Task {
     }
 
     public Task() {
-    }
-
-    private void checkTaskIdList(final List<UUID> taskIdList) {
-        if (Objects.isNull(taskIdList) || taskIdList.isEmpty()) {
-            throw new ValidationDomainException("Parameter waitForTaskIds cannot be null or empty.");
-        }
     }
 
     public String getCorrelationId() {
@@ -268,14 +258,14 @@ public class Task {
         }
     }
 
-    public void schedule(final Instant scheduledAt, final String client) {
+    private void schedule(final Instant scheduledAt, final String client) {
         checkSchedule(client);
         setStatus(Status.SCHEDULED);
         setScheduledAt(scheduledAt);
         unlock();
     }
 
-    public void cancel(final Instant canceledAt, final String failedReason, final String client) {
+    private void cancel(final Instant canceledAt, final String failedReason, final String client) {
         checkCancel(client);
         setCanceledAt(canceledAt);
         setStatus(Status.CANCELED);
@@ -317,7 +307,6 @@ public class Task {
             setFailedAt(failedAt);
             setFailures(getFailures() + 1);
             setFailedReason(failedReason);
-            setFinishBarrier(null);
             setOutput(null);
             unlock();
         } else {
@@ -326,13 +315,12 @@ public class Task {
             setFinishedAt(null);
             setFailedAt(failedAt);
             setFailedReason(failedReason);
-            setFinishBarrier(null);
             setOutput(null);
             unlock();
         }
     }
 
-    public void abort(final Instant abortedAt, final String failedReason, final String client) {
+    private void abort(final Instant abortedAt, final String failedReason, final String client) {
         checkAbort(client);
         setStatus(Status.ABORTED);
         setAbortedAt(abortedAt);
@@ -340,14 +328,14 @@ public class Task {
         unlock();
     }
 
-    public void complete(final Instant completedAt, final String client) {
+    private void complete(final Instant completedAt, final String client) {
         checkComplete(client);
         setStatus(Status.COMPLETED);
         setCompletedAt(completedAt);
         unlock();
     }
 
-    public Task attachParent(final Task parent) {
+    public Task attachToParent(final Task parent) {
         if (Objects.isNull(parent)) {
             throw new ValidationDomainException("Parameter parent cannot be null.");
         }
@@ -364,57 +352,31 @@ public class Task {
     }
 
     public Barrier addStartBarrier(final List<UUID> taskIdList) {
-        checkTaskIdList(taskIdList);
-
-        final Barrier barrier = new Barrier(
+        return new Barrier(
                 UUID.randomUUID(),
                 getId(),
                 taskIdList,
                 Barrier.Type.START,
-                false,
+                Barrier.Status.WAITING,
                 Instant.now(),
                 Instant.now(),
                 null,
                 Lock.free()
         );
-
-        setStartBarrier(barrier.getId());
-        return barrier;
     }
 
     public Barrier addFinishBarrier(final List<UUID> taskIdList) {
-        checkTaskIdList(taskIdList);
-
-        final Barrier barrier = new Barrier(
+        return new Barrier(
                 UUID.randomUUID(),
                 getId(),
                 taskIdList,
                 Barrier.Type.FINISH,
-                false,
+                Barrier.Status.WAITING,
                 Instant.now(),
                 Instant.now(),
                 null,
                 Lock.free()
         );
-
-        setFinishBarrier(barrier.getId());
-        return barrier;
-    }
-
-    public UUID getStartBarrier() {
-        return startBarrier;
-    }
-
-    public void setStartBarrier(final UUID startBarrier) {
-        this.startBarrier = startBarrier;
-    }
-
-    public UUID getFinishBarrier() {
-        return finishBarrier;
-    }
-
-    public void setFinishBarrier(final UUID finishBarrier) {
-        this.finishBarrier = finishBarrier;
     }
 
     public Slot getOutput() {
@@ -471,14 +433,6 @@ public class Task {
 
     public void setAbortedAt(final Instant abortedAt) {
         this.abortedAt = abortedAt;
-    }
-
-    public boolean hasFinishBarrier() {
-        return getFinishBarrier() != null;
-    }
-
-    public boolean hasStartBarrier() {
-        return getStartBarrier() != null;
     }
 
     public boolean isCompleted() {
@@ -548,6 +502,29 @@ public class Task {
             }
 
             unlock();
+        }
+    }
+
+    public void releaseBarrier(final Barrier barrier, final String client) {
+        if (Objects.isNull(barrier)) {
+            throw new ValidationDomainException("Parameter barrier cannot be null.");
+        }
+        if (barrier.isNotReleased()) {
+            throw new ValidationDomainException("Barrier is not released");
+        }
+
+        if (barrier.getType().equals(Barrier.Type.START)) {
+            switch (barrier.getStatus()) {
+                case COMPLETED -> schedule(Instant.now(), client);
+                case FAILED -> cancel(Instant.now(), BARRIER_IS_FAILED.formatted(barrier.getId()), client);
+            }
+        }
+
+        if (barrier.getType().equals(Barrier.Type.FINISH)) {
+            switch (barrier.getStatus()) {
+                case COMPLETED -> complete(Instant.now(), client);
+                case FAILED -> abort(Instant.now(), BARRIER_IS_FAILED.formatted(barrier.getId()), client);
+            }
         }
     }
 

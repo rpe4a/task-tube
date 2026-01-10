@@ -2,6 +2,7 @@ package com.example.tasktube.sandboxspring;
 
 import com.example.tasktube.client.sdk.core.publisher.TaskTubePublisherFactory;
 import com.example.tasktube.client.sdk.core.task.Constant;
+import com.example.tasktube.sandboxspring.tube.regress.StartPointTaskReturnNothing;
 import com.example.tasktube.sandboxspring.tube.test.ParentTaskReturnString0String;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -18,7 +19,7 @@ public class SandboxSpringApplication {
 
         final TaskTubePublisherFactory taskPublisher = context.getBean(TaskTubePublisherFactory.class);
         final Optional<UUID> task = taskPublisher
-                .create(new ParentTaskReturnString0String(), new Constant<>("Hello World!"))
+                .create(new StartPointTaskReturnNothing())
                 .pushIn("sandbox-tube");
 
         System.out.println(task.get());

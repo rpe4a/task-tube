@@ -4,7 +4,7 @@ CREATE TABLE barriers
     task_id     UUID        NOT NULL,               -- уникальный идентификатор задачи
     wait_for    UUID[]      NOT NULL,               -- задачи, которые надо ждать
     type        varchar(32) NOT NULL,               -- тип
-    released    BOOLEAN,                            -- флаг, что барьер достигнут
+    status      varchar(32) NOT NULL,               -- статус барьера
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(), -- время последнего обновления
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(), -- время создания
     released_at TIMESTAMPTZ,                        -- время достижения барьера
@@ -23,8 +23,6 @@ CREATE TABLE tasks
     input          JSONB,                                -- входные данные (Map<String, Object>)
     output         JSONB,                                -- результат выполнения (Map<String, Object>)
     is_root        BOOLEAN       NOT NULL DEFAULT FALSE, -- флаг корневой задачи
-    start_barrier  UUID REFERENCES barriers,             -- уникальный идентификатор барьера
-    finish_barrier UUID REFERENCES barriers,             -- уникальный идентификатор барьера
     updated_at     TIMESTAMPTZ   NOT NULL DEFAULT NOW(), -- время последнего обновления
     created_at     TIMESTAMPTZ   NOT NULL DEFAULT NOW(), -- время создания
     canceled_at    TIMESTAMPTZ,                          -- время отмены задачи

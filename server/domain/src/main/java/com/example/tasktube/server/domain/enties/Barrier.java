@@ -10,11 +10,12 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class Barrier {
+
     private UUID id;
     private UUID taskId;
     private List<UUID> waitFor;
     private Type type;
-    private boolean released;
+    private Status status;
     private Instant updatedAt;
     private Instant createdAt;
     private Instant releasedAt;
@@ -28,7 +29,7 @@ public class Barrier {
             final UUID taskId,
             final List<UUID> waitFor,
             final Type type,
-            final boolean released,
+            final Status status,
             final Instant updatedAt,
             final Instant createdAt,
             final Instant releasedAt,
@@ -38,7 +39,7 @@ public class Barrier {
         this.taskId = taskId;
         this.waitFor = waitFor;
         this.type = type;
-        this.released = released;
+        this.status = status;
         this.updatedAt = updatedAt;
         this.createdAt = createdAt;
         this.releasedAt = releasedAt;
@@ -77,18 +78,6 @@ public class Barrier {
         this.type = type;
     }
 
-    public boolean isReleased() {
-        return released;
-    }
-
-    public void setReleased(final boolean released) {
-        this.released = released;
-    }
-
-    public boolean isNotReleased() {
-        return !isReleased();
-    }
-
     public Instant getUpdatedAt() {
         return updatedAt;
     }
@@ -113,6 +102,14 @@ public class Barrier {
         this.releasedAt = releasedAt;
     }
 
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(final Status status) {
+        this.status = status;
+    }
+
     public Lock getLock() {
         return lock;
     }
@@ -121,18 +118,14 @@ public class Barrier {
         this.lock = lock;
     }
 
-    public void release(final String client) {
+    public void release(final String client, final Status status) {
         if (Objects.isNull(client)) {
             throw new ValidationDomainException("Parameter client cannot be null.");
         }
         if (!getLock().isLockedBy(client)) {
             throw new ValidationDomainException("Barrier is not locked by the client '%s'.".formatted(client));
         }
-        if (isReleased()) {
-            throw new ValidationDomainException("Barrier is already released.".formatted(client));
-        }
-
-        setReleased(true);
+        setStatus(status);
         setReleasedAt(Instant.now());
         setUpdatedAt(Instant.now());
         unlock();
@@ -154,6 +147,20 @@ public class Barrier {
             setUpdatedAt(Instant.now());
             unlock();
         }
+    }
+
+    public boolean isReleased() {
+        return getStatus().equals(Status.COMPLETED) || getStatus().equals(Status.FAILED);
+    }
+
+    public boolean isNotReleased() {
+        return getStatus().equals(Status.WAITING);
+    }
+
+    public enum Status {
+        WAITING,
+        COMPLETED,
+        FAILED
     }
 
     public enum Type {

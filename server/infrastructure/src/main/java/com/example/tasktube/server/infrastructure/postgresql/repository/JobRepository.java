@@ -1,8 +1,11 @@
 package com.example.tasktube.server.infrastructure.postgresql.repository;
 
 import com.example.tasktube.server.application.exceptions.ApplicationException;
+import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IJobRepository;
+import com.example.tasktube.server.infrastructure.postgresql.mapper.BarrierDataMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,25 +20,29 @@ import java.util.UUID;
 
 @Repository
 public class JobRepository implements IJobRepository {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobRepository.class);
 
     private final NamedParameterJdbcTemplate db;
+    private final BarrierDataMapper mapper;
 
     public JobRepository(
-            final NamedParameterJdbcTemplate db
+            final NamedParameterJdbcTemplate db,
+            final BarrierDataMapper mapper
     ) {
         this.db = Objects.requireNonNull(db);
+        this.mapper = mapper;
     }
 
     @Override
-    public List<UUID> lockBarrierIdList(final int count, final String client) {
+    public List<Barrier> lockBarrierList(final Barrier.Status status, final int count, final String client) {
         if (count <= 0) {
             throw new ApplicationException("Parameter count must be more than zero.");
         }
         if (StringUtils.isEmpty(client)) {
             throw new ApplicationException("Parameter client cannot be null or empty.");
         }
-        LOGGER.debug("Attempting to lock '{}' barrier IDs by client '{}'.", count, client);
+        LOGGER.debug("Attempting to lock '{}' barrier with status '{}' by client '{}'.", status, count, client);
 
         final String queryCommand = """
                     WITH locked_barriers
@@ -46,8 +53,8 @@ public class JobRepository implements IJobRepository {
                           AND locked_by is NULL
                           AND locked_at is NULL
                           AND released_at is NULL
-                          AND released = false
-                        ORDER BY updated_at
+                          AND status = :status
+                        ORDER BY created_at desc
                             FOR UPDATE SKIP LOCKED
                         LIMIT :count
                     )
@@ -57,15 +64,22 @@ public class JobRepository implements IJobRepository {
                         locked_at = current_timestamp,
                         updated_at = current_timestamp
                     WHERE id IN (SELECT id FROM locked_barriers)
-                    RETURNING id
+                    RETURNING *
                 """;
 
-        final RowMapper<UUID> rsMapper = (rs, rowNum) -> rs.getObject("id", UUID.class);
+        final RowMapper<Barrier> rsMapper = (rs, rowNum) -> mapper.getBarrier(rs);
 
-        final List<UUID> lockedIds = db.query(queryCommand, Map.of("locked_by", client, "count", count), rsMapper);
-        LOGGER.debug("Locked '{}' barrier IDs by client '{}'.", lockedIds.size(), client);
+        final List<Barrier> lockedBarriers = db.query(
+                queryCommand,
+                Map.of(
+                        "locked_by", client,
+                        "count", count,
+                        "status", status.name()
+                ),
+                rsMapper);
+        LOGGER.debug("Locked '{}' barrier by client '{}'.", lockedBarriers.size(), client);
 
-        return lockedIds;
+        return lockedBarriers;
     }
 
     @Override
@@ -77,7 +91,6 @@ public class JobRepository implements IJobRepository {
             throw new ApplicationException("Parameter client cannot be null or empty.");
         }
         LOGGER.debug("Attempting to lock '{}' task IDs with status '{}' by client '{}'.", count, status, client);
-
 
         final String queryCommand = """
                     WITH locked_task

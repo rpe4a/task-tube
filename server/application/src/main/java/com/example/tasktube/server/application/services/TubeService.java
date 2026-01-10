@@ -27,6 +27,7 @@ import java.util.UUID;
 
 @Service
 public class TubeService implements ITubeService {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TubeService.class);
 
     private final ITubeRepository tubeRepository;
@@ -65,14 +66,10 @@ public class TubeService implements ITubeService {
             waitingTaskIdList.addAll(taskSlots);
         }
 
-        if (!waitingTaskIdList.isEmpty()) {
-            final Barrier barrier = task.addStartBarrier(waitingTaskIdList);
-            barrierRepository.save(barrier);
-        }
+        final Barrier barrier = task.addStartBarrier(waitingTaskIdList);
+        barrierRepository.save(barrier);
 
-        return tubeRepository
-                .push(task)
-                .getId();
+        return tubeRepository.push(task).getId();
     }
     // TODO: add tests
 

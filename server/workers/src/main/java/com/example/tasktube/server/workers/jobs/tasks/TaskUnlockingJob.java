@@ -36,7 +36,7 @@ public class TaskUnlockingJob {
         this.taskService = Objects.requireNonNull(taskService);
     }
 
-    @Scheduled(fixedDelayString = "${spring.application.jobs.tasks.scheduling.delay}")
+    @Scheduled(fixedDelayString = "${spring.application.jobs.tasks.locked.delay}")
     public void run() {
         LOGGER.info("Start find locked tasks.");
         final List<UUID> lockedTaskIdList = jobService.getLockedTaskIdList(count, timeoutSeconds);

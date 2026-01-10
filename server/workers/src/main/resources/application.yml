@@ -3,12 +3,6 @@ spring:
     name: server-workers
     jobs:
       tasks:
-        scheduling:
-          delay: "5000"
-          count: 10
-        finalizing:
-          delay: "5000"
-          count: 10
         locked:
           delay: "5000"
           count: 10

@@ -2,6 +2,7 @@ package com.example.tasktube.server.application.services;
 
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.application.port.in.IJobService;
+import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IJobRepository;
 import com.google.common.base.Strings;
@@ -10,12 +11,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 @Service
 public class JobService implements IJobService {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(JobService.class);
 
     private final IJobRepository jobRepository;
@@ -24,23 +27,6 @@ public class JobService implements IJobService {
             final IJobRepository jobRepository
     ) {
         this.jobRepository = Objects.requireNonNull(jobRepository);
-    }
-
-    @Override
-    @Transactional
-    public List<UUID> getTaskIdList(final Task.Status status, final int count, final String client) {
-        if (count <= 0) {
-            throw new ApplicationException("Parameter count must be more than zero.");
-        }
-        if (Strings.isNullOrEmpty(client)) {
-            throw new ApplicationException("Parameter client cannot be null or empty.");
-        }
-        if (Objects.isNull(status)) {
-            throw new ApplicationException("Parameter status cannot be null.");
-        }
-        LOGGER.info("Client '{}' tries to lock '{}' tasks with status: '{}'.", client, count, status);
-
-        return jobRepository.lockTaskIdList(status, count, client);
     }
 
     @Override
@@ -58,8 +44,7 @@ public class JobService implements IJobService {
     }
 
     @Override
-    @Transactional
-    public List<UUID> getBarrierIdList(final int count, final String client) {
+    public List<UUID> getBarrierIdList(final Barrier.Status status, final int count, final String client) {
         if (count <= 0) {
             throw new ApplicationException("Parameter count must be more than zero.");
         }
@@ -68,7 +53,11 @@ public class JobService implements IJobService {
         }
         LOGGER.info("Client '{}' tries to lock '{}' barriers.", client, count);
 
-        return jobRepository.lockBarrierIdList(count, client);
+        return jobRepository.lockBarrierList(status, count, client)
+                .stream()
+                .sorted(Comparator.comparing(Barrier::getCreatedAt, Comparator.reverseOrder()))
+                .map(Barrier::getId)
+                .toList();
     }
 
     @Override

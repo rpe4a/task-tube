@@ -4,6 +4,7 @@ import com.example.tasktube.server.api.RestApiApplication;
 import com.example.tasktube.server.application.models.PopTaskDto;
 import com.example.tasktube.server.application.models.PushTaskDto;
 import com.example.tasktube.server.application.models.TaskSettingsDto;
+import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.values.Lock;
 import com.example.tasktube.server.domain.values.TaskSettings;
@@ -33,10 +34,9 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(barrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -60,8 +60,6 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
         assertThat(taskScheduled.get().getInput()).isEqualTo(taskProcessing.get().getInput());
         assertThat(taskScheduled.get().getOutput()).isNull();
         assertThat(taskScheduled.get().isRoot()).isTrue();
-        assertThat(taskScheduled.get().getStartBarrier()).isNull();
-        assertThat(taskScheduled.get().getFinishBarrier()).isNull();
         assertThat(taskScheduled.get().getUpdatedAt().toEpochMilli()).isGreaterThan(taskProcessing.get().getUpdatedAt().toEpochMilli());
         assertThat(taskScheduled.get().getCreatedAt().toEpochMilli()).isEqualTo(taskProcessing.get().getCreatedAt().toEpochMilli());
         assertThat(taskScheduled.get().getScheduledAt()).isNotNull();
@@ -86,10 +84,9 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(barrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -119,10 +116,9 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(barrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -151,10 +147,9 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(barrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -188,10 +183,9 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(barrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -247,10 +241,9 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(barrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -292,8 +285,6 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
         assertThat(taskAborted.get().getInput()).isEqualTo(taskProcessing.get().getInput());
         assertThat(taskAborted.get().getOutput()).isNull();
         assertThat(taskAborted.get().isRoot()).isTrue();
-        assertThat(taskAborted.get().getStartBarrier()).isNull();
-        assertThat(taskAborted.get().getFinishBarrier()).isNull();
         assertThat(taskAborted.get().getUpdatedAt().toEpochMilli()).isGreaterThan(taskFailed.get().getUpdatedAt().toEpochMilli());
         assertThat(taskAborted.get().getCreatedAt().toEpochMilli()).isEqualTo(taskFailed.get().getCreatedAt().toEpochMilli());
         assertThat(taskAborted.get().getScheduledAt().toEpochMilli()).isEqualTo(taskFailed.get().getScheduledAt().toEpochMilli());
@@ -312,63 +303,15 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
     }
 
     @Test
-    void shouldAbortTaskScheduleFailed() {
-        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1, 10, 10);
-        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
-
-        final UUID taskId = tubeService.push(pushTaskDto);
-
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
-
-        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
-
-        final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
-
-        taskService.startTask(taskPopped.get().getId(), Instant.now(), CLIENT);
-
-        final Optional<Task> taskProcessing = taskRepository.get(popTask.get().id());
-
-        final Instant failedAt1 = Instant.now();
-        final String failReasonMessage1 = "Task is failed";
-        taskService.failTask(taskProcessing.get().getId(), failedAt1, failReasonMessage1, CLIENT);
-
-        final Optional<Task> taskScheduled1 = taskRepository.get(taskProcessing.get().getId());
-        assertThat(taskScheduled1.isPresent()).isTrue();
-        assertThat(taskScheduled1.get().getScheduledAt().toEpochMilli()).isGreaterThan(Instant.now().toEpochMilli());
-
-        TestUtils.await(taskSettingsDto.failureRetryTimeoutSeconds(), TimeUnit.SECONDS);
-
-        final Optional<PopTaskDto> popFailedTask1 = tubeService.pop(taskPopped.get().getTube(), CLIENT);
-        assertThat(popFailedTask1.isPresent()).isTrue();
-
-        taskService.startTask(popFailedTask1.get().id(), Instant.now(), CLIENT);
-
-        final Optional<Task> taskFailed = taskRepository.get(popFailedTask1.get().id());
-        assertThat(taskFailed.isPresent()).isTrue();
-
-        final Instant failedAt2 = Instant.now();
-        final String failReasonMessage2 = "Task is aborted";
-        taskService.failTask(popFailedTask1.get().id(), failedAt2, failReasonMessage2, CLIENT);
-
-        final Optional<Task> taskAborted = taskRepository.get(taskProcessing.get().getId());
-
-        assertThatThrownBy(() -> taskService.scheduleTask(taskId, Instant.now(), instanceIdProvider.get()));
-    }
-
-    @Test
     void shouldAbortTaskStartFailed() {
         final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).getFirst();
+        barrierService.release(barrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -412,10 +355,9 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(barrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -459,10 +401,9 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(barrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -506,10 +447,9 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
+        jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
+        barrierService.release(barrier.getId(), instanceIdProvider.get());
 
         final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
 
@@ -545,52 +485,4 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
 
         assertThatThrownBy(() -> taskService.finishTask(TestUtils.createFinishTaskDto(taskId, CLIENT)));
     }
-
-    @Test
-    void shouldAbortTaskCompleteFailed() {
-        final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1, 10,10);
-        final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
-
-        final UUID taskId = tubeService.push(pushTaskDto);
-
-        final List<UUID> taskIdList = jobService.getTaskIdList(Task.Status.CREATED, 10, instanceIdProvider.get());
-
-        final UUID createdTaskId = taskIdList.get(0);
-        taskService.scheduleTask(createdTaskId, Instant.now(), instanceIdProvider.get());
-
-        final Optional<PopTaskDto> popTask = tubeService.pop(pushTaskDto.tube(), CLIENT);
-
-        final Optional<Task> taskPopped = taskRepository.get(popTask.get().id());
-
-        taskService.startTask(taskPopped.get().getId(), Instant.now(), CLIENT);
-
-        final Optional<Task> taskProcessing = taskRepository.get(popTask.get().id());
-
-        final Instant failedAt1 = Instant.now();
-        final String failReasonMessage1 = "Task is failed";
-        taskService.failTask(taskProcessing.get().getId(), failedAt1, failReasonMessage1, CLIENT);
-
-        final Optional<Task> taskScheduled1 = taskRepository.get(taskProcessing.get().getId());
-        assertThat(taskScheduled1.isPresent()).isTrue();
-        assertThat(taskScheduled1.get().getScheduledAt().toEpochMilli()).isGreaterThan(Instant.now().toEpochMilli());
-
-        TestUtils.await(taskSettingsDto.failureRetryTimeoutSeconds(), TimeUnit.SECONDS);
-
-        final Optional<PopTaskDto> popFailedTask1 = tubeService.pop(taskPopped.get().getTube(), CLIENT);
-        assertThat(popFailedTask1.isPresent()).isTrue();
-
-        taskService.startTask(popFailedTask1.get().id(), Instant.now(), CLIENT);
-
-        final Optional<Task> taskFailed = taskRepository.get(popFailedTask1.get().id());
-        assertThat(taskFailed.isPresent()).isTrue();
-
-        final Instant failedAt2 = Instant.now();
-        final String failReasonMessage2 = "Task is aborted";
-        taskService.failTask(popFailedTask1.get().id(), failedAt2, failReasonMessage2, CLIENT);
-
-        final Optional<Task> taskAborted = taskRepository.get(taskProcessing.get().getId());
-
-        assertThatThrownBy(() -> taskService.completeTask(taskId, Instant.now(), instanceIdProvider.get()));
-    }
-
 }

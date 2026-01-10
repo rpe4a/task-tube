@@ -16,6 +16,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class BarrierService implements IBarrierService {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(BarrierService.class);
 
     private final IBarrierRepository barrierRepository;
@@ -31,7 +32,7 @@ public class BarrierService implements IBarrierService {
 
     @Override
     @Transactional
-    public void releaseBarrier(final UUID barrierId, final String client) {
+    public void release(final UUID barrierId, final String client) {
         if (Objects.isNull(barrierId)) {
             throw new ApplicationException("Parameter barrierId cannot be null.");
         }
@@ -40,27 +41,34 @@ public class BarrierService implements IBarrierService {
         }
         LOGGER.info("Release barrier id: '{}'.", barrierId);
 
-        final Barrier barrier = barrierRepository.get(barrierId).orElseThrow();
+        final Barrier barrier = barrierRepository.getById(barrierId).orElseThrow();
+        if (barrier.getWaitFor().isEmpty()) {
+            LOGGER.debug("Barrier '{}' doesn't have any waiting tasks.", barrierId);
+            barrier.release(client, Barrier.Status.COMPLETED);
+        } else {
+            LOGGER.debug("Barrier '{}' has '{}' waiting tasks.", barrierId, barrier.getWaitFor().size());
+            final List<Task> tasks = taskRepository.get(barrier.getWaitFor());
+            final boolean allTasksTerminatedState = tasks.stream().allMatch(Task::isTerminated);
+            if (allTasksTerminatedState) {
+                if (tasks.stream().allMatch(Task::isCompleted)) {
+                    barrier.release(client, Barrier.Status.COMPLETED);
+                } else {
+                    barrier.release(client, Barrier.Status.FAILED);
+                }
+
+                LOGGER.debug("Barrier '{}' has released with status '{}'.", barrierId, barrier.getStatus());
+            } else {
+                LOGGER.debug("Not all tasks have terminated state.");
+                barrier.unlock();
+            }
+        }
 
         if (barrier.isReleased()) {
-            LOGGER.debug("Barrier '{}' has already been released.", barrierId);
-            barrier.unlock();
-        } else {
-            if (barrier.getWaitFor().isEmpty()) {
-                LOGGER.debug("Barrier '{}' doesn't have any waiting tasks.", barrierId);
-                barrier.release(client);
-            } else {
-                LOGGER.debug("Barrier '{}' has '{}' waiting tasks.", barrierId, barrier.getWaitFor().size());
-                final List<Task> tasks = taskRepository.get(barrier.getWaitFor());
-                final boolean allTasksTerminatedState = tasks.stream().allMatch(Task::isTerminated);
-                if (allTasksTerminatedState) {
-                    LOGGER.debug("Barrier '{}' has released.", barrierId);
-                    barrier.release(client);
-                }else {
-                    LOGGER.debug("Not all tasks have terminated state.");
-                    barrier.unlock();
-                }
-            }
+            final Task task = taskRepository.get(barrier.getTaskId(), client).orElseThrow();
+
+            task.releaseBarrier(barrier, client);
+
+            taskRepository.update(task);
         }
 
         barrierRepository.update(barrier);
@@ -68,7 +76,7 @@ public class BarrierService implements IBarrierService {
 
     @Override
     @Transactional
-    public void unlockBarrier(final UUID barrierId, final int lockedTimeoutSeconds) {
+    public void unlock(final UUID barrierId, final int lockedTimeoutSeconds) {
         if (Objects.isNull(barrierId)) {
             throw new ApplicationException("Parameter barrierId cannot be null.");
         }
@@ -77,7 +85,7 @@ public class BarrierService implements IBarrierService {
         }
         LOGGER.warn("Locked barrier id: '{}'.", barrierId);
 
-        final Barrier barrier = barrierRepository.get(barrierId).orElseThrow();
+        final Barrier barrier = barrierRepository.getById(barrierId).orElseThrow();
 
         barrier.unblock(lockedTimeoutSeconds);
 

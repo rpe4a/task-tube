@@ -3,7 +3,7 @@ select * from tasks order by scheduled_at;
 select * from tasks order by started_at;
 select * from tasks order by heartbeat_at;
 
-select * from barriers
+select * from barriers order by status, created_at  desc
 
 delete from tasks;
 delete from barriers;

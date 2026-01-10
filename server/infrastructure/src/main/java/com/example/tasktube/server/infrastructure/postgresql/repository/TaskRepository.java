@@ -5,6 +5,7 @@ import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskDataMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -62,6 +63,53 @@ public class TaskRepository implements ITaskRepository {
     }
 
     @Override
+    public Optional<Task> get(final UUID id, final String client) {
+        if (Objects.isNull(id)) {
+            throw new ApplicationException("Parameter tube cannot be null or empty.");
+        }
+        if (StringUtils.isEmpty(client)) {
+            throw new ApplicationException("Parameter client cannot be null or empty.");
+        }
+        LOGGER.debug("Attempting to get '{}' task by client: '{}'.", id, client);
+
+        final String queryCommand = """
+                    WITH locked_task
+                    AS (
+                        SELECT id
+                        FROM tasks
+                        WHERE locked = false
+                          AND locked_by is NULL
+                          AND locked_at is NULL
+                          AND id = :id
+                        ORDER BY scheduled_at
+                            FOR UPDATE SKIP LOCKED
+                    )
+                    UPDATE tasks
+                    SET locked = true,
+                        locked_by = :locked_by,
+                        locked_at = current_timestamp,
+                        updated_at = current_timestamp
+                    WHERE id IN (SELECT id FROM locked_task)
+                    RETURNING *
+                """;
+
+        final ResultSetExtractor<Optional<Task>> rsExtractor = rs -> {
+            if (rs.next()) {
+                try {
+                    final Task task = mapper.getTask(rs);
+                    return Optional.of(task);
+                } catch (final JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            } else {
+                return Optional.empty();
+            }
+        };
+
+        return db.query(queryCommand, Map.of("id", id, "locked_by", client), rsExtractor);
+    }
+
+    @Override
     public List<Task> get(final List<UUID> taskIdList) {
         if (Objects.isNull(taskIdList) || taskIdList.isEmpty()) {
             throw new ApplicationException("Parameter taskIdList cannot be null or empty.");
@@ -104,8 +152,6 @@ public class TaskRepository implements ITaskRepository {
                         input = :input::jsonb,
                         output = :output::jsonb,
                         is_root = :is_root,
-                        start_barrier = :start_barrier,
-                        finish_barrier = :finish_barrier,
                         updated_at = current_timestamp,
                         created_at = :created_at,
                         scheduled_at = :scheduled_at,

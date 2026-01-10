@@ -28,10 +28,7 @@ class RegressApplicationUnlockBarrierTests extends AbstractRegressApplicationTes
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final Task task = taskRepository.get(taskId).orElseThrow();
-        assertThat(task.getStartBarrier()).isNotNull();
-
-        final Barrier barrier = barrierRepository.get(task.getStartBarrier()).orElseThrow();
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
 
         final Lock lock = new Lock(Instant.now(), true, instanceIdProvider.get());
         barrier.setLock(lock);
@@ -48,10 +45,7 @@ class RegressApplicationUnlockBarrierTests extends AbstractRegressApplicationTes
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final Task task = taskRepository.get(taskId).orElseThrow();
-        assertThat(task.getStartBarrier()).isNotNull();
-
-        final Barrier barrier = barrierRepository.get(task.getStartBarrier()).orElseThrow();
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
 
         final Lock lock = new Lock(Instant.now().minusSeconds(600), true, instanceIdProvider.get());
         barrier.setLock(lock);
@@ -68,10 +62,7 @@ class RegressApplicationUnlockBarrierTests extends AbstractRegressApplicationTes
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        final Task task = taskRepository.get(taskId).orElseThrow();
-        assertThat(task.getStartBarrier()).isNotNull();
-
-        final Barrier barrier = barrierRepository.get(task.getStartBarrier()).orElseThrow();
+        final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
 
         final Lock lock = new Lock(Instant.now().minusSeconds(600), true, instanceIdProvider.get());
         barrier.setLock(lock);
@@ -81,15 +72,15 @@ class RegressApplicationUnlockBarrierTests extends AbstractRegressApplicationTes
         final List<UUID> lockedBarriers = jobService.getLockedBarrierIdList(10, 600);
         assertThat(lockedBarriers).hasSize(1);
 
-        final Barrier lockedBarrier = barrierRepository.get(task.getStartBarrier()).orElseThrow();
+        final Barrier lockedBarrier = barrierRepository.getById(barrier.getId()).orElseThrow();
         assertThat(lockedBarrier.getCreatedAt().toEpochMilli()).isEqualTo(barrier.getCreatedAt().toEpochMilli());
         assertThat(lockedBarrier.getLock().lockedBy()).isEqualTo(lock.lockedBy());
         assertThat(lockedBarrier.getLock().lockedAt().toEpochMilli()).isEqualTo(lock.lockedAt().toEpochMilli());
         assertThat(lockedBarrier.getLock().locked()).isEqualTo(lock.locked());
 
-        barrierService.unlockBarrier(barrier.getId(), 600);
+        barrierService.unlock(barrier.getId(), 600);
 
-        final Barrier unlockedBarrier = barrierRepository.get(barrier.getId()).orElseThrow();
+        final Barrier unlockedBarrier = barrierRepository.getById(barrier.getId()).orElseThrow();
         assertThat(unlockedBarrier.getCreatedAt().toEpochMilli()).isEqualTo(barrier.getCreatedAt().toEpochMilli());
         assertThat(unlockedBarrier.getUpdatedAt().toEpochMilli()).isGreaterThan(barrier.getUpdatedAt().toEpochMilli());
         assertThat(unlockedBarrier.getLock()).isEqualTo(Lock.free());
