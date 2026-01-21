@@ -9,6 +9,7 @@ import com.example.tasktube.client.sdk.core.http.dto.PopTaskResponse;
 import com.example.tasktube.client.sdk.core.http.dto.PopTasksRequest;
 import com.example.tasktube.client.sdk.core.http.dto.ProcessTaskRequest;
 import com.example.tasktube.client.sdk.core.http.dto.StartTaskRequest;
+import com.example.tasktube.client.sdk.core.http.dto.StartTaskResponse;
 import com.example.tasktube.client.sdk.core.http.dto.TaskRequest;
 import com.example.tasktube.client.sdk.core.exception.TaskTubeApiException;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -51,8 +52,9 @@ public class TaskTubeHttpClient implements ITaskTubeClient {
                 .build();
     }
 
+    @Nonnull
     @Override
-    public void startTask(@Nonnull final UUID taskId, @Nonnull final StartTaskRequest request) {
+    public Optional<StartTaskResponse> startTask(@Nonnull final UUID taskId, @Nonnull final StartTaskRequest request) {
         Preconditions.checkNotNull(taskId);
         Preconditions.checkNotNull(request);
 
@@ -61,7 +63,7 @@ public class TaskTubeHttpClient implements ITaskTubeClient {
                 .POST(getBody(request))
                 .build();
 
-        send(httpRequest);
+        return send(httpRequest, new TypeReference<>() {});
     }
 
     @Override

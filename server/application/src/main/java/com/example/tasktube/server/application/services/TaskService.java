@@ -2,13 +2,17 @@ package com.example.tasktube.server.application.services;
 
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.application.models.FinishTaskDto;
+import com.example.tasktube.server.application.models.PopTaskDto;
 import com.example.tasktube.server.application.port.in.ITaskService;
 import com.example.tasktube.server.application.utils.SlotUtils;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
+import com.example.tasktube.server.domain.port.out.IArgumentFiller;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
+import com.example.tasktube.server.domain.values.argument.Argument;
+import com.example.tasktube.server.domain.values.slot.Slot;
 import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -32,20 +37,24 @@ public class TaskService implements ITaskService {
     private final ITubeRepository tubeRepository;
     private final ITaskRepository taskRepository;
     private final IBarrierRepository barrierRepository;
+    private final IArgumentFiller argumentFiller;
 
     public TaskService(
             final ITubeRepository tubeRepository,
             final ITaskRepository taskRepository,
-            final IBarrierRepository barrierRepository
+            final IBarrierRepository barrierRepository,
+            final IArgumentFiller argumentFiller
+
     ) {
         this.tubeRepository = Objects.requireNonNull(tubeRepository);
         this.taskRepository = Objects.requireNonNull(taskRepository);
         this.barrierRepository = Objects.requireNonNull(barrierRepository);
+        this.argumentFiller = Objects.requireNonNull(argumentFiller);
     }
 
     @Override
     @Transactional
-    public void startTask(final UUID taskId, final Instant startedAt, final String client) {
+    public List<Argument> startTask(final UUID taskId, final Instant startedAt, final String client) {
         if (Objects.isNull(taskId)) {
             throw new ApplicationException("Parameter taskId cannot be null.");
         }
@@ -59,9 +68,17 @@ public class TaskService implements ITaskService {
 
         final Task task = taskRepository.get(taskId).orElseThrow();
 
+        final List<Argument> arguments = new LinkedList<>();
+
+        for (final Slot slot : task.getInput()) {
+            arguments.add(slot.fill(argumentFiller));
+        }
+
         task.start(startedAt, client);
 
         taskRepository.update(task);
+
+        return arguments;
     }
 
     @Override

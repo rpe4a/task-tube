@@ -32,16 +32,13 @@ public class TubeService implements ITubeService {
 
     private final ITubeRepository tubeRepository;
     private final IBarrierRepository barrierRepository;
-    private final IArgumentFiller argumentFiller;
 
     public TubeService(
             final ITubeRepository tubeRepository,
-            final IBarrierRepository barrierRepository,
-            final IArgumentFiller argumentFiller
+            final IBarrierRepository barrierRepository
     ) {
         this.tubeRepository = Objects.requireNonNull(tubeRepository);
         this.barrierRepository = Objects.requireNonNull(barrierRepository);
-        this.argumentFiller = Objects.requireNonNull(argumentFiller);
     }
 
     @Override
@@ -84,8 +81,9 @@ public class TubeService implements ITubeService {
         }
         LOGGER.info("Pop task from '{}' by '{}' client.", tube, client);
 
-        return tubeRepository.pop(tube, client)
-                .map(this::getPopTaskDto);
+        return tubeRepository
+                .pop(tube, client)
+                .map(PopTaskDto::from);
     }
 
     // TODO: add tests
@@ -107,28 +105,8 @@ public class TubeService implements ITubeService {
         final List<Task> tasks = tubeRepository.popList(tube, client, count);
         LOGGER.info("Popped '{}' tasks from '{}' by '{}' client.", tasks.size(), tube, client);
 
-        final List<PopTaskDto> results = new ArrayList<>(tasks.size());
-        for (final Task task : tasks) {
-            results.add(getPopTaskDto(task));
-        }
-
-        return results;
-    }
-
-    private PopTaskDto getPopTaskDto(final Task task) {
-        final List<Argument> arguments = new LinkedList<>();
-
-        for (final Slot slot : task.getInput()) {
-            arguments.add(slot.fill(argumentFiller));
-        }
-
-        return new PopTaskDto(
-                task.getId(),
-                task.getName(),
-                task.getTube(),
-                task.getCorrelationId(),
-                arguments,
-                task.getSettings()
-        );
+        return tasks.stream()
+                .map(PopTaskDto::from)
+                .toList();
     }
 }

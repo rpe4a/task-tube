@@ -19,7 +19,7 @@ public class SandboxSpringApplication {
 
         final TaskTubePublisherFactory taskPublisher = context.getBean(TaskTubePublisherFactory.class);
         final Optional<UUID> task = taskPublisher
-                .create(new StartPointTaskReturnNothing())
+                .create(new ParentTaskReturnString0String(), new Constant<>("hello"))
                 .pushIn("sandbox-tube");
 
         System.out.println(task.get());

@@ -30,7 +30,7 @@ public class ParentTaskReturnString0String extends Task1<String, String> {
         final TaskResult<Integer> childTaskResult0 = pushIn(new ChildTaskReturnInteger());
 
         final TaskResult<Integer> childTaskResult1 =
-                pushIn(new ChildTaskReturnInteger0String(), constant("Hello World"),
+                pushIn(new ChildTaskReturnInteger0String(), constant(arg0),
                         waitFor(childTaskResult0),
                         configure().maxCountOfFailures(5),
                         configure().failureRetryTimeoutSeconds(120),

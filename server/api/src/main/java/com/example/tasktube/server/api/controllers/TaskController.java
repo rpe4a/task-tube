@@ -4,7 +4,9 @@ import com.example.tasktube.server.api.requests.FailTaskRequest;
 import com.example.tasktube.server.api.requests.FinishTaskRequest;
 import com.example.tasktube.server.api.requests.ProcessTaskRequest;
 import com.example.tasktube.server.api.requests.StartTaskRequest;
+import com.example.tasktube.server.api.requests.StartTaskResponse;
 import com.example.tasktube.server.application.port.in.ITaskService;
+import com.example.tasktube.server.domain.values.argument.Argument;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
@@ -15,12 +17,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 @RestController()
 @RequestMapping(path = "/api/v1/task")
 public final class TaskController extends AbstractController {
+
     private final ITaskService taskService;
 
     public TaskController(
@@ -33,7 +37,7 @@ public final class TaskController extends AbstractController {
             value = "/{id}/start",
             method = RequestMethod.POST
     )
-    public ResponseEntity<Void> start(
+    public ResponseEntity<StartTaskResponse> start(
             @PathVariable("id") final UUID taskId,
             @NotNull @Valid @RequestBody final StartTaskRequest request,
             final BindingResult bindingResult
@@ -42,9 +46,11 @@ public final class TaskController extends AbstractController {
             return ResponseEntity.badRequest().build();
         }
 
-        taskService.startTask(taskId, request.startedAt(), request.client());
+        final List<Argument> arguments = taskService.startTask(taskId, request.startedAt(), request.client());
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(
+                new StartTaskResponse(arguments.toArray(new Argument[0]))
+        );
     }
 
     @RequestMapping(

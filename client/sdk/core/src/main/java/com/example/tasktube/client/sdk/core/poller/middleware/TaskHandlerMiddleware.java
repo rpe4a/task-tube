@@ -4,6 +4,7 @@ import com.example.tasktube.client.sdk.core.IInstanceIdProvider;
 import com.example.tasktube.client.sdk.core.http.ITaskTubeClient;
 import com.example.tasktube.client.sdk.core.http.dto.FinishTaskRequest;
 import com.example.tasktube.client.sdk.core.http.dto.StartTaskRequest;
+import com.example.tasktube.client.sdk.core.http.dto.StartTaskResponse;
 import com.example.tasktube.client.sdk.core.http.dto.TaskRequest;
 import com.example.tasktube.client.sdk.core.task.TaskInput;
 import com.example.tasktube.client.sdk.core.task.TaskOutput;
@@ -13,9 +14,11 @@ import jakarta.annotation.Nonnull;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.Optional;
 
 @Order(Integer.MAX_VALUE - 1)
 public final class TaskHandlerMiddleware extends AbstractMiddleware {
+
     private final ITaskTubeClient ITaskTubeClient;
     private final IInstanceIdProvider IInstanceIdProvider;
     private final SlotValueSerializer slotValueSerializer;
@@ -40,10 +43,16 @@ public final class TaskHandlerMiddleware extends AbstractMiddleware {
     }
 
     private void start(final TaskInput input) {
-        ITaskTubeClient.startTask(input.getId(), new StartTaskRequest(
-                IInstanceIdProvider.get(),
-                Instant.now()
-        ));
+        final Optional<StartTaskResponse> result = ITaskTubeClient
+                .startTask(
+                        input.getId(),
+                        new StartTaskRequest(
+                                IInstanceIdProvider.get(),
+                                Instant.now()
+                        )
+                );
+
+        input.setArguments(result.get().arguments());
     }
 
     private void finish(final TaskOutput output) {

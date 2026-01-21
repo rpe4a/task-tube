@@ -1,10 +1,9 @@
 package com.example.tasktube.server.application.models;
 
+import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.values.TaskSettings;
-import com.example.tasktube.server.domain.values.argument.Argument;
 import org.springframework.lang.NonNull;
 
-import java.util.List;
 import java.util.UUID;
 
 public record PopTaskDto(
@@ -12,7 +11,16 @@ public record PopTaskDto(
         @NonNull String name,
         @NonNull String tube,
         @NonNull String correlationId,
-        @NonNull List<Argument> arguments,
         @NonNull TaskSettings settings
 ) {
+
+    public static PopTaskDto from(final Task task) {
+        return new PopTaskDto(
+                task.getId(),
+                task.getName(),
+                task.getTube(),
+                task.getCorrelationId(),
+                task.getSettings()
+        );
+    }
 }

@@ -2,6 +2,7 @@ package com.example.tasktube.server.infrastructure.configuration;
 
 import com.example.tasktube.server.application.port.in.ITaskService;
 import com.example.tasktube.server.application.services.TaskService;
+import com.example.tasktube.server.domain.port.out.IArgumentFiller;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
@@ -18,8 +19,9 @@ public class TaskConfiguration {
     public ITaskService registerTaskService(
             final ITubeRepository tubeRepository,
             final ITaskRepository taskRepository,
-            final IBarrierRepository barrierRepository
-    ) {
-        return new TaskService(tubeRepository, taskRepository, barrierRepository);
+            final IBarrierRepository barrierRepository,
+            final IArgumentFiller argumentFiller
+            ) {
+        return new TaskService(tubeRepository, taskRepository, barrierRepository, argumentFiller);
     }
 }

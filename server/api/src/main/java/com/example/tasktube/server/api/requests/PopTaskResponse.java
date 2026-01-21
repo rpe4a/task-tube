@@ -15,11 +15,10 @@ public record PopTaskResponse(
         @NotBlank String name,
         @NotBlank String tube,
         @NotBlank String correlationId,
-        @NotNull  List<Argument> arguments,
         @NotNull TaskSettings settings
 ) {
     public static PopTaskResponse from(final PopTaskDto task) {
-        return new PopTaskResponse(task.id(), task.name(), task.tube(), task.correlationId(), task.arguments(), task.settings());
+        return new PopTaskResponse(task.id(), task.name(), task.tube(), task.correlationId(), task.settings());
     }
 }
 
