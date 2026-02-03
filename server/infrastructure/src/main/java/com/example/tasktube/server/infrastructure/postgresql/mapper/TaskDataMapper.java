@@ -57,6 +57,7 @@ public class TaskDataMapper {
             map.put("locked_by", null);
         }
         map.put("settings", task.getSettings() != null ? toJson(task.getSettings()) : null);
+        map.put("logs", task.getLogs() != null ? toJson(task.getLogs()) : null);
         map.put("handled_by", task.getHandledBy());
 
         return map;
@@ -117,6 +118,8 @@ public class TaskDataMapper {
                 )
         );
         task.setSettings(fromJson(rs.getString("settings"), new TypeReference<>() {
+        }));
+        task.setLogs(fromJson(rs.getString("logs"), new TypeReference<>() {
         }));
         task.setHandledBy(rs.getString("handled_by"));
 

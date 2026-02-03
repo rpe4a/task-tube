@@ -16,6 +16,7 @@ public class TaskOutput {
     private Value<?> result;
     private String failureMessage;
     private TaskRecord<?>[] children;
+    private LogRecord[] logs;
 
     private TaskOutput(
             @Nonnull final UUID id,
@@ -89,9 +90,20 @@ public class TaskOutput {
         return children;
     }
 
+    @Nullable
+    public LogRecord[] getLogs() {
+        return logs;
+    }
+
     @Nonnull
     public TaskOutput setChildren(@Nonnull final List<TaskRecord<?>> children) {
         this.children = Objects.requireNonNull(children).toArray(new TaskRecord<?>[0]);
+        return this;
+    }
+
+    @Nonnull
+    public TaskOutput setLogs(@Nonnull final List<LogRecord> logs) {
+        this.logs = Objects.requireNonNull(logs).toArray(new LogRecord[0]);
         return this;
     }
 

@@ -5,6 +5,7 @@ import com.example.tasktube.client.sdk.core.task.argument.ArgumentDeserializer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
@@ -18,16 +19,19 @@ import java.util.Optional;
 import java.util.UUID;
 
 public abstract sealed class Task<TResult> permits Task0, Task1, Task2, Task3, Task4, Task5, Task6, Task7 {
+
     private static final String CANNOT_FIND_METHOD_RUN = "Cannot find method run.";
     private static final String DEFAULT_METHOD_NAME = "run";
 
     private final List<TaskRecord<?>> children = new LinkedList<>();
+    private final List<LogRecord> logs = new LinkedList<>();
+
+    private TaskLoggerWrapper loggerWrapper;
 
     private UUID id;
     private String tube;
     private String correlationId;
     private TaskSettings settings;
-
     private ArgumentDeserializer argumentDeserializer;
 
     @Nonnull
@@ -292,6 +296,20 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2, Task3, T
         return child.getResult();
     }
 
+    @Nonnull
+    public TaskLogger logger() {
+        TaskLoggerWrapper wrapper = loggerWrapper;
+        if (wrapper == null) {
+            synchronized (this) {
+                if (loggerWrapper == null) {
+                    loggerWrapper = new TaskLoggerWrapper(new TaskLogger(logs));
+                }
+                wrapper = loggerWrapper;
+            }
+        }
+        return wrapper.logger;
+    }
+
     private <R> TaskRecord<R> addChild(final Task<R> task, final TaskConfiguration[] configurations) {
         final TaskRecord<R> child = task.attachTo(this);
 
@@ -340,6 +358,7 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2, Task3, T
 
         output.setResult(result);
         output.setChildren(children);
+        output.setLogs(logs);
     }
 
     private Optional<Value<TResult>> executeRunMethod(final Argument[] arguments) {
@@ -391,6 +410,7 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2, Task3, T
     }
 
     public static class Executor {
+
         public static final String EXECUTE_METHOD_NAME = "execute";
         private final Task<?> task;
 
@@ -426,6 +446,15 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2, Task3, T
             } catch (final NoSuchMethodException e) {
                 return findExecuteMethod(taskClazz.getSuperclass());
             }
+        }
+    }
+
+    private static class TaskLoggerWrapper {
+
+        public final TaskLogger logger;
+
+        public TaskLoggerWrapper(final TaskLogger logger) {
+            this.logger = logger;
         }
     }
 }

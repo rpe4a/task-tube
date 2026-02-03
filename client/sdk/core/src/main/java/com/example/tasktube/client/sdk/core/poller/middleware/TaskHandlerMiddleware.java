@@ -3,6 +3,7 @@ package com.example.tasktube.client.sdk.core.poller.middleware;
 import com.example.tasktube.client.sdk.core.IInstanceIdProvider;
 import com.example.tasktube.client.sdk.core.http.ITaskTubeClient;
 import com.example.tasktube.client.sdk.core.http.dto.FinishTaskRequest;
+import com.example.tasktube.client.sdk.core.http.dto.LogRequest;
 import com.example.tasktube.client.sdk.core.http.dto.StartTaskRequest;
 import com.example.tasktube.client.sdk.core.http.dto.StartTaskResponse;
 import com.example.tasktube.client.sdk.core.http.dto.TaskRequest;
@@ -61,10 +62,17 @@ public final class TaskHandlerMiddleware extends AbstractMiddleware {
                         ? new TaskRequest[0]
                         : Arrays.stream(output.getChildren()).map(taskRecord -> taskRecord.toRequest(slotValueSerializer)).toArray(TaskRequest[]::new);
 
+        final LogRequest[] logs =
+                Objects.isNull(output.getLogs())
+                        ? new LogRequest[0]
+                        : Arrays.stream(output.getLogs()).map(LogRequest::from).toArray(LogRequest[]::new);
+
+
         ITaskTubeClient.finishTask(
                 output.getId(),
                 new FinishTaskRequest(
                         children,
+                        logs,
                         output.getResult().serialize(slotValueSerializer),
                         IInstanceIdProvider.get(),
                         Instant.now()

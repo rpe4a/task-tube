@@ -2,7 +2,7 @@ package com.example.tasktube.server.application.services;
 
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.application.models.FinishTaskDto;
-import com.example.tasktube.server.application.models.PopTaskDto;
+import com.example.tasktube.server.application.models.LogRecordDto;
 import com.example.tasktube.server.application.port.in.ITaskService;
 import com.example.tasktube.server.application.utils.SlotUtils;
 import com.example.tasktube.server.domain.enties.Barrier;
@@ -11,6 +11,7 @@ import com.example.tasktube.server.domain.port.out.IArgumentFiller;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
+import com.example.tasktube.server.domain.values.LogRecord;
 import com.example.tasktube.server.domain.values.argument.Argument;
 import com.example.tasktube.server.domain.values.slot.Slot;
 import com.google.common.base.Strings;
@@ -18,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -147,7 +149,17 @@ public class TaskService implements ITaskService {
 
         barrierRepository.save(barriers);
 
-        task.finish(taskDto.finishedAt(), taskDto.output(), taskDto.client());
+        final List<LogRecord> logs = new LinkedList<>();
+        if (!CollectionUtils.isEmpty(taskDto.logs())) {
+            logs.addAll(taskDto.logs().stream().map(LogRecordDto::to).toList());
+        }
+
+        task.finish(
+                taskDto.finishedAt(),
+                taskDto.output(),
+                logs,
+                taskDto.client()
+        );
 
         taskRepository.update(task);
     }

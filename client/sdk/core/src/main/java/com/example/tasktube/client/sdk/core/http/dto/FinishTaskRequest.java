@@ -8,6 +8,7 @@ import java.time.Instant;
 
 public record FinishTaskRequest(
         @Nullable TaskRequest[] children,
+        @Nullable LogRequest[] logs,
         @Nonnull Slot output,
         @Nonnull String client,
         @Nonnull Instant finishedAt

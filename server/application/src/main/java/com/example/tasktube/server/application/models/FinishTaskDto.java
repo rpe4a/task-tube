@@ -1,18 +1,19 @@
 package com.example.tasktube.server.application.models;
 
 import com.example.tasktube.server.domain.values.slot.Slot;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
 public record FinishTaskDto(
-        @NonNull UUID taskId,
+        @Nonnull UUID taskId,
         @Nullable List<PushTaskDto> children,
-        @NonNull Slot output,
-        @NonNull String client,
-        @NonNull Instant finishedAt
+        @Nullable List<LogRecordDto> logs,
+        @Nonnull Slot output,
+        @Nonnull String client,
+        @Nonnull Instant finishedAt
 ) {
 }

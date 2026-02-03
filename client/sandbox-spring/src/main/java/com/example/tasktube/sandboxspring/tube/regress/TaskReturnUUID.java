@@ -11,6 +11,8 @@ public class TaskReturnUUID extends Task0<UUID> {
     @Nonnull
     @Override
     public Value<UUID> run() throws Exception {
+        logger().info("{} thread", Thread.currentThread().getName());
+
         return constant(UUID.randomUUID());
     }
 }

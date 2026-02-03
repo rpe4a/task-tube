@@ -2,16 +2,16 @@ package com.example.tasktube.server.application.models;
 
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.values.TaskSettings;
-import org.springframework.lang.NonNull;
+import jakarta.annotation.Nonnull;
 
 import java.util.UUID;
 
 public record PopTaskDto(
-        @NonNull UUID id,
-        @NonNull String name,
-        @NonNull String tube,
-        @NonNull String correlationId,
-        @NonNull TaskSettings settings
+        @Nonnull UUID id,
+        @Nonnull String name,
+        @Nonnull String tube,
+        @Nonnull String correlationId,
+        @Nonnull TaskSettings settings
 ) {
 
     public static PopTaskDto from(final Task task) {

@@ -168,7 +168,8 @@ public class TaskRepository implements ITaskRepository {
                         locked = :locked,
                         locked_by = :locked_by,
                         settings = :settings::jsonb,
-                        handled_by = :handled_by
+                        handled_by = :handled_by,
+                        logs = :logs::jsonb
                     WHERE id = :id
                 """;
 

@@ -12,7 +12,7 @@ spring:
 
     poller:
       producerPollingIntervalMilliseconds: 5000
-      shutdownAwaitTerminationSeconds: 60
+      shutdownAwaitTerminationSeconds: 3
       maxConsumersCount: 1
       minConsumersCount: 1
       consumerEmptyQueueSleepTimeoutMilliseconds: 100

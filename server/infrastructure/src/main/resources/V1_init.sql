@@ -39,5 +39,6 @@ CREATE TABLE tasks
     locked         BOOLEAN       NULL,                   -- заблокирована ли
     locked_by      varchar(256),                         -- кем заблокирована
     settings       JSONB,                                -- настройки
+    logs           JSONB,                                -- логи задачи
     handled_by     varchar(256)                          -- кем обработана
 );

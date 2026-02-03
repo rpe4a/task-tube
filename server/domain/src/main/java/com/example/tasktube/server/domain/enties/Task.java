@@ -2,11 +2,14 @@ package com.example.tasktube.server.domain.enties;
 
 import com.example.tasktube.server.domain.exceptions.ValidationDomainException;
 import com.example.tasktube.server.domain.values.Lock;
+import com.example.tasktube.server.domain.values.LogRecord;
 import com.example.tasktube.server.domain.values.TaskSettings;
 import com.example.tasktube.server.domain.values.slot.Slot;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -40,6 +43,8 @@ public class Task {
     private TaskSettings settings;
     private String handledBy;
 
+    private List<LogRecord> logs;
+
     public Task(final UUID id,
                 final String name,
                 final String tube,
@@ -63,6 +68,7 @@ public class Task {
                 final String failedReason,
                 final Lock lock,
                 final TaskSettings settings,
+                final List<LogRecord> logs,
                 final String handledBy
     ) {
         this.id = id;
@@ -88,9 +94,13 @@ public class Task {
         this.failedReason = failedReason;
         this.lock = lock;
         this.handledBy = handledBy;
+        this.logs = Optional
+                .ofNullable(logs).orElse(new LinkedList<>());
         this.settings = Optional
                 .ofNullable(settings)
                 .orElse(TaskSettings.getDefault());
+
+        addLog(LogRecord.info("Task has been created."));
     }
 
     public Task() {
@@ -262,6 +272,7 @@ public class Task {
         checkSchedule(client);
         setStatus(Status.SCHEDULED);
         setScheduledAt(scheduledAt);
+        addLog(LogRecord.info("Task has been scheduled."));
         unlock();
     }
 
@@ -270,6 +281,7 @@ public class Task {
         setCanceledAt(canceledAt);
         setStatus(Status.CANCELED);
         setFailedReason(failedReason);
+        addLog(LogRecord.info("Task has been canceled."));
         unlock();
     }
 
@@ -277,6 +289,7 @@ public class Task {
         checkStart(client);
         setStartedAt(startedAt);
         setStatus(Status.PROCESSING);
+        addLog(LogRecord.info("Task has been started."));
         setLock(getLock().prolong());
     }
 
@@ -284,15 +297,18 @@ public class Task {
         checkProcess(client);
         setHeartbeatAt(heartbeatAt);
         setStatus(Status.PROCESSING);
+        addLog(LogRecord.info("Task is being processed."));
         setLock(getLock().prolong());
     }
 
-    public void finish(final Instant finishedAt, final Slot output, final String client) {
+    public void finish(final Instant finishedAt, final Slot output, final List<LogRecord> logs, final String client) {
         checkFinish(output, client);
         setFinishedAt(finishedAt);
         setStatus(Status.FINISHED);
         setOutput(output);
         setHandledBy(client);
+        addLogs(logs);
+        addLog(LogRecord.info("Task has been finished."));
         unlock();
     }
 
@@ -308,6 +324,7 @@ public class Task {
             setFailures(getFailures() + 1);
             setFailedReason(failedReason);
             setOutput(null);
+            addLog(LogRecord.info("Task has been failed."));
             unlock();
         } else {
             setStatus(Status.ABORTED);
@@ -316,6 +333,7 @@ public class Task {
             setFailedAt(failedAt);
             setFailedReason(failedReason);
             setOutput(null);
+            addLog(LogRecord.info("Task has been aborted."));
             unlock();
         }
     }
@@ -325,6 +343,7 @@ public class Task {
         setStatus(Status.ABORTED);
         setAbortedAt(abortedAt);
         setFailedReason(failedReason);
+        addLog(LogRecord.info("Task has been aborted."));
         unlock();
     }
 
@@ -332,6 +351,7 @@ public class Task {
         checkComplete(client);
         setStatus(Status.COMPLETED);
         setCompletedAt(completedAt);
+        addLog(LogRecord.info("Task has been completed."));
         unlock();
     }
 
@@ -477,27 +497,34 @@ public class Task {
 
         if (getLock().isLockedBefore(lockedTimeout)) {
             if (Status.CREATED.equals(getStatus())) {
+                addLog(LogRecord.info("Execution of task is blocked in CREATED state, has been unlocked and returned to queue."));
                 setCreatedAt(Instant.now());
             }
             if (Status.SCHEDULED.equals(getStatus())) {
+                addLog(LogRecord.info("Execution of task is blocked in SCHEDULED state, has been unlocked and returned to queue."));
                 setScheduledAt(Instant.now());
             }
             if (Status.PROCESSING.equals(getStatus())) {
+                addLog(LogRecord.info("Execution of task is blocked in PROCESSING state, has been unlocked and returned to queue."));
                 setStatus(Status.SCHEDULED);
                 setScheduledAt(Instant.now());
                 setStartedAt(null);
                 setHeartbeatAt(null);
             }
             if (Status.FINISHED.equals(getStatus())) {
+                addLog(LogRecord.info("Execution of task is blocked in FINISHED state, has been unlocked and returned to queue."));
                 setFinishedAt(Instant.now());
             }
             if (Status.CANCELED.equals(getStatus())) {
+                addLog(LogRecord.info("Execution of task is blocked in CANCELED state, has been unlocked and returned to queue."));
                 setCanceledAt(Instant.now());
             }
             if (Status.ABORTED.equals(getStatus())) {
+                addLog(LogRecord.info("Execution of task is blocked in ABORTED state, has been unlocked and returned to queue."));
                 setAbortedAt(Instant.now());
             }
             if (Status.COMPLETED.equals(getStatus())) {
+                addLog(LogRecord.info("Execution of task is blocked in COMPLETED state, has been unlocked and returned to queue."));
                 setCompletedAt(Instant.now());
             }
 
@@ -526,6 +553,22 @@ public class Task {
                 case FAILED -> abort(Instant.now(), BARRIER_IS_FAILED.formatted(barrier.getId()), client);
             }
         }
+    }
+
+    public List<LogRecord> getLogs() {
+        return logs;
+    }
+
+    public void setLogs(final List<LogRecord> logs) {
+        this.logs = logs;
+    }
+
+    public void addLog(final LogRecord log) {
+        this.logs.add(log);
+    }
+
+    public void addLogs(final Collection<LogRecord> logs) {
+        this.logs.addAll(logs);
     }
 
     public enum Status {

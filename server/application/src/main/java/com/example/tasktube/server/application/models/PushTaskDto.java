@@ -2,22 +2,23 @@ package com.example.tasktube.server.application.models;
 
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.values.slot.Slot;
-import org.springframework.lang.NonNull;
-import org.springframework.lang.Nullable;
+import jakarta.annotation.Nullable;
+import jakarta.annotation.Nonnull;
+
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public record PushTaskDto(
-        @NonNull UUID id,
-        @NonNull String name,
-        @NonNull String tube,
-        @NonNull String correlationId,
+public record  PushTaskDto(
+        @Nonnull UUID id,
+        @Nonnull String name,
+        @Nonnull String tube,
+        @Nonnull String correlationId,
         @Nullable List<Slot> input,
         @Nullable List<UUID> waitTasks,
-        @NonNull Instant createdAt,
+        @Nonnull Instant createdAt,
         @Nullable TaskSettingsDto settings
 ) {
     public Task to(final boolean isRoot) {
@@ -47,6 +48,7 @@ public record PushTaskDto(
                 Optional.ofNullable(settings)
                         .map(TaskSettingsDto::to)
                         .orElse(null),
+                null,
                 null
         );
     }
