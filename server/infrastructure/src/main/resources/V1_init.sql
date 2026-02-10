@@ -1,3 +1,14 @@
+CREATE TABLE logs
+(
+    id                  UUID PRIMARY KEY     DEFAULT gen_random_uuid(), -- уникальный идентификатор
+    task_id             UUID        NOT NULL,                           -- уникальный идентификатор задачи
+    type                varchar(32) NOT NULL,                           -- тип
+    level               varchar(32) NOT NULL,                           -- уровень лога
+    timestamp           TIMESTAMPTZ NOT NULL DEFAULT NOW(),             -- время создания
+    message             text,                                           -- сообщение
+    exceptionMessage    text,                                           -- сообщение об ошибке
+    exceptionStackTrace text                                            -- стек ошибки
+);
 CREATE TABLE barriers
 (
     id          UUID PRIMARY KEY,                   -- уникальный идентификатор
@@ -39,6 +50,5 @@ CREATE TABLE tasks
     locked         BOOLEAN       NULL,                   -- заблокирована ли
     locked_by      varchar(256),                         -- кем заблокирована
     settings       JSONB,                                -- настройки
-    logs           JSONB,                                -- логи задачи
     handled_by     varchar(256)                          -- кем обработана
 );

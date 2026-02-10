@@ -48,7 +48,6 @@ public record  PushTaskDto(
                 Optional.ofNullable(settings)
                         .map(TaskSettingsDto::to)
                         .orElse(null),
-                null,
                 null
         );
     }

@@ -4,8 +4,6 @@ import com.example.tasktube.server.application.models.FinishTaskDto;
 import com.example.tasktube.server.application.models.PushTaskDto;
 import com.example.tasktube.server.application.models.TaskSettingsDto;
 import com.example.tasktube.server.domain.values.slot.ConstantSlot;
-import com.example.tasktube.server.domain.values.slot.Slot;
-import org.checkerframework.checker.units.qual.C;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -45,7 +43,7 @@ public class TestUtils {
     }
 
     public static FinishTaskDto createFinishTaskDto(final UUID taskId, final String client, final List<PushTaskDto> children) {
-        return new FinishTaskDto(taskId, children, new ConstantSlot(), client, Instant.now());
+        return new FinishTaskDto(taskId, children, null, new ConstantSlot(), client, Instant.now());
     }
 
     public static void await(final long amount, final TimeUnit timeUnit) {

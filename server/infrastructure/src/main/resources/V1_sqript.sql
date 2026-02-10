@@ -5,8 +5,13 @@ select * from tasks order by heartbeat_at;
 
 select * from barriers order by status, created_at  desc
 
+select * from logs
+where task_id = '82644423-05b2-4d2e-adae-b324a5c4cb59'
+order by timestamp
+
 delete from tasks;
 delete from barriers;
+delete from logs;
 
 UPDATE barriers
 SET locked_at = null,

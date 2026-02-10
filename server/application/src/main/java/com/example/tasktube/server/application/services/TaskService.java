@@ -11,7 +11,7 @@ import com.example.tasktube.server.domain.port.out.IArgumentFiller;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
-import com.example.tasktube.server.domain.values.LogRecord;
+import com.example.tasktube.server.domain.enties.LogRecord;
 import com.example.tasktube.server.domain.values.argument.Argument;
 import com.example.tasktube.server.domain.values.slot.Slot;
 import com.google.common.base.Strings;
@@ -151,7 +151,7 @@ public class TaskService implements ITaskService {
 
         final List<LogRecord> logs = new LinkedList<>();
         if (!CollectionUtils.isEmpty(taskDto.logs())) {
-            logs.addAll(taskDto.logs().stream().map(LogRecordDto::to).toList());
+            logs.addAll(taskDto.logs().stream().map(l -> l.to(task.getId())).toList());
         }
 
         task.finish(

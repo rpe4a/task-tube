@@ -2,6 +2,7 @@ package com.example.tasktube.server.infrastructure.postgresql.repository;
 
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.domain.enties.Task;
+import com.example.tasktube.server.domain.port.out.IEventPublisher;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskDataMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,17 +22,21 @@ import java.util.UUID;
 
 @Repository
 public class TaskRepository implements ITaskRepository {
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskRepository.class);
 
     private final NamedParameterJdbcTemplate db;
     private final TaskDataMapper mapper;
+    private final IEventPublisher eventPublisher;
 
     public TaskRepository(
             final NamedParameterJdbcTemplate db,
-            final TaskDataMapper mapper
+            final TaskDataMapper mapper,
+            final IEventPublisher eventPublisher
     ) {
         this.db = Objects.requireNonNull(db);
         this.mapper = Objects.requireNonNull(mapper);
+        this.eventPublisher = Objects.requireNonNull(eventPublisher);
     }
 
     @Override
@@ -168,8 +173,7 @@ public class TaskRepository implements ITaskRepository {
                         locked = :locked,
                         locked_by = :locked_by,
                         settings = :settings::jsonb,
-                        handled_by = :handled_by,
-                        logs = :logs::jsonb
+                        handled_by = :handled_by
                     WHERE id = :id
                 """;
 
@@ -177,5 +181,7 @@ public class TaskRepository implements ITaskRepository {
         if (affected > 0) {
             LOGGER.debug("Task with ID: '{}' updated successfully.", task.getId());
         }
+
+        eventPublisher.publish(task.pullEvents());
     }
 }

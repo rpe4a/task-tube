@@ -1,26 +1,36 @@
-package com.example.tasktube.server.domain.values;
-
-import com.google.common.base.Throwables;
+package com.example.tasktube.server.domain.enties;
 
 import java.time.Instant;
+import java.util.UUID;
 
-public class LogRecord {
+public class LogRecord extends Entity<UUID> {
 
+    private UUID taskId;
     private LogRecordType type;
-    private Instant timestamp;
     private LogRecordLevel level;
+    private Instant timestamp;
     private String message;
     private String exceptionMessage;
     private String exceptionStackTrace;
 
     public LogRecord() {
+        super(UUID.randomUUID());
     }
 
-    public LogRecord(final LogRecordType type, final Instant timestamp, final LogRecordLevel level, final String message, final Throwable throwable) {
-        this(type, timestamp, level, message, throwable.getMessage(), Throwables.getStackTraceAsString(throwable));
+    public LogRecord(final UUID taskId,
+                     final LogRecordType type,
+                     final Instant timestamp,
+                     final LogRecordLevel level,
+                     final String message,
+                     final String exceptionMessage,
+                     final String exceptionStackTrace
+    ) {
+        this(UUID.randomUUID(), taskId, type, timestamp, level, message, exceptionMessage, exceptionStackTrace);
     }
 
     public LogRecord(
+            final UUID id,
+            final UUID taskId,
             final LogRecordType type,
             final Instant timestamp,
             final LogRecordLevel level,
@@ -28,6 +38,8 @@ public class LogRecord {
             final String exceptionMessage,
             final String exceptionStackTrace
     ) {
+        super(id);
+        this.taskId = taskId;
         this.type = type;
         this.timestamp = timestamp;
         this.level = level;
@@ -36,8 +48,9 @@ public class LogRecord {
         this.exceptionStackTrace = exceptionStackTrace;
     }
 
-    public static LogRecord info(final String message) {
+    public static LogRecord info(final UUID taskId, final String message) {
         return new LogRecord(
+                taskId,
                 LogRecordType.SERVER,
                 Instant.now(),
                 LogRecordLevel.INFO,
@@ -93,5 +106,13 @@ public class LogRecord {
 
     public void setExceptionStackTrace(final String exceptionStackTrace) {
         this.exceptionStackTrace = exceptionStackTrace;
+    }
+
+    public UUID getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(final UUID taskId) {
+        this.taskId = taskId;
     }
 }

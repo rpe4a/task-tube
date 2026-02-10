@@ -169,7 +169,7 @@ class TaskControllerValidationTests {
 
     @Test
     void shouldFinishTaskWithNullClientReturnBadRequest() throws Exception {
-        final FinishTaskRequest request = new FinishTaskRequest(null, new ConstantSlot(), null, Instant.now());
+        final FinishTaskRequest request = new FinishTaskRequest(null, null, new ConstantSlot(), null, Instant.now());
         final String taskId = UUID.randomUUID().toString();
 
         mockMvc.perform(post("/api/v1/task/" + taskId + "/finish")
@@ -180,7 +180,7 @@ class TaskControllerValidationTests {
 
     @Test
     void shouldFinishTaskWithEmptyClientReturnBadRequest() throws Exception {
-        final FinishTaskRequest request = new FinishTaskRequest(null, new ConstantSlot(), "", Instant.now());
+        final FinishTaskRequest request = new FinishTaskRequest(null, null, new ConstantSlot(), "", Instant.now());
         final String taskId = UUID.randomUUID().toString();
 
         mockMvc.perform(post("/api/v1/task/" + taskId + "/finish")
@@ -191,7 +191,7 @@ class TaskControllerValidationTests {
 
     @Test
     void shouldFinishTaskWithNullOutputReturnBadRequest() throws Exception {
-        final FinishTaskRequest request = new FinishTaskRequest(null, null, "test-client", Instant.now());
+        final FinishTaskRequest request = new FinishTaskRequest(null, null, null, "test-client", Instant.now());
         final String taskId = UUID.randomUUID().toString();
 
         mockMvc.perform(post("/api/v1/task/" + taskId + "/finish")
@@ -202,7 +202,7 @@ class TaskControllerValidationTests {
 
     @Test
     void shouldFinishTaskWithNullFinishedAtReturnBadRequest() throws Exception {
-        final FinishTaskRequest request = new FinishTaskRequest(null, new ConstantSlot(), "test-client", null);
+        final FinishTaskRequest request = new FinishTaskRequest(null, null, new ConstantSlot(), "test-client", null);
         final String taskId = UUID.randomUUID().toString();
 
         mockMvc.perform(post("/api/v1/task/" + taskId + "/finish")
@@ -213,7 +213,7 @@ class TaskControllerValidationTests {
 
     @Test
     void shouldFinishTaskReturnNoContent() throws Exception {
-        final FinishTaskRequest request = new FinishTaskRequest(null, new ConstantSlot(), "test-client", Instant.now());
+        final FinishTaskRequest request = new FinishTaskRequest(null, null, new ConstantSlot(), "test-client", Instant.now());
         final String taskId = UUID.randomUUID().toString();
 
         Mockito.doNothing().when(mockTaskService).finishTask(Mockito.any());

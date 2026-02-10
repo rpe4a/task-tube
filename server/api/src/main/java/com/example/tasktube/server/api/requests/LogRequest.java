@@ -1,8 +1,8 @@
 package com.example.tasktube.server.api.requests;
 
 import com.example.tasktube.server.application.models.LogRecordDto;
-import com.example.tasktube.server.domain.values.LogRecordLevel;
-import com.example.tasktube.server.domain.values.LogRecordType;
+import com.example.tasktube.server.domain.enties.LogRecordLevel;
+import com.example.tasktube.server.domain.enties.LogRecordType;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

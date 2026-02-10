@@ -61,7 +61,7 @@ class RegressApplicationScheduleTests extends AbstractRegressApplicationTests {
 
         final UUID taskId = tubeService.push(pushTaskDto);
 
-        assertThatThrownBy(() -> taskService.finishTask(new FinishTaskDto(taskId, null, new ConstantSlot(), CLIENT, Instant.now())));
+        assertThatThrownBy(() -> taskService.finishTask(new FinishTaskDto(taskId, null, null, new ConstantSlot(), CLIENT, Instant.now())));
     }
 
     @Test

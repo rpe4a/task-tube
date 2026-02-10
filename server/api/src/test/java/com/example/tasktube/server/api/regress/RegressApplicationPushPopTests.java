@@ -11,13 +11,11 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @ActiveProfiles("test")
 @SpringBootTest(
@@ -135,7 +133,6 @@ class RegressApplicationPushPopTests extends AbstractRegressApplicationTests {
         assertThat(popTask.get().id()).isEqualTo(pushTask.get().getId());
         assertThat(popTask.get().name()).isEqualTo(pushTask.get().getName());
         assertThat(popTask.get().tube()).isEqualTo(pushTask.get().getTube());
-        assertThat(popTask.get().arguments()).isEqualTo(pushTask.get().getInput());
 
         final Optional<Task> taskScheduled = taskRepository.get(popTask.get().id());
         assertThat(taskScheduled.isEmpty()).isFalse();

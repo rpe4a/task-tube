@@ -1,4 +1,4 @@
-package com.example.tasktube.server.domain.values;
+package com.example.tasktube.server.domain.enties;
 
 public enum LogRecordLevel {
     ERROR("ERROR"),

@@ -2,6 +2,7 @@ package com.example.tasktube.server.infrastructure.postgresql.repository;
 
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.domain.enties.Task;
+import com.example.tasktube.server.domain.port.out.IEventPublisher;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskDataMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -21,19 +22,23 @@ import java.util.function.Function;
 
 @Repository
 public class TubeRepository implements ITubeRepository {
+
     public static final int TASK_PARTITION_SIZE = 1000;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TubeRepository.class);
 
     private final NamedParameterJdbcTemplate db;
     private final TaskDataMapper mapper;
+    private final IEventPublisher eventPublisher;
 
     public TubeRepository(
             final NamedParameterJdbcTemplate db,
-            final TaskDataMapper mapper
+            final TaskDataMapper mapper,
+            final IEventPublisher eventPublisher
     ) {
         this.db = Objects.requireNonNull(db);
         this.mapper = Objects.requireNonNull(mapper);
+        this.eventPublisher = Objects.requireNonNull(eventPublisher);
     }
 
     private static String getInsertCommand() {
@@ -64,7 +69,6 @@ public class TubeRepository implements ITubeRepository {
                         locked,
                         locked_by,
                         settings,
-                        logs,
                         handled_by
                     ) VALUES (
                         :id,
@@ -92,7 +96,6 @@ public class TubeRepository implements ITubeRepository {
                         :locked,
                         :locked_by,
                         :settings::jsonb,
-                        :logs::jsonb,
                         :handled_by
                     )
                 """;
@@ -111,6 +114,9 @@ public class TubeRepository implements ITubeRepository {
         if (affected > 0) {
             LOGGER.debug("Successfully pushed task with ID: '{}' to tube: '{}'.", task.getId(), task.getTube());
         }
+
+        eventPublisher.publish(task.pullEvents());
+
         return task;
     }
 
@@ -137,14 +143,19 @@ public class TubeRepository implements ITubeRepository {
         if (tasks.size() <= TASK_PARTITION_SIZE) {
             final int[] affected = db.batchUpdate(insertCommand, getTasksBatch.apply(tasks));
             LOGGER.debug("Batch pushed '{}' tasks. Rows affected: '{}'.", tasks.size(), affected.length);
-            return;
+        } else {
+            final List<List<Task>> partitions = Lists.partition(tasks, TASK_PARTITION_SIZE);
+            partitions.forEach(partition -> {
+                final int[] affected = db.batchUpdate(insertCommand, getTasksBatch.apply(partition));
+                LOGGER.debug("Batch pushed partition of '{}' tasks. Rows affected: '{}'.", partition.size(), affected.length);
+            });
         }
 
-        final List<List<Task>> partitions = Lists.partition(tasks, TASK_PARTITION_SIZE);
-        partitions.forEach(partition -> {
-            final int[] affected = db.batchUpdate(insertCommand, getTasksBatch.apply(partition));
-            LOGGER.debug("Batch pushed partition of '{}' tasks. Rows affected: '{}'.", partition.size(), affected.length);
-        });
+        eventPublisher.publish(
+                tasks.stream()
+                        .flatMap(t -> t.pullEvents().stream())
+                        .toList()
+        );
     }
 
     @Override

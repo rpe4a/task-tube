@@ -256,7 +256,7 @@ class TubeControllerValidationTests {
         final PopTaskRequest request = new PopTaskRequest("client");
 
         Mockito.when(mockTubeService.pop(Mockito.anyString(), Mockito.anyString()))
-                .thenReturn(Optional.of(new PopTaskDto(UUID.randomUUID(), "", "", "", null, null)));
+                .thenReturn(Optional.of(new PopTaskDto(UUID.randomUUID(), "", "", "", null)));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/tube/test-tube/pop")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -310,7 +310,7 @@ class TubeControllerValidationTests {
         final PopTasksRequest request = new PopTasksRequest("client", 10);
 
         Mockito.when(mockTubeService.popList(Mockito.anyString(), Mockito.anyString(), Mockito.anyInt()))
-                .thenReturn(List.of(new PopTaskDto(UUID.randomUUID(), "", "", "", null, null)));
+                .thenReturn(List.of(new PopTaskDto(UUID.randomUUID(), "", "", "", null)));
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/tube/test-tube/pop/list")
                         .contentType(MediaType.APPLICATION_JSON)

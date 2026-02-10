@@ -9,9 +9,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Barrier {
+public class Barrier extends Entity<UUID> {
 
-    private UUID id;
     private UUID taskId;
     private List<UUID> waitFor;
     private Type type;
@@ -22,6 +21,7 @@ public class Barrier {
     private Lock lock;
 
     public Barrier() {
+        super(UUID.randomUUID());
     }
 
     public Barrier(
@@ -35,7 +35,7 @@ public class Barrier {
             final Instant releasedAt,
             final Lock lock
     ) {
-        this.id = id;
+        super(id);
         this.taskId = taskId;
         this.waitFor = waitFor;
         this.type = type;
@@ -44,14 +44,6 @@ public class Barrier {
         this.createdAt = createdAt;
         this.releasedAt = releasedAt;
         this.lock = lock;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(final UUID id) {
-        this.id = id;
     }
 
     public UUID getTaskId() {
