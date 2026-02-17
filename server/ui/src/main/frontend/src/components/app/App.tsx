@@ -1,11 +1,11 @@
 import React from 'react';
-import Tasks from '../tasks/Tasks';
 import { Route, Routes } from 'react-router';
+import Tasks from '../tasks/Tasks';
 
 function App(): React.JSX.Element {
   return (
     <Routes>
-      <Route path="/" element={<Tasks />} />
+      <Route index path="/" element={<Tasks />} />
     </Routes>
   );
 }
