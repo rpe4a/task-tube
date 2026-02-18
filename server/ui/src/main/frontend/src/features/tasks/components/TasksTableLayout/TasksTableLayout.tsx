@@ -48,18 +48,22 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
           <Table>
             <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
               <TableRow>
+                <TableCell sx={{ fontWeight: 600 }}>Id</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Tube</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Created At</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Updated At</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Completed At</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Aborted At</TableCell>
+                <TableCell sx={{ fontWeight: 600 }}>Duration</TableCell>
                 <TableCell sx={{ fontWeight: 600 }}>Handled By</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {tasks.map((task) => (
                 <TableRow key={task.id} hover>
+                  <TableCell>{task.id}</TableCell>
                   <TableCell>{task.name}</TableCell>
                   <TableCell>{task.tube}</TableCell>
                   <TableCell>
@@ -68,6 +72,14 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
                   <TableCell>{DateTimeUtils.formatDateTime(task.createdAt)}</TableCell>
                   <TableCell>{DateTimeUtils.formatDateTime(task.updatedAt)}</TableCell>
                   <TableCell>{DateTimeUtils.formatDateTime(task.completedAt)}</TableCell>
+                  <TableCell>{DateTimeUtils.formatDateTime(task.abortedAt)}</TableCell>
+                  <TableCell>
+                    {DateTimeUtils.calculateDuration(
+                      task.createdAt,
+                      task.completedAt,
+                      task.abortedAt,
+                    )}
+                  </TableCell>
                   <TableCell>{task.handledBy}</TableCell>
                 </TableRow>
               ))}

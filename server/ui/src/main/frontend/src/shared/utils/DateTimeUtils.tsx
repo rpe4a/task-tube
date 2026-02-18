@@ -14,3 +14,25 @@ export const formatDateTime = (
   const date = dayjs(dateTimeString);
   return date.format(formater);
 };
+
+export const calculateDuration = (
+  createdAt: string,
+  completedAt: string | null,
+  abortedAt: string | null,
+): string => {
+  if (!createdAt) return '-';
+
+  const startTime = dayjs(createdAt);
+  const endTime = completedAt ? dayjs(completedAt) : abortedAt ? dayjs(abortedAt) : null;
+
+  if (!endTime) return '-';
+
+  const durationMs = endTime.diff(startTime);
+  const durationSec = Math.floor(durationMs / 1000);
+
+  const hours = Math.floor(durationSec / 3600);
+  const minutes = Math.floor((durationSec % 3600) / 60);
+  const seconds = durationSec % 60;
+
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+};

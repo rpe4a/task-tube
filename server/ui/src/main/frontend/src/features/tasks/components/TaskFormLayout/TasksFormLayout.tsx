@@ -60,11 +60,11 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
 
   return (
     <>
-      <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
-        <Typography variant="h5" sx={{ mb: 3 }}>
-          Fetch Tasks
-        </Typography>
+      <Typography variant="h4" sx={{ mb: 3 }}>
+        Search Executions
+      </Typography>
 
+      <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'flex-end', mb: 3 }}>
           <TextField
             label="Or enter custom tube name"

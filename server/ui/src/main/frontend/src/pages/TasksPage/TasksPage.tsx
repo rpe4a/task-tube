@@ -224,7 +224,7 @@ function Tasks(): React.JSX.Element {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ py: 3 }}>
+    <Container maxWidth="xl" sx={{ py: 3 }}>
       <TasksFormLayout
         customTube={customTube}
         createdAt={createdAt}
