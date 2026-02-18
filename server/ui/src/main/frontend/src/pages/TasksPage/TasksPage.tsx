@@ -1,4 +1,4 @@
-import { Container } from '@mui/material';
+import { Container, SelectChangeEvent } from '@mui/material';
 import React, { useState } from 'react';
 import TasksFormLayout from '../../features/tasks/components/TaskFormLayout/TasksFormLayout';
 import TaskPageDto from '../../features/tasks/models/TaskPageDto';
@@ -122,9 +122,29 @@ function Tasks(): React.JSX.Element {
   const [customTube, setCustomTube] = useState<string>('');
   const [createdAt, setCreatedAt] = useState<Dayjs | null>(null);
   const [completedAt, setCompletedAt] = useState<Dayjs | null>(null);
+  const [searchId, setSearchId] = useState<string>('');
+  const [searchName, setSearchName] = useState<string>('');
+  const [searchTube, setSearchTube] = useState<string>('');
+  const [searchStatus, setSearchStatus] = useState<string>('');
 
   const handleCustomTubeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCustomTube(event.target.value);
+  };
+
+  const handleSearchIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchId(event.target.value);
+  };
+
+  const handleSearchNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchName(event.target.value);
+  };
+
+  const handleSearchTubeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTube(event.target.value);
+  };
+
+  const handleSearchStatusChange = (event: SelectChangeEvent<string>) => {
+    setSearchStatus(event.target.value as string);
   };
 
   const handleFetchTasks = async (
@@ -154,6 +174,28 @@ function Tasks(): React.JSX.Element {
         );
       }
 
+      if (searchId) {
+        fetchedTasks = fetchedTasks.filter((t) =>
+          t.id.toLowerCase().includes(searchId.toLowerCase()),
+        );
+      }
+
+      if (searchName) {
+        fetchedTasks = fetchedTasks.filter((t) =>
+          t.name.toLowerCase().includes(searchName.toLowerCase()),
+        );
+      }
+
+      if (searchTube) {
+        fetchedTasks = fetchedTasks.filter((t) =>
+          t.tube.toLowerCase().includes(searchTube.toLowerCase()),
+        );
+      }
+
+      if (searchStatus) {
+        fetchedTasks = fetchedTasks.filter((t) => t.status === searchStatus);
+      }
+
       setTasks(fetchedTasks);
     } catch (error) {
       console.error('Error fetching tasks:', error);
@@ -167,6 +209,10 @@ function Tasks(): React.JSX.Element {
     setCustomTube('');
     setCreatedAt(null);
     setCompletedAt(null);
+    setSearchId('');
+    setSearchName('');
+    setSearchTube('');
+    setSearchStatus('');
     try {
       const fetchedTasks = await mockFetchAllTasks();
       setTasks(fetchedTasks);
@@ -183,10 +229,18 @@ function Tasks(): React.JSX.Element {
         customTube={customTube}
         createdAt={createdAt}
         completedAt={completedAt}
+        searchId={searchId}
+        searchName={searchName}
+        searchTube={searchTube}
+        searchStatus={searchStatus}
         loading={loading}
         handleCustomTubeChange={handleCustomTubeChange}
         handleCreatedAtChange={setCreatedAt}
         handleCompletedAtChange={setCompletedAt}
+        handleSearchIdChange={handleSearchIdChange}
+        handleSearchNameChange={handleSearchNameChange}
+        handleSearchTubeChange={handleSearchTubeChange}
+        handleSearchStatusChange={handleSearchStatusChange}
         handleFetchTasks={handleFetchTasks}
         handleFetchAll={handleFetchAll}
       />

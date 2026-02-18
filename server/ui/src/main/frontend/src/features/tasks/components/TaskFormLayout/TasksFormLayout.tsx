@@ -1,4 +1,16 @@
-import { Box, Button, CircularProgress, Paper, TextField, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Paper,
+  TextField,
+  Typography,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
+  SelectChangeEvent,
+} from '@mui/material';
 import { JSX } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -9,10 +21,18 @@ interface TasksFormLayoutProps {
   customTube: string;
   createdAt: Dayjs | null;
   completedAt: Dayjs | null;
+  searchId: string;
+  searchName: string;
+  searchTube: string;
+  searchStatus: string;
   loading: boolean;
   handleCustomTubeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   handleCreatedAtChange: (value: Dayjs | null) => void;
   handleCompletedAtChange: (value: Dayjs | null) => void;
+  handleSearchIdChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSearchNameChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSearchTubeChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleSearchStatusChange: (event: SelectChangeEvent<string>) => void;
   handleFetchTasks: (createdAt?: Dayjs | null, completedAt?: Dayjs | null) => void;
   handleFetchAll: () => void;
 }
@@ -22,10 +42,18 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
     customTube,
     createdAt,
     completedAt,
+    searchId,
+    searchName,
+    searchTube,
+    searchStatus,
     loading,
     handleCustomTubeChange,
     handleCreatedAtChange,
     handleCompletedAtChange,
+    handleSearchIdChange,
+    handleSearchNameChange,
+    handleSearchTubeChange,
+    handleSearchStatusChange,
     handleFetchTasks,
     handleFetchAll,
   } = props;
@@ -37,7 +65,7 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
           Fetch Tasks
         </Typography>
 
-        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'flex-end', mb: 3 }}>
           <TextField
             label="Or enter custom tube name"
             value={customTube}
@@ -78,6 +106,50 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
           >
             Fetch All
           </Button>
+        </Box>
+
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          Search Filters
+        </Typography>
+
+        <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+          <TextField
+            label="Search by ID"
+            value={searchId}
+            onChange={handleSearchIdChange}
+            placeholder="e.g., c7a1b6f2"
+            sx={{ minWidth: 200 }}
+            disabled={loading}
+          />
+
+          <TextField
+            label="Search by Name"
+            value={searchName}
+            onChange={handleSearchNameChange}
+            placeholder="e.g., Generate Report"
+            sx={{ minWidth: 200 }}
+            disabled={loading}
+          />
+
+          <TextField
+            label="Search by Tube"
+            value={searchTube}
+            onChange={handleSearchTubeChange}
+            placeholder="e.g., reporting"
+            sx={{ minWidth: 200 }}
+            disabled={loading}
+          />
+
+          <FormControl sx={{ minWidth: 150 }} disabled={loading}>
+            <InputLabel>Status</InputLabel>
+            <Select value={searchStatus} onChange={handleSearchStatusChange} label="Status">
+              <MenuItem value="">All</MenuItem>
+              <MenuItem value="PENDING">PENDING</MenuItem>
+              <MenuItem value="PROCESSING">PROCESSING</MenuItem>
+              <MenuItem value="COMPLETED">COMPLETED</MenuItem>
+              <MenuItem value="ABORTED">ABORTED</MenuItem>
+            </Select>
+          </FormControl>
         </Box>
       </Paper>
     </>
