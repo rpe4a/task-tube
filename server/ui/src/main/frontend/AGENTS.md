@@ -10,6 +10,8 @@ This is a React 19 + TypeScript frontend for the task-tube project. Built with C
 - TypeScript 4.9.5
 - React Router 7.13.0
 - Material-UI (@mui) 7.3.8
+- MUI X Date and Time Pickers 8.0.0
+- Day.js 1.11.19
 - TanStack React Query 5.90.21
 - Jest + React Testing Library for tests
 
