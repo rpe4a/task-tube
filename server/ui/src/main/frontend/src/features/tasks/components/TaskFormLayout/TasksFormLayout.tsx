@@ -60,7 +60,7 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
 
   return (
     <>
-      <Typography variant="h4" sx={{ mb: 3 }}>
+      <Typography variant="h5" sx={{ mb: 3 }}>
         Search Executions
       </Typography>
 

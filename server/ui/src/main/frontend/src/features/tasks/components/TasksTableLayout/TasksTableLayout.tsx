@@ -10,6 +10,7 @@ import {
   TableBody,
   Chip,
   Typography,
+  TablePagination,
 } from '@mui/material';
 import { JSX } from 'react';
 import TaskPageDto from '../../models/TaskPageDto';
@@ -18,6 +19,10 @@ import * as DateTimeUtils from '../../../../shared/utils/DateTimeUtils';
 interface TaskTableLayoutProps {
   loading: boolean;
   tasks: TaskPageDto[];
+  page: number;
+  rowsPerPage: number;
+  onChangePage: (event: unknown, newPage: number) => void;
+  onChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const getStatusColor = (
@@ -36,7 +41,9 @@ const getStatusColor = (
 };
 
 function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
-  const { loading, tasks } = props;
+  const { loading, tasks, page, rowsPerPage, onChangePage, onChangeRowsPerPage } = props;
+  const paginatedTasks = tasks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
   return (
     <>
       {loading ? (
@@ -44,48 +51,75 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
           <CircularProgress />
         </Box>
       ) : tasks.length > 0 ? (
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 600 }}>Id</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Tube</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Created At</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Updated At</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Completed At</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Aborted At</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Duration</TableCell>
-                <TableCell sx={{ fontWeight: 600 }}>Handled By</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {tasks.map((task) => (
-                <TableRow key={task.id} hover>
-                  <TableCell>{task.id}</TableCell>
-                  <TableCell>{task.name}</TableCell>
-                  <TableCell>{task.tube}</TableCell>
-                  <TableCell>
-                    <Chip label={task.status} color={getStatusColor(task.status)} size="small" />
-                  </TableCell>
-                  <TableCell>{DateTimeUtils.formatDateTime(task.createdAt)}</TableCell>
-                  <TableCell>{DateTimeUtils.formatDateTime(task.updatedAt)}</TableCell>
-                  <TableCell>{DateTimeUtils.formatDateTime(task.completedAt)}</TableCell>
-                  <TableCell>{DateTimeUtils.formatDateTime(task.abortedAt)}</TableCell>
-                  <TableCell>
-                    {DateTimeUtils.calculateDuration(
-                      task.createdAt,
-                      task.completedAt,
-                      task.abortedAt,
-                    )}
-                  </TableCell>
-                  <TableCell>{task.handledBy}</TableCell>
+        <>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Typography variant="h5">Results</Typography>
+            </Box>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25, 50]}
+              component="div"
+              count={tasks.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={onChangePage}
+              onRowsPerPageChange={onChangeRowsPerPage}
+            />
+          </Box>
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+                <TableRow>
+                  <TableCell sx={{ fontWeight: 600 }}>Id</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Tube</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Created At</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Updated At</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Completed At</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Aborted At</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Duration</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Handled By</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {paginatedTasks.map((task) => (
+                  <TableRow key={task.id} hover>
+                    <TableCell>{task.id}</TableCell>
+                    <TableCell>{task.name}</TableCell>
+                    <TableCell>{task.tube}</TableCell>
+                    <TableCell>
+                      <Chip label={task.status} color={getStatusColor(task.status)} size="small" />
+                    </TableCell>
+                    <TableCell>{DateTimeUtils.formatDateTime(task.createdAt)}</TableCell>
+                    <TableCell>{DateTimeUtils.formatDateTime(task.updatedAt)}</TableCell>
+                    <TableCell>{DateTimeUtils.formatDateTime(task.completedAt)}</TableCell>
+                    <TableCell>{DateTimeUtils.formatDateTime(task.abortedAt)}</TableCell>
+                    <TableCell>
+                      {DateTimeUtils.calculateDuration(
+                        task.createdAt,
+                        task.completedAt,
+                        task.abortedAt,
+                      )}
+                    </TableCell>
+                    <TableCell>{task.handledBy}</TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25, 50]}
+              component="div"
+              count={tasks.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={onChangePage}
+              onRowsPerPageChange={onChangeRowsPerPage}
+            />
+          </Box>
+        </>
       ) : (
         <Paper sx={{ p: 3, textAlign: 'center' }}>
           <Typography color="textSecondary">

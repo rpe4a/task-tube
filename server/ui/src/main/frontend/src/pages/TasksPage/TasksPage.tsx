@@ -6,119 +6,73 @@ import TaskTableLayout from '../../features/tasks/components/TasksTableLayout/Ta
 import dayjs, { Dayjs } from 'dayjs';
 
 // Mock API functions
+const generateMockTasks = (): TaskPageDto[] => {
+  const tubes = ['reporting', 'processing', 'notifications', 'analytics', 'email'];
+  const statuses: Array<'PENDING' | 'PROCESSING' | 'COMPLETED' | 'ABORTED'> = [
+    'PENDING',
+    'PROCESSING',
+    'COMPLETED',
+    'ABORTED',
+  ];
+  const workers = ['worker-1', 'worker-2', 'worker-3', 'worker-4', 'unassigned'];
+  const taskNames = [
+    'Generate Report',
+    'Export Data',
+    'Process Payment',
+    'Send Email',
+    'Analyze Metrics',
+    'Update Cache',
+    'Sync Database',
+    'Generate Invoice',
+    'Send Notification',
+    'Cleanup Old Files',
+  ];
+
+  const tasks: TaskPageDto[] = [];
+  for (let i = 1; i <= 28; i++) {
+    const tube = tubes[Math.floor(Math.random() * tubes.length)];
+    const status = statuses[Math.floor(Math.random() * statuses.length)];
+    const worker = workers[Math.floor(Math.random() * workers.length)];
+    const taskName = taskNames[Math.floor(Math.random() * taskNames.length)];
+    const createdDate = dayjs().subtract(Math.random() * 30, 'days');
+    const updatedDate =
+      status === 'PENDING' ? createdDate : createdDate.add(Math.random() * 120, 'minutes');
+    const completedDate =
+      status === 'COMPLETED' ? updatedDate.add(Math.random() * 60, 'minutes') : null;
+    const abortedDate =
+      status === 'ABORTED' ? updatedDate.add(Math.random() * 60, 'minutes') : null;
+
+    tasks.push({
+      id: `${tube}-${i.toString().padStart(3, '0')}-${Math.random().toString(36).substr(2, 9)}`,
+      name: `${taskName} #${i}`,
+      tube,
+      status,
+      createdAt: createdDate.format(),
+      updatedAt: updatedDate.format(),
+      completedAt: completedDate?.format() || null,
+      abortedAt: abortedDate?.format() || null,
+      handledBy: worker,
+    });
+  }
+  return tasks;
+};
+
 const mockFetchTasksByTube = async (tube: string): Promise<TaskPageDto[]> => {
   await new Promise((resolve) => setTimeout(resolve, 500));
-
-  const mockTasks: Record<string, TaskPageDto[]> = {
-    reporting: [
-      {
-        id: 'c7a1b6f2-6f4e-4a8c-9a2f-0a3a5b1d9c11',
-        name: 'Generate Report',
-        tube: 'reporting',
-        status: 'PROCESSING',
-        createdAt: '2026-02-17T12:00:00Z',
-        updatedAt: '2026-02-17T12:05:10Z',
-        abortedAt: null,
-        completedAt: null,
-        handledBy: 'worker-3',
-      },
-      {
-        id: 'a2b3c4d5-e6f7-4a8c-9a2f-0a3a5b1d9c22',
-        name: 'Export Data',
-        tube: 'reporting',
-        status: 'COMPLETED',
-        createdAt: '2026-02-16T10:00:00Z',
-        updatedAt: '2026-02-16T10:15:30Z',
-        abortedAt: null,
-        completedAt: '2026-02-16T10:15:30Z',
-        handledBy: 'worker-1',
-      },
-    ],
-    processing: [
-      {
-        id: 'f1e2d3c4-b5a6-4a8c-9a2f-0a3a5b1d9c33',
-        name: 'Process Payment',
-        tube: 'processing',
-        status: 'PENDING',
-        createdAt: '2026-02-17T13:00:00Z',
-        updatedAt: '2026-02-17T13:00:00Z',
-        abortedAt: null,
-        completedAt: null,
-        handledBy: 'unassigned',
-      },
-    ],
-    notifications: [
-      {
-        id: 'n8o7p6q5-r4s3-4a8c-9a2f-0a3a5b1d9c44',
-        name: 'Send Email',
-        tube: 'notifications',
-        status: 'COMPLETED',
-        createdAt: '2026-02-17T11:30:00Z',
-        updatedAt: '2026-02-17T11:35:00Z',
-        abortedAt: null,
-        completedAt: '2026-02-17T11:35:00Z',
-        handledBy: 'worker-2',
-      },
-    ],
-  };
-
-  return mockTasks[tube] || [];
+  const allTasks = generateMockTasks();
+  return allTasks.filter((t) => t.tube === tube);
 };
 
 const mockFetchAllTasks = async (): Promise<TaskPageDto[]> => {
   await new Promise((resolve) => setTimeout(resolve, 500));
-
-  return [
-    {
-      id: 'c7a1b6f2-6f4e-4a8c-9a2f-0a3a5b1d9c11',
-      name: 'Generate Report',
-      tube: 'reporting',
-      status: 'ABORTED',
-      createdAt: '2026-02-17T12:00:00Z',
-      updatedAt: '2026-02-17T12:05:10Z',
-      abortedAt: '2026-02-17T12:15:10Z',
-      completedAt: null,
-      handledBy: 'worker-3',
-    },
-    {
-      id: 'a2b3c4d5-e6f7-4a8c-9a2f-0a3a5b1d9c22',
-      name: 'Export Data',
-      tube: 'reporting',
-      status: 'COMPLETED',
-      createdAt: '2026-02-16T10:00:00Z',
-      updatedAt: '2026-02-16T10:15:30Z',
-      abortedAt: null,
-      completedAt: '2026-02-16T10:15:30Z',
-      handledBy: 'worker-1',
-    },
-    {
-      id: 'f1e2d3c4-b5a6-4a8c-9a2f-0a3a5b1d9c33',
-      name: 'Process Payment',
-      tube: 'processing',
-      status: 'PENDING',
-      createdAt: '2026-02-17T13:00:00Z',
-      updatedAt: '2026-02-17T13:00:00Z',
-      abortedAt: null,
-      completedAt: null,
-      handledBy: 'unassigned',
-    },
-    {
-      id: 'n8o7p6q5-r4s3-4a8c-9a2f-0a3a5b1d9c44',
-      name: 'Send Email',
-      tube: 'notifications',
-      status: 'COMPLETED',
-      createdAt: '2026-02-17T11:30:00Z',
-      updatedAt: '2026-02-17T11:35:00Z',
-      abortedAt: null,
-      completedAt: '2026-02-17T11:35:00Z',
-      handledBy: 'worker-2',
-    },
-  ];
+  return generateMockTasks();
 };
 
 function Tasks(): React.JSX.Element {
   const [tasks, setTasks] = useState<TaskPageDto[]>([]);
   const [loading, setLoading] = useState(false);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [customTube, setCustomTube] = useState<string>('');
   const [createdAt, setCreatedAt] = useState<Dayjs | null>(null);
   const [completedAt, setCompletedAt] = useState<Dayjs | null>(null);
@@ -147,11 +101,21 @@ function Tasks(): React.JSX.Element {
     setSearchStatus(event.target.value as string);
   };
 
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
   const handleFetchTasks = async (
     createdAtValue?: Dayjs | null,
     completedAtValue?: Dayjs | null,
   ) => {
     setLoading(true);
+    setPage(0);
     try {
       const tube = customTube;
 
@@ -206,6 +170,7 @@ function Tasks(): React.JSX.Element {
 
   const handleFetchAll = async () => {
     setLoading(true);
+    setPage(0);
     setCustomTube('');
     setCreatedAt(null);
     setCompletedAt(null);
@@ -244,7 +209,14 @@ function Tasks(): React.JSX.Element {
         handleFetchTasks={handleFetchTasks}
         handleFetchAll={handleFetchAll}
       />
-      <TaskTableLayout loading={loading} tasks={tasks} />
+      <TaskTableLayout
+        loading={loading}
+        tasks={tasks}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onChangePage={handleChangePage}
+        onChangeRowsPerPage={handleChangeRowsPerPage}
+      />
     </Container>
   );
 }
