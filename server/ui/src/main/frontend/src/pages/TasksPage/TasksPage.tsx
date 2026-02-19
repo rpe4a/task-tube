@@ -68,24 +68,20 @@ const mockFetchAllTasks = async (): Promise<TaskPageDto[]> => {
   return generateMockTasks();
 };
 
-function Tasks(): React.JSX.Element {
+function TasksPage(): React.JSX.Element {
   const [tasks, setTasks] = useState<TaskPageDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [customTube, setCustomTube] = useState<string>('');
-  const [createdAt, setCreatedAt] = useState<Dayjs | null>(null);
-  const [completedAt, setCompletedAt] = useState<Dayjs | null>(null);
+  const [createdFrom, setCreatedFrom] = useState<Dayjs | null>(null);
+  const [createdTo, setCreatedTo] = useState<Dayjs | null>(null);
   const [searchId, setSearchId] = useState<string>('');
   const [searchName, setSearchName] = useState<string>('');
   const [searchTube, setSearchTube] = useState<string>('');
   const [searchStatus, setSearchStatus] = useState<string>('');
 
-  const handleCustomTubeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setCustomTube(event.target.value);
-  };
-
   const handleSearchIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
     setSearchId(event.target.value);
   };
 
@@ -110,31 +106,23 @@ function Tasks(): React.JSX.Element {
     setPage(0);
   };
 
-  const handleFetchTasks = async (
-    createdAtValue?: Dayjs | null,
-    completedAtValue?: Dayjs | null,
-  ) => {
+  const handleFetchTasks = async () => {
     setLoading(true);
     setPage(0);
     try {
-      const tube = customTube;
-
       let fetchedTasks: TaskPageDto[] = [];
-      if (tube) {
-        fetchedTasks = await mockFetchTasksByTube(tube);
-      } else {
-        fetchedTasks = await mockFetchAllTasks();
-      }
 
-      if (createdAtValue) {
+      fetchedTasks = await mockFetchAllTasks();
+
+      if (createdFrom) {
         fetchedTasks = fetchedTasks.filter(
-          (t) => dayjs(t.createdAt).valueOf() >= createdAtValue.valueOf(),
+          (t) => dayjs(t.createdAt).valueOf() >= createdFrom.valueOf(),
         );
       }
 
-      if (completedAtValue) {
+      if (createdTo) {
         fetchedTasks = fetchedTasks.filter(
-          (t) => t.completedAt && dayjs(t.completedAt).valueOf() >= completedAtValue.valueOf(),
+          (t) => dayjs(t.createdAt).valueOf() <= createdTo.valueOf(),
         );
       }
 
@@ -168,46 +156,23 @@ function Tasks(): React.JSX.Element {
     }
   };
 
-  const handleFetchAll = async () => {
-    setLoading(true);
-    setPage(0);
-    setCustomTube('');
-    setCreatedAt(null);
-    setCompletedAt(null);
-    setSearchId('');
-    setSearchName('');
-    setSearchTube('');
-    setSearchStatus('');
-    try {
-      const fetchedTasks = await mockFetchAllTasks();
-      setTasks(fetchedTasks);
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <Container maxWidth="xl" sx={{ py: 3 }}>
       <TasksFormLayout
-        customTube={customTube}
-        createdAt={createdAt}
-        completedAt={completedAt}
+        createdFrom={createdFrom}
+        createdTo={createdTo}
         searchId={searchId}
         searchName={searchName}
         searchTube={searchTube}
         searchStatus={searchStatus}
         loading={loading}
-        handleCustomTubeChange={handleCustomTubeChange}
-        handleCreatedAtChange={setCreatedAt}
-        handleCompletedAtChange={setCompletedAt}
+        handleCreatedFromChange={setCreatedFrom}
+        handleCreatedToChange={setCreatedTo}
         handleSearchIdChange={handleSearchIdChange}
         handleSearchNameChange={handleSearchNameChange}
         handleSearchTubeChange={handleSearchTubeChange}
         handleSearchStatusChange={handleSearchStatusChange}
-        handleFetchTasks={handleFetchTasks}
-        handleFetchAll={handleFetchAll}
+        handleSearchTasks={handleFetchTasks}
       />
       <TaskTableLayout
         loading={loading}
@@ -221,4 +186,4 @@ function Tasks(): React.JSX.Element {
   );
 }
 
-export default Tasks;
+export default TasksPage;
