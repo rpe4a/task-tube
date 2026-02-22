@@ -12,12 +12,20 @@ import {
   SelectChangeEvent,
   Grid,
 } from '@mui/material';
-import { JSX } from 'react';
+import { JSX, useState } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
 import 'dayjs/locale/en-gb';
+
+// UUID v4 regex pattern
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const isValidUUID = (value: string): boolean => {
+  if (!value) return true; // Empty value is allowed
+  return UUID_PATTERN.test(value);
+};
 
 interface TasksFormLayoutProps {
   createdFrom: Dayjs | null;
@@ -54,6 +62,19 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
     handleSearchTasks,
   } = props;
 
+  const [idError, setIdError] = useState<string>('');
+
+  const handleIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+
+    if (isValidUUID(value)) {
+      setIdError('');
+      handleSearchIdChange(event);
+    } else {
+      setIdError('Invalid UUID format. Expected: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
+    }
+  };
+
   return (
     <>
       <Typography variant="h5" sx={{ mb: 3 }}>
@@ -67,10 +88,12 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
               fullWidth
               label="Search by ID"
               value={searchId}
-              onChange={handleSearchIdChange}
-              placeholder="e.g., c7a1b6f2"
+              onChange={handleIdChange}
+              placeholder="e.g., c7a1b6f2-1234-5678-9abc-def012345678"
               sx={{ minWidth: 200 }}
               disabled={loading}
+              error={!!idError}
+              helperText={idError}
             />
           </Grid>
           <Grid size={{ xs: 12, md: 6, lg: 4, xl: 4 }}>
