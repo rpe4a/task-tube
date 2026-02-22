@@ -11,6 +11,7 @@ import {
   Chip,
   Typography,
   TablePagination,
+  Tooltip,
 } from '@mui/material';
 import { JSX } from 'react';
 import TaskPageDto from '../../models/TaskPageDto';
@@ -47,7 +48,7 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
   const { loading, tasks, page, rowsPerPage, onChangePage, onChangeRowsPerPage } = props;
   const paginatedTasks = tasks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
-  const handleCellDoubleClick = (event: React.MouseEvent<HTMLTableCellElement>) => {
+  const handleCellClick = (event: React.MouseEvent<HTMLTableCellElement>) => {
     const cellText = event.currentTarget.textContent;
     if (cellText) {
       navigator.clipboard.writeText(cellText).catch((err) => {
@@ -97,32 +98,148 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
               <TableBody>
                 {paginatedTasks.map((task) => (
                   <TableRow key={task.id} hover>
-                    <TableCell onDoubleClick={handleCellDoubleClick}>{task.id}</TableCell>
-                    <TableCell onDoubleClick={handleCellDoubleClick}>{task.name}</TableCell>
-                    <TableCell onDoubleClick={handleCellDoubleClick}>{task.tube}</TableCell>
-                    <TableCell onDoubleClick={handleCellDoubleClick}>
-                      <Chip label={task.status} color={getStatusColor(task.status)} size="small" />
+                    <TableCell onClick={handleCellClick}>
+                      <Tooltip
+                        disableFocusListener
+                        placement="right"
+                        arrow
+                        disableInteractive
+                        title="Copy to clipboard"
+                      >
+                        <span style={{ cursor: 'pointer' }}>{task.id}</span>
+                      </Tooltip>
                     </TableCell>
-                    <TableCell onDoubleClick={handleCellDoubleClick}>
-                      {DateTimeUtils.formatDateTime(task.createdAt)}
+                    <TableCell onClick={handleCellClick}>
+                      <Tooltip
+                        disableFocusListener
+                        placement="right"
+                        arrow
+                        disableInteractive
+                        title="Copy to clipboard"
+                      >
+                        <span style={{ cursor: 'pointer' }}>{task.name}</span>
+                      </Tooltip>
                     </TableCell>
-                    <TableCell onDoubleClick={handleCellDoubleClick}>
-                      {DateTimeUtils.formatDateTime(task.updatedAt)}
+                    <TableCell onClick={handleCellClick}>
+                      <Tooltip
+                        disableFocusListener
+                        placement="right"
+                        arrow
+                        disableInteractive
+                        title="Copy to clipboard"
+                      >
+                        <span style={{ cursor: 'pointer' }}>{task.tube}</span>
+                      </Tooltip>
                     </TableCell>
-                    <TableCell onDoubleClick={handleCellDoubleClick}>
-                      {DateTimeUtils.formatDateTime(task.completedAt)}
+                    <TableCell onClick={handleCellClick}>
+                      <Tooltip
+                        disableFocusListener
+                        placement="right"
+                        arrow
+                        disableInteractive
+                        title="Copy to clipboard"
+                      >
+                        <span style={{ cursor: 'pointer' }}>
+                          <Chip
+                            label={task.status}
+                            color={getStatusColor(task.status)}
+                            size="small"
+                          />
+                        </span>
+                      </Tooltip>
                     </TableCell>
-                    <TableCell onDoubleClick={handleCellDoubleClick}>
-                      {DateTimeUtils.formatDateTime(task.abortedAt)}
+                    <TableCell onClick={handleCellClick}>
+                      <Tooltip
+                        disableFocusListener
+                        placement="right"
+                        arrow
+                        disableInteractive
+                        title="Copy to clipboard"
+                      >
+                        <span style={{ cursor: 'pointer' }}>
+                          {DateTimeUtils.formatDateTime(
+                            task.createdAt,
+                            DateTimeUtils.DateTimeFormater.CALENDAR,
+                          )}
+                        </span>
+                      </Tooltip>
                     </TableCell>
-                    <TableCell onDoubleClick={handleCellDoubleClick}>
-                      {DateTimeUtils.calculateDuration(
-                        task.createdAt,
-                        task.completedAt,
-                        task.abortedAt,
-                      )}
+                    <TableCell onClick={handleCellClick}>
+                      <Tooltip
+                        disableFocusListener
+                        placement="right"
+                        arrow
+                        disableInteractive
+                        title="Copy to clipboard"
+                      >
+                        <span style={{ cursor: 'pointer' }}>
+                          {DateTimeUtils.formatDateTime(
+                            task.updatedAt,
+                            DateTimeUtils.DateTimeFormater.CALENDAR,
+                          )}
+                        </span>
+                      </Tooltip>
                     </TableCell>
-                    <TableCell onDoubleClick={handleCellDoubleClick}>{task.handledBy}</TableCell>
+                    <TableCell onClick={handleCellClick}>
+                      <Tooltip
+                        disableFocusListener
+                        placement="right"
+                        arrow
+                        disableInteractive
+                        title="Copy to clipboard"
+                      >
+                        <span style={{ cursor: 'pointer' }}>
+                          {DateTimeUtils.formatDateTime(
+                            task.completedAt,
+                            DateTimeUtils.DateTimeFormater.CALENDAR,
+                          )}
+                        </span>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell onClick={handleCellClick}>
+                      <Tooltip
+                        disableFocusListener
+                        placement="right"
+                        arrow
+                        disableInteractive
+                        title="Copy to clipboard"
+                      >
+                        <span style={{ cursor: 'pointer' }}>
+                          {DateTimeUtils.formatDateTime(
+                            task.abortedAt,
+                            DateTimeUtils.DateTimeFormater.CALENDAR,
+                          )}
+                        </span>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell onClick={handleCellClick}>
+                      <Tooltip
+                        disableFocusListener
+                        placement="right"
+                        arrow
+                        disableInteractive
+                        title="Copy to clipboard"
+                      >
+                        <span style={{ cursor: 'pointer' }}>
+                          {DateTimeUtils.calculateDuration(
+                            task.createdAt,
+                            task.completedAt,
+                            task.abortedAt,
+                          )}
+                        </span>
+                      </Tooltip>
+                    </TableCell>
+                    <TableCell onClick={handleCellClick}>
+                      <Tooltip
+                        disableFocusListener
+                        placement="right"
+                        arrow
+                        disableInteractive
+                        title="Copy to clipboard"
+                      >
+                        <span style={{ cursor: 'pointer' }}>{task.handledBy}</span>
+                      </Tooltip>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

@@ -4,6 +4,7 @@ export const DateTimeFormater = {
   DEFAULT: 'YYYY-MM-DD HH:mm:ss',
   DATE: 'YYYY-MM-DD',
   TIME: 'HH:mm:ss',
+  CALENDAR: 'DD/MM/YYYY HH:mm',
 };
 
 export const formatDateTime = (
