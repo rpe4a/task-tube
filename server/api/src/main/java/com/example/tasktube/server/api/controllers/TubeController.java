@@ -1,14 +1,12 @@
 package com.example.tasktube.server.api.controllers;
 
 import com.example.tasktube.server.api.requests.PopTaskRequest;
-import com.example.tasktube.server.api.requests.PopTaskResponse;
+import com.example.tasktube.server.api.responses.PopTaskResponse;
 import com.example.tasktube.server.api.requests.PopTasksRequest;
 import com.example.tasktube.server.api.requests.TaskRequest;
 import com.example.tasktube.server.application.port.in.ITubeService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;

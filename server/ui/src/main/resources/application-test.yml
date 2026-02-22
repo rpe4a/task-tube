@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: server-ui-test
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/task_tube
+    username: admin
+    password: 12345

@@ -1,71 +1,46 @@
 import { Container, SelectChangeEvent } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import TasksFormLayout from '../../features/tasks/components/TaskFormLayout/TasksFormLayout';
 import TaskPageDto from '../../features/tasks/models/TaskPageDto';
 import TaskTableLayout from '../../features/tasks/components/TasksTableLayout/TasksTableLayout';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
+import { useQuery } from '@tanstack/react-query';
 
-// Mock API functions
-const generateMockTasks = (): TaskPageDto[] => {
-  const tubes = ['reporting', 'processing', 'notifications', 'analytics', 'email'];
-  const statuses: Array<'PENDING' | 'PROCESSING' | 'COMPLETED' | 'ABORTED'> = [
-    'PENDING',
-    'PROCESSING',
-    'COMPLETED',
-    'ABORTED',
-  ];
-  const workers = ['worker-1', 'worker-2', 'worker-3', 'worker-4', 'unassigned'];
-  const taskNames = [
-    'Generate Report',
-    'Export Data',
-    'Process Payment',
-    'Send Email',
-    'Analyze Metrics',
-    'Update Cache',
-    'Sync Database',
-    'Generate Invoice',
-    'Send Notification',
-    'Cleanup Old Files',
-  ];
+interface FetchTasksParams {
+  page: number;
+  rowsPerPage: number;
+  createdFrom: Dayjs | null;
+  createdTo: Dayjs | null;
+  searchId: string;
+  searchName: string;
+  searchTube: string;
+  searchStatus: string;
+}
 
-  const tasks: TaskPageDto[] = [];
-  for (let i = 1; i <= 28; i++) {
-    const tube = tubes[Math.floor(Math.random() * tubes.length)];
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
-    const worker = workers[Math.floor(Math.random() * workers.length)];
-    const taskName = taskNames[Math.floor(Math.random() * taskNames.length)];
-    const createdDate = dayjs().subtract(Math.random() * 30, 'days');
-    const updatedDate =
-      status === 'PENDING' ? createdDate : createdDate.add(Math.random() * 120, 'minutes');
-    const completedDate =
-      status === 'COMPLETED' ? updatedDate.add(Math.random() * 60, 'minutes') : null;
-    const abortedDate =
-      status === 'ABORTED' ? updatedDate.add(Math.random() * 60, 'minutes') : null;
+const fetchTasks = async (params: FetchTasksParams): Promise<TaskPageDto[]> => {
+  const {
+    page,
+    rowsPerPage,
+    createdFrom,
+    createdTo,
+    searchId,
+    searchName,
+    searchTube,
+    searchStatus,
+  } = params;
 
-    tasks.push({
-      id: `${tube}-${i.toString().padStart(3, '0')}-${Math.random().toString(36).substr(2, 9)}`,
-      name: `${taskName} #${i}`,
-      tube,
-      status,
-      createdAt: createdDate.format(),
-      updatedAt: updatedDate.format(),
-      completedAt: completedDate?.format() || null,
-      abortedAt: abortedDate?.format() || null,
-      handledBy: worker,
-    });
-  }
-  return tasks;
-};
+  let searchParams = new URLSearchParams();
+  searchParams.append('page', page.toString());
+  searchParams.append('size', rowsPerPage.toString());
+  if (createdFrom) searchParams.append('createdFrom', createdFrom.toISOString());
+  if (createdTo) searchParams.append('createdTo', createdTo.toISOString());
+  if (searchId) searchParams.append('id', searchId);
+  if (searchName) searchParams.append('name', searchName);
+  if (searchTube) searchParams.append('tube', searchTube);
+  if (searchStatus) searchParams.append('status', searchStatus);
 
-const mockFetchTasksByTube = async (tube: string): Promise<TaskPageDto[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  const allTasks = generateMockTasks();
-  return allTasks.filter((t) => t.tube === tube);
-};
-
-const mockFetchAllTasks = async (): Promise<TaskPageDto[]> => {
-  await new Promise((resolve) => setTimeout(resolve, 500));
-  return generateMockTasks();
+  const response = await fetch(`/api/v1/tasks?${searchParams.toString()}`);
+  return response.json();
 };
 
 function TasksPage(): React.JSX.Element {
@@ -79,6 +54,42 @@ function TasksPage(): React.JSX.Element {
   const [searchName, setSearchName] = useState<string>('');
   const [searchTube, setSearchTube] = useState<string>('');
   const [searchStatus, setSearchStatus] = useState<string>('');
+
+  const { isPending, isError, data, error, refetch } = useQuery({
+    queryKey: ['tasks'],
+    queryFn: () =>
+      fetchTasks({
+        page,
+        rowsPerPage,
+        createdFrom,
+        createdTo,
+        searchId,
+        searchName,
+        searchTube,
+        searchStatus,
+      }),
+  });
+
+  useEffect(() => {
+    handleResponse(isPending, isError, data, error);
+  }, [isPending, isError, data, error]);
+
+  const handleResponse = (
+    isPending: boolean,
+    isError: boolean,
+    data: TaskPageDto[] | undefined,
+    error: Error | null,
+  ) => {
+    if (isPending) {
+      setLoading(true);
+    } else if (isError) {
+      console.error('Error fetching tasks:', error);
+      setLoading(false);
+    } else if (data) {
+      setTasks(data);
+      setLoading(false);
+    }
+  };
 
   const handleSearchIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
@@ -107,53 +118,7 @@ function TasksPage(): React.JSX.Element {
   };
 
   const handleFetchTasks = async () => {
-    setLoading(true);
-    setPage(0);
-    try {
-      let fetchedTasks: TaskPageDto[] = [];
-
-      fetchedTasks = await mockFetchAllTasks();
-
-      if (createdFrom) {
-        fetchedTasks = fetchedTasks.filter(
-          (t) => dayjs(t.createdAt).valueOf() >= createdFrom.valueOf(),
-        );
-      }
-
-      if (createdTo) {
-        fetchedTasks = fetchedTasks.filter(
-          (t) => dayjs(t.createdAt).valueOf() <= createdTo.valueOf(),
-        );
-      }
-
-      if (searchId) {
-        fetchedTasks = fetchedTasks.filter((t) =>
-          t.id.toLowerCase().includes(searchId.toLowerCase()),
-        );
-      }
-
-      if (searchName) {
-        fetchedTasks = fetchedTasks.filter((t) =>
-          t.name.toLowerCase().includes(searchName.toLowerCase()),
-        );
-      }
-
-      if (searchTube) {
-        fetchedTasks = fetchedTasks.filter((t) =>
-          t.tube.toLowerCase().includes(searchTube.toLowerCase()),
-        );
-      }
-
-      if (searchStatus) {
-        fetchedTasks = fetchedTasks.filter((t) => t.status === searchStatus);
-      }
-
-      setTasks(fetchedTasks);
-    } catch (error) {
-      console.error('Error fetching tasks:', error);
-    } finally {
-      setLoading(false);
-    }
+    refetch();
   };
 
   return (

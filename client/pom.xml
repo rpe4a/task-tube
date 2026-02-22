@@ -15,6 +15,7 @@
 
     <modules>
         <module>sandbox</module>
+        <module>sandbox-spring</module>
         <module>sdk</module>
     </modules>
 

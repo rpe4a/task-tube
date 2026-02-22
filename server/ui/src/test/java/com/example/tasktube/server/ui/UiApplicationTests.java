@@ -1,4 +1,4 @@
-package com.example.tasktube.ui;
+package com.example.tasktube.server.ui;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

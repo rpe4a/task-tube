@@ -1,4 +1,4 @@
-package com.example.tasktube.server.api.requests;
+package com.example.tasktube.server.api.responses;
 
 import com.example.tasktube.server.application.models.PopTaskDto;
 import com.example.tasktube.server.domain.values.TaskSettings;

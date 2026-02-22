@@ -32,10 +32,13 @@ const getStatusColor = (
     TaskPageDto['status'],
     'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'
   > = {
-    PENDING: 'warning',
+    CREATED: 'default',
+    SCHEDULED: 'primary',
+    CANCELED: 'warning',
     PROCESSING: 'info',
     COMPLETED: 'success',
     ABORTED: 'error',
+    FINISHED: 'secondary',
   };
   return statusColorMap[status];
 };

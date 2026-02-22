@@ -4,7 +4,7 @@ import com.example.tasktube.server.api.requests.FailTaskRequest;
 import com.example.tasktube.server.api.requests.FinishTaskRequest;
 import com.example.tasktube.server.api.requests.ProcessTaskRequest;
 import com.example.tasktube.server.api.requests.StartTaskRequest;
-import com.example.tasktube.server.api.requests.StartTaskResponse;
+import com.example.tasktube.server.api.responses.StartTaskResponse;
 import com.example.tasktube.server.application.port.in.ITaskService;
 import com.example.tasktube.server.domain.values.argument.Argument;
 import jakarta.validation.Valid;

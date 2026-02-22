@@ -2,7 +2,14 @@ interface TaskPageDto {
   id: string;
   name: string;
   tube: string;
-  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'ABORTED';
+  status:
+    | 'CREATED'
+    | 'SCHEDULED'
+    | 'PROCESSING'
+    | 'FINISHED'
+    | 'COMPLETED'
+    | 'ABORTED'
+    | 'CANCELED';
   createdAt: string;
   updatedAt: string;
   abortedAt: string | null;

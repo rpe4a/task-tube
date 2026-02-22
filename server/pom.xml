@@ -19,6 +19,7 @@
         <module>application</module>
         <module>domain</module>
         <module>infrastructure</module>
+        <module>ui</module>
     </modules>
 
     <properties>
