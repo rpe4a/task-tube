@@ -47,6 +47,15 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
   const { loading, tasks, page, rowsPerPage, onChangePage, onChangeRowsPerPage } = props;
   const paginatedTasks = tasks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
+  const handleCellDoubleClick = (event: React.MouseEvent<HTMLTableCellElement>) => {
+    const cellText = event.currentTarget.textContent;
+    if (cellText) {
+      navigator.clipboard.writeText(cellText).catch((err) => {
+        console.error('Failed to copy to clipboard:', err);
+      });
+    }
+  };
+
   return (
     <>
       {loading ? (
@@ -88,24 +97,32 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
               <TableBody>
                 {paginatedTasks.map((task) => (
                   <TableRow key={task.id} hover>
-                    <TableCell>{task.id}</TableCell>
-                    <TableCell>{task.name}</TableCell>
-                    <TableCell>{task.tube}</TableCell>
-                    <TableCell>
+                    <TableCell onDoubleClick={handleCellDoubleClick}>{task.id}</TableCell>
+                    <TableCell onDoubleClick={handleCellDoubleClick}>{task.name}</TableCell>
+                    <TableCell onDoubleClick={handleCellDoubleClick}>{task.tube}</TableCell>
+                    <TableCell onDoubleClick={handleCellDoubleClick}>
                       <Chip label={task.status} color={getStatusColor(task.status)} size="small" />
                     </TableCell>
-                    <TableCell>{DateTimeUtils.formatDateTime(task.createdAt)}</TableCell>
-                    <TableCell>{DateTimeUtils.formatDateTime(task.updatedAt)}</TableCell>
-                    <TableCell>{DateTimeUtils.formatDateTime(task.completedAt)}</TableCell>
-                    <TableCell>{DateTimeUtils.formatDateTime(task.abortedAt)}</TableCell>
-                    <TableCell>
+                    <TableCell onDoubleClick={handleCellDoubleClick}>
+                      {DateTimeUtils.formatDateTime(task.createdAt)}
+                    </TableCell>
+                    <TableCell onDoubleClick={handleCellDoubleClick}>
+                      {DateTimeUtils.formatDateTime(task.updatedAt)}
+                    </TableCell>
+                    <TableCell onDoubleClick={handleCellDoubleClick}>
+                      {DateTimeUtils.formatDateTime(task.completedAt)}
+                    </TableCell>
+                    <TableCell onDoubleClick={handleCellDoubleClick}>
+                      {DateTimeUtils.formatDateTime(task.abortedAt)}
+                    </TableCell>
+                    <TableCell onDoubleClick={handleCellDoubleClick}>
                       {DateTimeUtils.calculateDuration(
                         task.createdAt,
                         task.completedAt,
                         task.abortedAt,
                       )}
                     </TableCell>
-                    <TableCell>{task.handledBy}</TableCell>
+                    <TableCell onDoubleClick={handleCellDoubleClick}>{task.handledBy}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
