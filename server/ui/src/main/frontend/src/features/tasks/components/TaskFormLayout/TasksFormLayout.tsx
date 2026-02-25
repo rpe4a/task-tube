@@ -127,11 +127,14 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
                 onChange={handleSearchStatusChange}
                 label="Status"
               >
-                <MenuItem value="">All</MenuItem>
-                <MenuItem value="PENDING">PENDING</MenuItem>
+                <MenuItem value="">ALL</MenuItem>
+                <MenuItem value="CREATED">CREATED</MenuItem>
+                <MenuItem value="SCHEDULED">SCHEDULED</MenuItem>
                 <MenuItem value="PROCESSING">PROCESSING</MenuItem>
-                <MenuItem value="COMPLETED">COMPLETED</MenuItem>
+                <MenuItem value="FINISHED">FINISHED</MenuItem>
                 <MenuItem value="ABORTED">ABORTED</MenuItem>
+                <MenuItem value="CANCELED">CANCELED</MenuItem>
+                <MenuItem value="COMPLETED">COMPLETED</MenuItem>
               </Select>
             </FormControl>
           </Grid>
@@ -143,12 +146,14 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
               value={createdFrom}
               onChange={handleCreatedFromChange}
               disabled={loading}
+              timezone="UTC"
             />
             <DateTimePicker
               label="Created - To"
               value={createdTo}
               onChange={handleCreatedToChange}
               disabled={loading}
+              timezone="UTC"
             />
           </LocalizationProvider>
 

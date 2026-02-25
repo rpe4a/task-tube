@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 export const DateTimeFormater = {
   DEFAULT: 'YYYY-MM-DD HH:mm:ss',
@@ -12,7 +14,7 @@ export const formatDateTime = (
   formater: string = DateTimeFormater.DEFAULT,
 ): string => {
   if (!dateTimeString) return '-';
-  const date = dayjs(dateTimeString);
+  const date = dayjs.utc(dateTimeString);
   return date.format(formater);
 };
 

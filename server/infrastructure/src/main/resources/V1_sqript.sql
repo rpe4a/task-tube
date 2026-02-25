@@ -34,3 +34,18 @@ WHERE id = ?
 
 
 select current_timestamp - interval '600 second'
+
+SELECT id,
+       name,
+       tube,
+       status,
+       updated_at,
+       created_at,
+       aborted_at,
+       completed_at,
+       handled_by,
+       COUNT(*) OVER() AS total_count
+FROM tasks
+WHERE tube = 'sandbox-tube'
+ORDER BY created_at DESC
+LIMIT 5 OFFSET 0

@@ -1,10 +1,14 @@
 import { Container, SelectChangeEvent } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import TasksFormLayout from '../../features/tasks/components/TaskFormLayout/TasksFormLayout';
-import TaskPageDto from '../../features/tasks/models/TaskPageDto';
+import TasksPageDto from '../../features/tasks/models/TasksPageDto';
 import TaskTableLayout from '../../features/tasks/components/TasksTableLayout/TasksTableLayout';
 import { Dayjs } from 'dayjs';
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import TasksPageResponse from '../../features/tasks/models/TasksPageResponse';
+dayjs.extend(utc);
 
 interface FetchTasksParams {
   page: number;
@@ -17,7 +21,7 @@ interface FetchTasksParams {
   searchStatus: string;
 }
 
-const fetchTasks = async (params: FetchTasksParams): Promise<TaskPageDto[]> => {
+const fetchTasks = async (params: FetchTasksParams): Promise<TasksPageResponse> => {
   const {
     page,
     rowsPerPage,
@@ -44,10 +48,11 @@ const fetchTasks = async (params: FetchTasksParams): Promise<TaskPageDto[]> => {
 };
 
 function TasksPage(): React.JSX.Element {
-  const [tasks, setTasks] = useState<TaskPageDto[]>([]);
+  const [tasks, setTasks] = useState<TasksPageDto[]>([]);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [createdFrom, setCreatedFrom] = useState<Dayjs | null>(null);
   const [createdTo, setCreatedTo] = useState<Dayjs | null>(null);
   const [searchId, setSearchId] = useState<string>('');
@@ -55,8 +60,8 @@ function TasksPage(): React.JSX.Element {
   const [searchTube, setSearchTube] = useState<string>('');
   const [searchStatus, setSearchStatus] = useState<string>('');
 
-  const { isPending, isError, data, error, refetch } = useQuery({
-    queryKey: ['tasks'],
+  const { isPending, isError, isFetching, data, error, isPlaceholderData, refetch } = useQuery({
+    queryKey: ['tasks', page],
     queryFn: () =>
       fetchTasks({
         page,
@@ -68,16 +73,18 @@ function TasksPage(): React.JSX.Element {
         searchTube,
         searchStatus,
       }),
+    refetchOnWindowFocus: false,
+    placeholderData: keepPreviousData,
   });
 
   useEffect(() => {
     handleResponse(isPending, isError, data, error);
-  }, [isPending, isError, data, error]);
+  }, [isPending, isError, isFetching, data, error]);
 
   const handleResponse = (
     isPending: boolean,
     isError: boolean,
-    data: TaskPageDto[] | undefined,
+    data: TasksPageResponse | undefined,
     error: Error | null,
   ) => {
     if (isPending) {
@@ -86,9 +93,18 @@ function TasksPage(): React.JSX.Element {
       console.error('Error fetching tasks:', error);
       setLoading(false);
     } else if (data) {
-      setTasks(data);
+      setTasks(data.tasks);
+      setTotalCount(data.totalCount);
       setLoading(false);
     }
+  };
+
+  const handleCreatedFromChange = (value: Dayjs | null) => {
+    setCreatedFrom(dayjs.utc(value));
+  };
+
+  const handleCreatedToChange = (value: Dayjs | null) => {
+    setCreatedTo(dayjs.utc(value));
   };
 
   const handleSearchIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,7 +125,10 @@ function TasksPage(): React.JSX.Element {
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
+    if (!isPlaceholderData) {
+      setPage(newPage);
+      // refetch();
+    }
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -131,8 +150,8 @@ function TasksPage(): React.JSX.Element {
         searchTube={searchTube}
         searchStatus={searchStatus}
         loading={loading}
-        handleCreatedFromChange={setCreatedFrom}
-        handleCreatedToChange={setCreatedTo}
+        handleCreatedFromChange={handleCreatedFromChange}
+        handleCreatedToChange={handleCreatedToChange}
         handleSearchIdChange={handleSearchIdChange}
         handleSearchNameChange={handleSearchNameChange}
         handleSearchTubeChange={handleSearchTubeChange}
@@ -144,6 +163,7 @@ function TasksPage(): React.JSX.Element {
         tasks={tasks}
         page={page}
         rowsPerPage={rowsPerPage}
+        totalCount={totalCount}
         onChangePage={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
       />

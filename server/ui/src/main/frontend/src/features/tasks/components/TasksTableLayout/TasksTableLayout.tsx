@@ -14,12 +14,16 @@ import {
   Tooltip,
 } from '@mui/material';
 import { JSX } from 'react';
-import TaskPageDto from '../../models/TaskPageDto';
+import TasksPageDto from '../../models/TasksPageDto';
 import * as DateTimeUtils from '../../../../shared/utils/DateTimeUtils';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+dayjs.extend(utc);
 
 interface TaskTableLayoutProps {
   loading: boolean;
-  tasks: TaskPageDto[];
+  tasks: TasksPageDto[];
+  totalCount: number;
   page: number;
   rowsPerPage: number;
   onChangePage: (event: unknown, newPage: number) => void;
@@ -27,10 +31,10 @@ interface TaskTableLayoutProps {
 }
 
 const getStatusColor = (
-  status: TaskPageDto['status'],
+  status: TasksPageDto['status'],
 ): 'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success' => {
   const statusColorMap: Record<
-    TaskPageDto['status'],
+    TasksPageDto['status'],
     'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'
   > = {
     CREATED: 'default',
@@ -45,8 +49,8 @@ const getStatusColor = (
 };
 
 function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
-  const { loading, tasks, page, rowsPerPage, onChangePage, onChangeRowsPerPage } = props;
-  const paginatedTasks = tasks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const { loading, tasks, totalCount, page, rowsPerPage, onChangePage, onChangeRowsPerPage } =
+    props;
 
   const handleCellClick = (event: React.MouseEvent<HTMLTableCellElement>) => {
     const cellText = event.currentTarget.textContent;
@@ -72,7 +76,7 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
             <TablePagination
               rowsPerPageOptions={[5, 10, 25, 50]}
               component="div"
-              count={tasks.length}
+              count={totalCount}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={onChangePage}
@@ -96,7 +100,7 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {paginatedTasks.map((task) => (
+                {tasks.map((task) => (
                   <TableRow key={task.id} hover>
                     <TableCell onClick={handleCellClick}>
                       <Tooltip
@@ -106,7 +110,7 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
                         disableInteractive
                         title="Copy to clipboard"
                       >
-                        <span style={{ cursor: 'pointer' }}>{task.id}</span>
+                        <span style={{ cursor: 'pointer', wordBreak: 'break-all' }}>{task.id}</span>
                       </Tooltip>
                     </TableCell>
                     <TableCell onClick={handleCellClick}>
@@ -117,7 +121,9 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
                         disableInteractive
                         title="Copy to clipboard"
                       >
-                        <span style={{ cursor: 'pointer' }}>{task.name}</span>
+                        <span style={{ cursor: 'pointer', wordBreak: 'break-all' }}>
+                          {task.name}
+                        </span>
                       </Tooltip>
                     </TableCell>
                     <TableCell onClick={handleCellClick}>
@@ -128,7 +134,9 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
                         disableInteractive
                         title="Copy to clipboard"
                       >
-                        <span style={{ cursor: 'pointer' }}>{task.tube}</span>
+                        <span style={{ cursor: 'pointer', wordBreak: 'break-all' }}>
+                          {task.tube}
+                        </span>
                       </Tooltip>
                     </TableCell>
                     <TableCell onClick={handleCellClick}>
@@ -237,7 +245,9 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
                         disableInteractive
                         title="Copy to clipboard"
                       >
-                        <span style={{ cursor: 'pointer' }}>{task.handledBy}</span>
+                        <span style={{ cursor: 'pointer', wordBreak: 'break-all' }}>
+                          {task.handledBy}
+                        </span>
                       </Tooltip>
                     </TableCell>
                   </TableRow>
@@ -249,7 +259,7 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
             <TablePagination
               rowsPerPageOptions={[5, 10, 25, 50]}
               component="div"
-              count={tasks.length}
+              count={totalCount}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={onChangePage}

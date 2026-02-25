@@ -1,4 +1,4 @@
-interface TaskPageDto {
+interface TasksPageDto {
   id: string;
   name: string;
   tube: string;
@@ -17,4 +17,4 @@ interface TaskPageDto {
   handledBy: string;
 }
 
-export default TaskPageDto;
+export default TasksPageDto;
