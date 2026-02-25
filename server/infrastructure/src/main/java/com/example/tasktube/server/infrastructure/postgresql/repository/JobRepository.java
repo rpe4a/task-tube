@@ -5,7 +5,6 @@ import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IJobRepository;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.BarrierDataMapper;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +53,7 @@ public class JobRepository implements IJobRepository {
                           AND locked_at is NULL
                           AND released_at is NULL
                           AND status = :status
-                        ORDER BY created_at desc
+                        ORDER BY updated_at
                             FOR UPDATE SKIP LOCKED
                         LIMIT :count
                     )

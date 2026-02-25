@@ -3,10 +3,15 @@ select * from tasks order by scheduled_at;
 select * from tasks order by started_at;
 select * from tasks order by heartbeat_at;
 
-select * from barriers order by status, created_at  desc
+select * from tasks
+where correlation_id = '1d3c8b57-1ceb-46d6-a499-84a608637d15'
+order by created_at
+select * from barriers order by updated_at  asc LIMIT 10
+
+
 
 select * from logs
-where task_id = '82644423-05b2-4d2e-adae-b324a5c4cb59'
+where task_id = '6234fc28-6e1a-4490-aa1d-4554b6bb4948'
 order by timestamp
 
 delete from tasks;

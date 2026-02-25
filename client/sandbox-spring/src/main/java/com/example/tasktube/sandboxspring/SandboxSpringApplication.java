@@ -14,15 +14,18 @@ import java.util.UUID;
 @SpringBootApplication
 public class SandboxSpringApplication {
 
+    public static final int TASK_COUNT = 22;
+
     public static void main(final String[] args) {
         final ConfigurableApplicationContext context = SpringApplication.run(SandboxSpringApplication.class, args);
 
         final TaskTubePublisherFactory taskPublisher = context.getBean(TaskTubePublisherFactory.class);
-        final Optional<UUID> task = taskPublisher
-                .create(new ParentTaskReturnString0String(), new Constant<>("hello"))
-                .pushIn("sandbox-tube");
-
-        System.out.println(task.get());
+        for (int i = 0; i < TASK_COUNT; i++) {
+            final Optional<UUID> task = taskPublisher
+                    .create(new ParentTaskReturnString0String(), new Constant<>("hello"))
+                    .pushIn("sandbox-tube");
+            System.out.println(task.get());
+        }
     }
 
 }

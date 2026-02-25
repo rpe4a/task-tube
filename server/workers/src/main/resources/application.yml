@@ -9,7 +9,7 @@ spring:
           timeoutSeconds: 600
       barriers:
         releasing:
-          delay: "5000"
+          delay: "1000"
           count: 10
         locked:
           delay: "5000"

@@ -8,7 +8,7 @@ spring:
   task-tube:
     client:
       connectionTimeoutSeconds: 30
-      taskTubeServerApiHost: http://localhost:8080/
+      taskTubeServerApiHost: http://localhost:8081/
 
     poller:
       producerPollingIntervalMilliseconds: 5000
