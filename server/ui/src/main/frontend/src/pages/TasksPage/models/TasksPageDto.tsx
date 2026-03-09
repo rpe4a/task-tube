@@ -1,18 +1,15 @@
+import { TaskStatus } from '../../../shared/models/TaskStatus';
+
 interface TasksPageDto {
   id: string;
   name: string;
   tube: string;
-  status:
-    | 'CREATED'
-    | 'SCHEDULED'
-    | 'PROCESSING'
-    | 'FINISHED'
-    | 'COMPLETED'
-    | 'ABORTED'
-    | 'CANCELED';
+  correlationId: string;
+  status: TaskStatus;
   createdAt: string;
   updatedAt: string;
   abortedAt: string | null;
+  canceledAt: string | null;
   completedAt: string | null;
   handledBy: string;
 }

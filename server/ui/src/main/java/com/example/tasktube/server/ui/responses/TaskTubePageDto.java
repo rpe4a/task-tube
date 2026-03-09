@@ -3,17 +3,13 @@ package com.example.tasktube.server.ui.responses;
 import java.time.Instant;
 import java.util.UUID;
 
-public record TasksPageDto(
+public record TaskTubePageDto(
         UUID id,
         String name,
-        String tube,
         String status,
-        String correlationId,
-        Instant updatedAt,
+        UUID parentId,
         Instant createdAt,
         Instant abortedAt,
-        Instant canceledAt,
-        Instant completedAt,
-        String handledBy
+        Instant completedAt
 ) {
 }

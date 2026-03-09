@@ -5,20 +5,15 @@ import com.example.tasktube.server.domain.enties.Task;
 import java.time.Instant;
 import java.util.UUID;
 
-public class ParentTaskView {
+public class TaskTubeView {
 
     private UUID id;
     private String name;
-    private String tube;
     private Task.Status status;
-    private String correlationId;
-    private Instant updatedAt;
+    private UUID parentId;
     private Instant createdAt;
     private Instant abortedAt;
-    private Instant cancelledAt;
     private Instant completedAt;
-    private String handledBy;
-    private int totalCount;
 
     public UUID getId() {
         return id;
@@ -36,28 +31,12 @@ public class ParentTaskView {
         this.name = name;
     }
 
-    public String getTube() {
-        return tube;
-    }
-
-    public void setTube(final String tube) {
-        this.tube = tube;
-    }
-
     public Task.Status getStatus() {
         return status;
     }
 
     public void setStatus(final Task.Status status) {
         this.status = status;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(final Instant updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public Instant getCreatedAt() {
@@ -84,35 +63,11 @@ public class ParentTaskView {
         this.completedAt = completedAt;
     }
 
-    public String getHandledBy() {
-        return handledBy;
+    public UUID getParentId() {
+        return parentId;
     }
 
-    public void setHandledBy(final String handledBy) {
-        this.handledBy = handledBy;
-    }
-
-    public int getTotalCount() {
-        return totalCount;
-    }
-
-    public void setTotalCount(final int totalCount) {
-        this.totalCount = totalCount;
-    }
-
-    public String getCorrelationId() {
-        return correlationId;
-    }
-
-    public void setCorrelationId(final String correlationId) {
-        this.correlationId = correlationId;
-    }
-
-    public Instant getCancelledAt() {
-        return cancelledAt;
-    }
-
-    public void setCancelledAt(final Instant cancelledAt) {
-        this.cancelledAt = cancelledAt;
+    public void setParentId(final UUID parentId) {
+        this.parentId = parentId;
     }
 }

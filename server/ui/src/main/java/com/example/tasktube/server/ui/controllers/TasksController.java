@@ -60,9 +60,11 @@ public final class TasksController extends AbstractController {
                                                 t.getName(),
                                                 t.getTube(),
                                                 t.getStatus().name(),
+                                                t.getCorrelationId(),
                                                 t.getUpdatedAt(),
                                                 t.getCreatedAt(),
                                                 t.getAbortedAt(),
+                                                t.getCancelledAt(),
                                                 t.getCompletedAt(),
                                                 t.getHandledBy()
                                         )

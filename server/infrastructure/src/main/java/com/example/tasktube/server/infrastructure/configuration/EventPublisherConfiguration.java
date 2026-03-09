@@ -28,18 +28,18 @@ public class EventPublisherConfiguration {
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public IEventPublisher registerEventPublisher(
-            final EventHandlerRegistry registry
-    ) {
-        return new ApplicationEventPublisher(registry);
-    }
-
-    @Bean
-    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public EventHandlerRegistry registerEventHandlerRegistry(
             final List<IEventHandler<?>> handlers
     ) {
         return new EventHandlerRegistry(handlers);
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public IEventPublisher registerEventPublisher(
+            final EventHandlerRegistry registry
+    ) {
+        return new ApplicationEventPublisher(registry);
     }
 
 }

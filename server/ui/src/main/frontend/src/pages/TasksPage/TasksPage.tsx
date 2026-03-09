@@ -1,13 +1,13 @@
 import { Container, SelectChangeEvent } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import TasksFormLayout from '../../features/tasks/components/TaskFormLayout/TasksFormLayout';
-import TasksPageDto from '../../features/tasks/models/TasksPageDto';
+import TasksPageDto from './models/TasksPageDto';
 import TaskTableLayout from '../../features/tasks/components/TasksTableLayout/TasksTableLayout';
 import { Dayjs } from 'dayjs';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import TasksPageResponse from '../../features/tasks/models/TasksPageResponse';
+import TasksPageResponse from './models/TasksPageResponse';
 dayjs.extend(utc);
 
 interface FetchTasksParams {

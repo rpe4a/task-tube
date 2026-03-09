@@ -44,6 +44,7 @@ SELECT id,
        name,
        tube,
        status,
+       correlation_id,
        updated_at,
        created_at,
        aborted_at,
@@ -54,3 +55,36 @@ FROM tasks
 WHERE tube = 'sandbox-tube'
 ORDER BY created_at DESC
 LIMIT 5 OFFSET 0
+
+
+SELECT
+    t2.parent_id,
+    (select count(*) from tasks t1 where t1.parent_id = t2.id) as children,
+    id,
+       name,
+       status,
+       created_at,
+       aborted_at,
+       completed_at
+FROM tasks t2
+WHERE correlation_id = '03139157-8fd0-43b9-a839-af9638bfeb38'
+
+SELECT id,
+       name,
+       status,
+       parent_id,
+       created_at,
+       aborted_at,
+       completed_at
+FROM tasks
+WHERE id = 'cbadcfb8-c1b1-4615-9670-d94fb812ce6a' or parent_id = 'cbadcfb8-c1b1-4615-9670-d94fb812ce6a'
+
+ORDER BY created_at
+
+update tasks
+set status = 'COMPLETED'
+where id = 'e8047088-e515-41b7-a364-f3790a2a8fa2'
+
+update tasks
+set status = 'FINISHED'
+where id = 'e8047088-e515-41b7-a364-f3790a2a8fa2'

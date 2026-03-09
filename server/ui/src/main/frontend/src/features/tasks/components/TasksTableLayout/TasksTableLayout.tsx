@@ -1,3 +1,4 @@
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import {
   Box,
   CircularProgress,
@@ -12,12 +13,16 @@ import {
   Typography,
   TablePagination,
   Tooltip,
+  IconButton,
 } from '@mui/material';
 import { JSX } from 'react';
-import TasksPageDto from '../../models/TasksPageDto';
+import TasksPageDto from '../../../../pages/TasksPage/models/TasksPageDto';
 import * as DateTimeUtils from '../../../../shared/utils/DateTimeUtils';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
+import { Link, useNavigate } from 'react-router';
+import { TaskStatus } from '../../../../shared/models/TaskStatus';
+import { getStatusColor } from '../../../../shared/utils/ColorUtils';
 dayjs.extend(utc);
 
 interface TaskTableLayoutProps {
@@ -30,25 +35,8 @@ interface TaskTableLayoutProps {
   onChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const getStatusColor = (
-  status: TasksPageDto['status'],
-): 'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success' => {
-  const statusColorMap: Record<
-    TasksPageDto['status'],
-    'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'
-  > = {
-    CREATED: 'default',
-    SCHEDULED: 'primary',
-    CANCELED: 'warning',
-    PROCESSING: 'info',
-    COMPLETED: 'success',
-    ABORTED: 'error',
-    FINISHED: 'secondary',
-  };
-  return statusColorMap[status];
-};
-
 function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
+  const navigate = useNavigate();
   const { loading, tasks, totalCount, page, rowsPerPage, onChangePage, onChangeRowsPerPage } =
     props;
 
@@ -87,6 +75,7 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
             <Table>
               <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                 <TableRow>
+                  <TableCell sx={{ fontWeight: 600 }}></TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Id</TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Tube</TableCell>
@@ -102,6 +91,15 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
               <TableBody>
                 {tasks.map((task) => (
                   <TableRow key={task.id} hover>
+                    <TableCell>
+                      <Link
+                        to={`/tasktube/${task.correlationId}/tasks/${task.id}`}
+                        title="Show tasktube"
+                        target="_blank"
+                      >
+                        <AccountTreeIcon color="primary" />
+                      </Link>
+                    </TableCell>
                     <TableCell onClick={handleCellClick}>
                       <Tooltip
                         disableFocusListener
@@ -233,6 +231,7 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
                             task.createdAt,
                             task.completedAt,
                             task.abortedAt,
+                            task.canceledAt,
                           )}
                         </span>
                       </Tooltip>

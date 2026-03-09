@@ -5,20 +5,52 @@ import com.example.tasktube.server.domain.enties.Task;
 import java.time.Instant;
 import java.util.UUID;
 
-public class ParentTaskView {
+public class TaskTubeTreeNodeView {
 
     private UUID id;
     private String name;
-    private String tube;
     private Task.Status status;
-    private String correlationId;
-    private Instant updatedAt;
+    private UUID parentId;
     private Instant createdAt;
+    private Instant scheduledAt;
+    private Instant startedAt;
+    private Instant finishedAt;
     private Instant abortedAt;
-    private Instant cancelledAt;
+    private Instant canceledAt;
     private Instant completedAt;
-    private String handledBy;
-    private int totalCount;
+    private int childrenCount;
+
+    public Instant getScheduledAt() {
+        return scheduledAt;
+    }
+
+    public void setScheduledAt(final Instant scheduledAt) {
+        this.scheduledAt = scheduledAt;
+    }
+
+    public Instant getStartedAt() {
+        return startedAt;
+    }
+
+    public void setStartedAt(final Instant startedAt) {
+        this.startedAt = startedAt;
+    }
+
+    public Instant getFinishedAt() {
+        return finishedAt;
+    }
+
+    public void setFinishedAt(final Instant finishedAt) {
+        this.finishedAt = finishedAt;
+    }
+
+    public Instant getCanceledAt() {
+        return canceledAt;
+    }
+
+    public void setCanceledAt(final Instant canceledAt) {
+        this.canceledAt = canceledAt;
+    }
 
     public UUID getId() {
         return id;
@@ -36,28 +68,12 @@ public class ParentTaskView {
         this.name = name;
     }
 
-    public String getTube() {
-        return tube;
-    }
-
-    public void setTube(final String tube) {
-        this.tube = tube;
-    }
-
     public Task.Status getStatus() {
         return status;
     }
 
     public void setStatus(final Task.Status status) {
         this.status = status;
-    }
-
-    public Instant getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(final Instant updatedAt) {
-        this.updatedAt = updatedAt;
     }
 
     public Instant getCreatedAt() {
@@ -84,35 +100,19 @@ public class ParentTaskView {
         this.completedAt = completedAt;
     }
 
-    public String getHandledBy() {
-        return handledBy;
+    public UUID getParentId() {
+        return parentId;
     }
 
-    public void setHandledBy(final String handledBy) {
-        this.handledBy = handledBy;
+    public void setParentId(final UUID parentId) {
+        this.parentId = parentId;
     }
 
-    public int getTotalCount() {
-        return totalCount;
+    public int getChildrenCount() {
+        return childrenCount;
     }
 
-    public void setTotalCount(final int totalCount) {
-        this.totalCount = totalCount;
-    }
-
-    public String getCorrelationId() {
-        return correlationId;
-    }
-
-    public void setCorrelationId(final String correlationId) {
-        this.correlationId = correlationId;
-    }
-
-    public Instant getCancelledAt() {
-        return cancelledAt;
-    }
-
-    public void setCancelledAt(final Instant cancelledAt) {
-        this.cancelledAt = cancelledAt;
+    public void setChildrenCount(final int childrenCount) {
+        this.childrenCount = childrenCount;
     }
 }

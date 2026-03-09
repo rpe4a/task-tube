@@ -1,6 +1,7 @@
 package com.example.tasktube.sandboxspring.tube.test;
 
 import com.example.tasktube.client.sdk.core.task.Task2;
+import com.example.tasktube.client.sdk.core.task.TaskResult;
 import com.example.tasktube.client.sdk.core.task.Value;
 
 public class ChildTaskReturnInteger0Integer1Integer extends Task2<Integer, Integer, Integer> {
