@@ -49,6 +49,10 @@ function a11yProps(index: number) {
   };
 }
 
+const isTaskTerminated = (task: TaskTubeTaskResponse): boolean => {
+  return task.status === 'COMPLETED' || task.status === 'ABORTED' || task.status === 'CANCELED';
+};
+
 function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
   const { correlationId, taskId } = props;
 
@@ -57,11 +61,16 @@ function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
   const [tabIndex, setTabIndex] = useState(0);
 
   const { isPending, isError, isFetching, data, error } = useQuery({
-    queryKey: ['tasktube', correlationId, taskId, task?.status],
+    queryKey: ['tasktube', correlationId, taskId],
     queryFn: () => fetchTaskTubeTask(correlationId, taskId),
     refetchOnWindowFocus: false,
     refetchIntervalInBackground: true,
-    refetchInterval: 15000,
+    refetchInterval: () => {
+      if (task && isTaskTerminated(task)) {
+        return false;
+      }
+      return 15000;
+    },
   });
 
   useEffect(() => {
