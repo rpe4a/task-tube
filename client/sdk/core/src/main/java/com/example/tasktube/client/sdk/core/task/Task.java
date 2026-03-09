@@ -5,12 +5,12 @@ import com.example.tasktube.client.sdk.core.task.argument.ArgumentDeserializer;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -449,12 +449,7 @@ public abstract sealed class Task<TResult> permits Task0, Task1, Task2, Task3, T
         }
     }
 
-    private static class TaskLoggerWrapper {
+    private record TaskLoggerWrapper(TaskLogger logger) {
 
-        public final TaskLogger logger;
-
-        public TaskLoggerWrapper(final TaskLogger logger) {
-            this.logger = logger;
-        }
     }
 }

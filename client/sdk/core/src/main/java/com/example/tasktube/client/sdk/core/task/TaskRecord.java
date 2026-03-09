@@ -23,6 +23,7 @@ public class TaskRecord<TResult> {
     private String name;
     private String tube;
     private String correlationId;
+    private Instant createdAt;
 
     private TaskRecord() {
         this(UUID.randomUUID());
@@ -114,9 +115,17 @@ public class TaskRecord<TResult> {
                         .toList()
                         .toArray(new Slot[0]),
                 waitForTasks.toArray(new UUID[0]),
-                Instant.now(),
+                getCreatedAt(),
                 getSetting()
         );
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(final Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
     public static final class Builder<TResult> {
@@ -167,6 +176,7 @@ public class TaskRecord<TResult> {
 
         @Nonnull
         public TaskRecord<TResult> build() {
+            taskRecord.setCreatedAt(Instant.now());
             return taskRecord;
         }
 

@@ -8,6 +8,7 @@ import com.google.common.base.Preconditions;
 import jakarta.annotation.Nonnull;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -39,6 +40,7 @@ public final class TaskTubePublisher {
         final TaskRecord<?> record = builder.build();
 
         record.configure(configurations);
+        record.setCreatedAt(Instant.now());
 
         return client.pushTask(tube, record.toRequest(slotSerializer));
     }

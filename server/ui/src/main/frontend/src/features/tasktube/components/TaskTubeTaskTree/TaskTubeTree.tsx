@@ -126,8 +126,14 @@ function TaskTubeTree(props: TaskTubeTreeProps) {
           >
             <Typography gutterBottom sx={{ color: 'text.main', fontSize: 14 }}>
               {root.id}{' '}
-              <Chip label={root.status} color={getStatusColor(root.status)} size="small" />
+              <Chip
+                component="span"
+                label={root.status}
+                color={getStatusColor(root.status)}
+                size="small"
+              />
             </Typography>
+
             <Typography
               onClick={handleTaskClick}
               variant="h6"
@@ -137,7 +143,12 @@ function TaskTubeTree(props: TaskTubeTreeProps) {
             </Typography>
             <Typography gutterBottom sx={{ color: 'text.main', fontSize: 14 }}>
               Duration:{' '}
-              {DateTimeUtils.calculateDuration(root.createdAt, root.completedAt, root.abortedAt, root.canceledAt)}
+              {DateTimeUtils.calculateDuration(
+                root.createdAt,
+                root.completedAt,
+                root.abortedAt,
+                root.canceledAt,
+              )}
             </Typography>
             {isFetching && (
               <Button loading variant="outlined" loadingPosition="start">
@@ -168,6 +179,8 @@ function TaskTubeTree(props: TaskTubeTreeProps) {
           {isRefreshChildren && children && (
             <Box sx={{ ml: 2 }}>
               {children
+                .sort((a, b) => (dayjs(a.createdAt).isBefore(dayjs(b.createdAt)) ? -1 : 1))
+                .sort((a, b) => (dayjs(a.scheduledAt).isBefore(dayjs(b.scheduledAt)) ? -1 : 1))
                 .sort((a, b) => (dayjs(a.completedAt).isBefore(dayjs(b.completedAt)) ? -1 : 1))
                 .map((childNood) => (
                   <TaskTubeTree
