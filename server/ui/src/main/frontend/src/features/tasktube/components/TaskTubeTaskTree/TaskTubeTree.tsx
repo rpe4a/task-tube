@@ -7,7 +7,6 @@ import { getStatusColor } from '../../../../shared/utils/ColorUtils';
 import * as DateTimeUtils from '../../../../shared/utils/DateTimeUtils';
 import SchemaIcon from '@mui/icons-material/Schema';
 import TaskTubeTreeNode from '../../../../pages/TaskTubePage/models/TaskTubeTreeNode';
-import { s } from 'react-router/dist/development/index-react-server-client-1TI9M9o1';
 import dayjs from 'dayjs';
 
 interface TaskTubeTreeProps {
@@ -55,7 +54,6 @@ function TaskTubeTree(props: TaskTubeTreeProps) {
 
   const [root, setRoot] = useState<TaskTubeTreeNode | null>(rootNode);
   const [children, setChildren] = useState<TaskTubeTreeNode[] | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [isRefreshChildren, setIsRefreshChildren] = useState(isRefreshChildrenProp);
 
   const { isError, isFetching, data, error } = useQuery({
@@ -88,14 +86,11 @@ function TaskTubeTree(props: TaskTubeTreeProps) {
     error: Error | null,
   ) => {
     if (isFetching) {
-      setIsLoading(true);
     } else if (isError) {
       console.error('Error fetching task tree:', error);
-      setIsLoading(false);
     } else if (data) {
       setRoot(data.root);
       setChildren(data.children);
-      setIsLoading(false);
     }
   };
 

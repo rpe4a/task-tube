@@ -1,6 +1,5 @@
 import { Box } from '@mui/material';
 import TaskTubeTree from '../TaskTubeTaskTree/TaskTubeTree';
-import { useParams } from 'react-router';
 
 interface TaskTubeTreeLayoutProps {
   correlationId: string;

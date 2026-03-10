@@ -13,15 +13,13 @@ import {
   Typography,
   TablePagination,
   Tooltip,
-  IconButton,
 } from '@mui/material';
 import { JSX } from 'react';
 import TasksPageDto from '../../../../pages/TasksPage/models/TasksPageDto';
 import * as DateTimeUtils from '../../../../shared/utils/DateTimeUtils';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
-import { Link, useNavigate } from 'react-router';
-import { TaskStatus } from '../../../../shared/models/TaskStatus';
+import { Link } from 'react-router';
 import { getStatusColor } from '../../../../shared/utils/ColorUtils';
 dayjs.extend(utc);
 
@@ -36,7 +34,6 @@ interface TaskTableLayoutProps {
 }
 
 function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
-  const navigate = useNavigate();
   const { loading, tasks, totalCount, page, rowsPerPage, onChangePage, onChangeRowsPerPage } =
     props;
 

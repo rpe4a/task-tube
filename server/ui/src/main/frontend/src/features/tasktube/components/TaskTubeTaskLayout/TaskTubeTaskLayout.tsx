@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { TaskTubeTaskResponse } from '../../../../pages/TaskTubePage/models/TaskTubeTaskResponse';
-import { Box, Tabs, Tab, Typography, CircularProgress, Grid, Paper, Chip } from '@mui/material';
+import { Box, Tabs, Tab, Typography, CircularProgress, Grid, Chip } from '@mui/material';
 import { formatDateTime, calculateDuration } from '../../../../shared/utils/DateTimeUtils';
 import { lightTheme } from '@uiw/react-json-view/light';
 import JsonView from '@uiw/react-json-view';
 import { getStatusColor } from '../../../../shared/utils/ColorUtils';
+import TaskTubeTaskLogs from '../TaskTubeTaskLogs/TaskTubeTaskLogs';
 
 interface TaskTubeTaskLayoutProps {
   correlationId: string;
@@ -58,6 +59,7 @@ function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
 
   const [task, setTask] = useState<TaskTubeTaskResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showLog, setShowLog] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
 
   const { isPending, isError, isFetching, data, error } = useQuery({
@@ -76,6 +78,10 @@ function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
   useEffect(() => {
     handleResponse(isPending, isError, data, error);
   }, [isPending, isError, isFetching, data, error]);
+
+  useEffect(() => {
+    setTabIndex(0);
+  }, [correlationId, taskId]);
 
   const handleResponse = (
     isPending: boolean,
@@ -96,6 +102,10 @@ function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
+
+    if (newValue === 1) {
+      setShowLog(true);
+    }
   };
 
   // render
@@ -118,11 +128,11 @@ function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
             sx={{ borderBottom: 1, borderColor: 'divider' }}
           >
             <Tab label="Summary" {...a11yProps(0)} />
-            <Tab label="Input" {...a11yProps(1)} />
-            <Tab label="Output" {...a11yProps(2)} />
-            <Tab label="Settings" {...a11yProps(3)} />
-            <Tab label="Children" {...a11yProps(4)} />
-            <Tab label="Logs" {...a11yProps(5)} />
+            <Tab label="Logs" {...a11yProps(1)} />
+            <Tab label="Input" {...a11yProps(2)} />
+            <Tab label="Output" {...a11yProps(3)} />
+            <Tab label="Settings" {...a11yProps(4)} />
+            <Tab label="Children" {...a11yProps(5)} />
           </Tabs>
 
           <TabPanel value={tabIndex} index={0}>
@@ -225,6 +235,14 @@ function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
           </TabPanel>
 
           <TabPanel value={tabIndex} index={1}>
+            {showLog ? (
+              <TaskTubeTaskLogs correlationId={correlationId} taskId={taskId} />
+            ) : (
+              <Typography>No logs available</Typography>
+            )}
+          </TabPanel>
+
+          <TabPanel value={tabIndex} index={2}>
             {task.input && task.input !== 'undefined' ? (
               <JsonView value={JSON.parse(task.input)} style={lightTheme} collapsed={2} />
             ) : (
@@ -232,7 +250,7 @@ function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
             )}
           </TabPanel>
 
-          <TabPanel value={tabIndex} index={2}>
+          <TabPanel value={tabIndex} index={3}>
             {task.output && task.output !== 'undefined' ? (
               <JsonView value={JSON.parse(task.output)} style={lightTheme} collapsed={2} />
             ) : (
@@ -240,7 +258,7 @@ function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
             )}
           </TabPanel>
 
-          <TabPanel value={tabIndex} index={3}>
+          <TabPanel value={tabIndex} index={4}>
             <Grid container spacing={2}>
               <Grid size={6}>
                 <Typography variant="subtitle2">Max Failures</Typography>
@@ -261,13 +279,9 @@ function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
             </Grid>
           </TabPanel>
 
-          <TabPanel value={tabIndex} index={4}>
+          <TabPanel value={tabIndex} index={5}>
             <Typography>Children count: {task.countChildren}</Typography>
             {/* future: list child tasks */}
-          </TabPanel>
-
-          <TabPanel value={tabIndex} index={5}>
-            <Typography>No logs available</Typography>
           </TabPanel>
         </>
       )}
