@@ -1,8 +1,8 @@
 import { Container, SelectChangeEvent } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import TasksFormLayout from '../../features/tasks/components/TaskFormLayout/TasksFormLayout';
-import TasksPageDto from './models/TasksPageDto';
-import TaskTableLayout from '../../features/tasks/components/TasksTableLayout/TasksTableLayout';
+import TasksFormLayout from '../../features/tasks/TaskFormLayout/TasksFormLayout';
+import TasksPageTaskDto from './models/TasksPageTaskDto';
+import TaskTableLayout from '../../features/tasks/TasksTableLayout/TasksTableLayout';
 import { Dayjs } from 'dayjs';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
@@ -48,11 +48,11 @@ const fetchTasks = async (params: FetchTasksParams): Promise<TasksPageResponse> 
 };
 
 function TasksPage(): React.JSX.Element {
-  const [tasks, setTasks] = useState<TasksPageDto[]>([]);
+  const [tasks, setTasks] = useState<TasksPageTaskDto[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [createdFrom, setCreatedFrom] = useState<Dayjs | null>(null);
   const [createdTo, setCreatedTo] = useState<Dayjs | null>(null);
   const [searchId, setSearchId] = useState<string>('');
@@ -60,7 +60,7 @@ function TasksPage(): React.JSX.Element {
   const [searchTube, setSearchTube] = useState<string>('');
   const [searchStatus, setSearchStatus] = useState<string>('');
 
-  const { isPending, isError, isFetching, data, error, isPlaceholderData, refetch } = useQuery({
+  const { isPending, isFetching, isError, data, error, isPlaceholderData, refetch } = useQuery({
     queryKey: ['tasks', page],
     queryFn: () =>
       fetchTasks({
@@ -79,7 +79,7 @@ function TasksPage(): React.JSX.Element {
 
   useEffect(() => {
     handleResponse(isPending, isError, data, error);
-  }, [isPending, isError, isFetching, data, error]);
+  }, [isPending, isError, data, error]);
 
   const handleResponse = (
     isPending: boolean,
@@ -127,7 +127,6 @@ function TasksPage(): React.JSX.Element {
   const handleChangePage = (event: unknown, newPage: number) => {
     if (!isPlaceholderData) {
       setPage(newPage);
-      // refetch();
     }
   };
 
@@ -160,6 +159,7 @@ function TasksPage(): React.JSX.Element {
       />
       <TaskTableLayout
         loading={loading}
+        isFetching={isFetching}
         tasks={tasks}
         page={page}
         rowsPerPage={rowsPerPage}

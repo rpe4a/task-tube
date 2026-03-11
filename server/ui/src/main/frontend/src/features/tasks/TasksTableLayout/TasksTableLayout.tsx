@@ -15,17 +15,18 @@ import {
   Tooltip,
 } from '@mui/material';
 import { JSX } from 'react';
-import TasksPageDto from '../../../../pages/TasksPage/models/TasksPageDto';
-import * as DateTimeUtils from '../../../../shared/utils/DateTimeUtils';
+import TasksPageTaskDto from '../../../pages/TasksPage/models/TasksPageTaskDto';
+import * as DateTimeUtils from '../../../shared/utils/DateTimeUtils';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { Link } from 'react-router';
-import { getStatusColor } from '../../../../shared/utils/ColorUtils';
+import { getStatusColor } from '../../../shared/utils/ColorUtils';
 dayjs.extend(utc);
 
 interface TaskTableLayoutProps {
   loading: boolean;
-  tasks: TasksPageDto[];
+  isFetching: boolean;
+  tasks: TasksPageTaskDto[];
   totalCount: number;
   page: number;
   rowsPerPage: number;
@@ -34,8 +35,16 @@ interface TaskTableLayoutProps {
 }
 
 function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
-  const { loading, tasks, totalCount, page, rowsPerPage, onChangePage, onChangeRowsPerPage } =
-    props;
+  const {
+    loading,
+    isFetching,
+    tasks,
+    totalCount,
+    page,
+    rowsPerPage,
+    onChangePage,
+    onChangeRowsPerPage,
+  } = props;
 
   const handleCellClick = (event: React.MouseEvent<HTMLTableCellElement>) => {
     const cellText = event.currentTarget.textContent;
@@ -57,6 +66,7 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
               <Typography variant="h5">Results</Typography>
+              {isFetching && <CircularProgress size="1.5rem" sx={{ ml: 1 }} />}
             </Box>
             <TablePagination
               rowsPerPageOptions={[5, 10, 25, 50]}

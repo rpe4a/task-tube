@@ -1,7 +1,7 @@
-import TasksPageDto from './TasksPageDto';
+import TasksPageTaskDto from './TasksPageTaskDto';
 
 interface TasksPageResponse {
-  tasks: TasksPageDto[];
+  tasks: TasksPageTaskDto[];
   totalCount: number;
 }
 

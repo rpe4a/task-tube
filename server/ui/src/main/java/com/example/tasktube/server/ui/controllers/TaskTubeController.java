@@ -1,23 +1,34 @@
 package com.example.tasktube.server.ui.controllers;
 
+import com.example.tasktube.server.application.queries.ParentTasksQuery;
+import com.example.tasktube.server.application.queries.TaskLogsQuery;
 import com.example.tasktube.server.application.queries.TaskTubeQuery;
 import com.example.tasktube.server.application.queries.TaskTubeTreeNodeQuery;
 import com.example.tasktube.server.application.queries.TaskTubeTaskQuery;
+import com.example.tasktube.server.application.queries.handlers.TaskLogsQueryHandler;
 import com.example.tasktube.server.application.queries.handlers.TaskTubeTaskQueryHandler;
 import com.example.tasktube.server.application.queries.handlers.TaskTubeQueryHandler;
 import com.example.tasktube.server.application.queries.handlers.TaskTubeTreeNodeQueryHandler;
+import com.example.tasktube.server.application.queries.views.ParentTaskView;
+import com.example.tasktube.server.application.queries.views.TaskLogView;
 import com.example.tasktube.server.application.queries.views.TaskTubeTreeNodeView;
 import com.example.tasktube.server.application.queries.views.TaskTubeTaskView;
 import com.example.tasktube.server.application.queries.views.TaskTubeView;
+import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.ui.responses.TaskTubePageDto;
 import com.example.tasktube.server.ui.responses.TaskTubePageResponse;
+import com.example.tasktube.server.ui.responses.TaskTubeTaskLogDto;
+import com.example.tasktube.server.ui.responses.TaskTubeTaskLogsResponse;
 import com.example.tasktube.server.ui.responses.TaskTubeTaskResponse;
 import com.example.tasktube.server.ui.responses.TaskTubeTreeNode;
 import com.example.tasktube.server.ui.responses.TaskTubeTreeNodeResponse;
+import com.example.tasktube.server.ui.responses.TasksPageDto;
+import com.example.tasktube.server.ui.responses.TasksPageResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -32,15 +43,18 @@ public final class TaskTubeController extends AbstractController {
     private final TaskTubeQueryHandler queryHandler;
     private final TaskTubeTaskQueryHandler taskTubeTaskQueryHandler;
     private final TaskTubeTreeNodeQueryHandler taskTubeTreeNodeQueryHandler;
+    private final TaskLogsQueryHandler taskLogsQueryHandler;
 
     public TaskTubeController(
             final TaskTubeQueryHandler queryHandler,
             final TaskTubeTaskQueryHandler taskTubeTaskQueryHandler,
-            final TaskTubeTreeNodeQueryHandler taskTubeTreeNodeQueryHandler
+            final TaskTubeTreeNodeQueryHandler taskTubeTreeNodeQueryHandler,
+            final TaskLogsQueryHandler taskLogsQueryHandler
     ) {
         this.queryHandler = Objects.requireNonNull(queryHandler);
         this.taskTubeTaskQueryHandler = Objects.requireNonNull(taskTubeTaskQueryHandler);
         this.taskTubeTreeNodeQueryHandler = Objects.requireNonNull(taskTubeTreeNodeQueryHandler);
+        this.taskLogsQueryHandler = Objects.requireNonNull(taskLogsQueryHandler);
     }
 
     @RequestMapping(
@@ -166,6 +180,44 @@ public final class TaskTubeController extends AbstractController {
                 new TaskTubeTreeNodeResponse(
                         root,
                         children
+                )
+        );
+    }
+
+    @RequestMapping(
+            method = RequestMethod.GET,
+            path = "/{correlationId}/task/{taskId}/logs"
+    )
+    public ResponseEntity<TaskTubeTaskLogsResponse> getTaskTubeTaskChildren(
+            @PathVariable(name = "correlationId") final String correlationId,
+            @PathVariable(name = "taskId") final UUID taskId,
+            @RequestParam(required = false, name = "page", defaultValue = "0") final int page,
+            @RequestParam(required = false, name = "size", defaultValue = "100") final int size
+    ) {
+        final List<TaskLogView> logs = taskLogsQueryHandler.handle(
+                new TaskLogsQuery(
+                        taskId,
+                        page,
+                        size
+                )
+        );
+
+        return ResponseEntity.ok(new TaskTubeTaskLogsResponse(
+                        logs.stream()
+                                .map(l -> new TaskTubeTaskLogDto(
+                                                l.getId(),
+                                                l.getTaskId(),
+                                                l.getType(),
+                                                l.getLevel(),
+                                                l.getTimestamp(),
+                                                l.getMessage(),
+                                                l.getExceptionMessage(),
+                                                l.getExceptionStackTrace()
+                                        )
+                                ).toArray(TaskTubeTaskLogDto[]::new),
+                        logs.isEmpty()
+                                ? 0L
+                                : logs.getFirst().getTotalCount()
                 )
         );
     }

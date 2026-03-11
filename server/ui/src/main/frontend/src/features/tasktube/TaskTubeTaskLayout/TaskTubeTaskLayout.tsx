@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { TaskTubeTaskResponse } from '../../../../pages/TaskTubePage/models/TaskTubeTaskResponse';
+import { TaskTubeTaskResponse } from './model/TaskTubeTaskResponse';
 import { Box, Tabs, Tab, Typography, CircularProgress, Grid, Chip } from '@mui/material';
-import { formatDateTime, calculateDuration } from '../../../../shared/utils/DateTimeUtils';
+import { formatDateTime, calculateDuration } from '../../../shared/utils/DateTimeUtils';
 import { lightTheme } from '@uiw/react-json-view/light';
 import JsonView from '@uiw/react-json-view';
-import { getStatusColor } from '../../../../shared/utils/ColorUtils';
-import TaskTubeTaskLogs from '../TaskTubeTaskLogs/TaskTubeTaskLogs';
+import { getStatusColor } from '../../../shared/utils/ColorUtils';
+import TaskTubeTaskLogs from './components/TaskTubeTaskLogs';
 
 interface TaskTubeTaskLayoutProps {
   correlationId: string;

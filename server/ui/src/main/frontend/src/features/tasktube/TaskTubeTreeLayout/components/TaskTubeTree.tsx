@@ -1,12 +1,12 @@
 import { Alert, AlertColor, Badge, Box, Button, Chip, Typography } from '@mui/material';
 import { TaskStatus } from '../../../../shared/models/TaskStatus';
-import TaskTubeTreeNodeResponse from '../../../../pages/TaskTubePage/models/TaskTubeTreeNodeResponse';
+import TaskTubeTreeNodeResponse from '../model/TaskTubeTreeNodeResponse';
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getStatusColor } from '../../../../shared/utils/ColorUtils';
 import * as DateTimeUtils from '../../../../shared/utils/DateTimeUtils';
 import SchemaIcon from '@mui/icons-material/Schema';
-import TaskTubeTreeNode from '../../../../pages/TaskTubePage/models/TaskTubeTreeNode';
+import TaskTubeTreeNode from '../model/TaskTubeTreeNode';
 import dayjs from 'dayjs';
 
 interface TaskTubeTreeProps {

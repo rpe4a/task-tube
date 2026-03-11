@@ -1,5 +1,6 @@
 package com.example.tasktube.server.infrastructure.configuration;
 
+import com.example.tasktube.server.application.queries.repositories.ITaskLogViewRepository;
 import com.example.tasktube.server.application.queries.repositories.ITaskViewRepository;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.IEventPublisher;
@@ -10,10 +11,12 @@ import com.example.tasktube.server.domain.port.out.ITubeRepository;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.BarrierDataMapper;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.LogRecordMapper;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskDataMapper;
+import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskLogViewMapper;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskViewMapper;
 import com.example.tasktube.server.infrastructure.postgresql.repository.BarrierRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.JobRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.LogRecordRepository;
+import com.example.tasktube.server.infrastructure.postgresql.repository.TaskLogViewRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.TaskViewRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.TaskRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.TubeRepository;
@@ -47,9 +50,16 @@ public class PostgresqlConfiguration {
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public TaskViewMapper registerLTaskViewMapper(final ObjectMapper objectMapper) {
+    public TaskViewMapper registerTaskViewMapper(final ObjectMapper objectMapper) {
         return new TaskViewMapper(objectMapper);
     }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public TaskLogViewMapper registerTaskLogViewMapper() {
+        return new TaskLogViewMapper();
+    }
+
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
@@ -85,5 +95,11 @@ public class PostgresqlConfiguration {
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public ITaskViewRepository registerTaskViewRepository(final NamedParameterJdbcTemplate db, final TaskViewMapper mapper) {
         return new TaskViewRepository(db, mapper);
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public ITaskLogViewRepository registerTaskLogViewRepository(final NamedParameterJdbcTemplate db, final TaskLogViewMapper mapper) {
+        return new TaskLogViewRepository(db, mapper);
     }
 }

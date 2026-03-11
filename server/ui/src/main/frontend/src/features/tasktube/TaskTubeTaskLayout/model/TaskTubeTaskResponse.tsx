@@ -1,4 +1,4 @@
-import { TaskStatus } from '../../../shared/models/TaskStatus';
+import { TaskStatus } from '../../../../shared/models/TaskStatus';
 
 export interface TaskSettings {
   maxFailures: number;

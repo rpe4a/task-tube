@@ -71,14 +71,14 @@ public class TaskViewRepository implements ITaskViewRepository {
                 """);
         if (taskId != null) {
             sbQuery.append(" AND id = :id");
-            params.put("id", taskId.toString());
+            params.put("id", taskId);
         } else {
             if (taskName != null) {
-                sbQuery.append(" AND name like '%:name%'");
+                sbQuery.append(" AND name like CONCAT('%',:name,'%')");
                 params.put("name", taskName);
             }
             if (tube != null) {
-                sbQuery.append(" AND tube like '%:tube%'");
+                sbQuery.append(" AND tube like CONCAT('%',:tube,'%')");
                 params.put("tube", tube);
             }
             if (status != null) {

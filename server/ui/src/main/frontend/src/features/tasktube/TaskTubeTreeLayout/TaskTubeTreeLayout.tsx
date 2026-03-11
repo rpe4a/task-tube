@@ -1,5 +1,5 @@
 import { Box } from '@mui/material';
-import TaskTubeTree from '../TaskTubeTaskTree/TaskTubeTree';
+import TaskTubeTree from './components/TaskTubeTree';
 
 interface TaskTubeTreeLayoutProps {
   correlationId: string;

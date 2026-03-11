@@ -1,6 +1,6 @@
 import { TaskStatus } from '../../../shared/models/TaskStatus';
 
-interface TasksPageDto {
+interface TasksPageTaskDto {
   id: string;
   name: string;
   tube: string;
@@ -14,4 +14,4 @@ interface TasksPageDto {
   handledBy: string;
 }
 
-export default TasksPageDto;
+export default TasksPageTaskDto;

@@ -48,13 +48,13 @@ SELECT id,
        updated_at,
        created_at,
        aborted_at,
+       canceled_at,
        completed_at,
        handled_by,
        COUNT(*) OVER() AS total_count
 FROM tasks
-WHERE tube = 'sandbox-tube'
-ORDER BY created_at DESC
-LIMIT 5 OFFSET 0
+WHERE parent_id IS NULL
+  AND name like '%.ParentTaskReturnString0String%' ORDER BY created_at DESC LIMIT 10 OFFSET 0
 
 
 SELECT

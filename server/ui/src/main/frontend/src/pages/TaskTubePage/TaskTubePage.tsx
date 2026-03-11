@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useParams } from 'react-router';
 import { Grid } from '@mui/material';
-import TaskTubeTaskLayout from '../../features/tasktube/components/TaskTubeTaskLayout/TaskTubeTaskLayout';
-import TaskTubeTreeLayout from '../../features/tasktube/components/TaskTubeTreeLayout/TaskTubeTreeLayout';
+import TaskTubeTaskLayout from '../../features/tasktube/TaskTubeTaskLayout/TaskTubeTaskLayout';
+import TaskTubeTreeLayout from '../../features/tasktube/TaskTubeTreeLayout/TaskTubeTreeLayout';
 
 function TaskTubePage() {
   const { correlationIdParam, taskIdParam } = useParams();
