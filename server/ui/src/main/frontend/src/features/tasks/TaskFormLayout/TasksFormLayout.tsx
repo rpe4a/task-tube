@@ -18,14 +18,9 @@ import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
 import 'dayjs/locale/en-gb';
+import { isUUID } from '../../../shared/utils/UuidUtils';
 
-// UUID v4 regex pattern
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-const isValidUUID = (value: string): boolean => {
-  if (!value) return true; // Empty value is allowed
-  return UUID_PATTERN.test(value);
-};
 
 interface TasksFormLayoutProps {
   createdFrom: Dayjs | null;
@@ -67,7 +62,7 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
   const handleIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
 
-    if (isValidUUID(value)) {
+    if (!value || isUUID(value)) {
       setIdError('');
       handleSearchIdChange(event);
     } else {
@@ -77,7 +72,7 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
 
   return (
     <>
-      <Typography variant="h5" sx={{ mb: 3 }}>
+      <Typography variant="h5" sx={{ mb: 2 }}>
         Search Executions
       </Typography>
 
@@ -162,9 +157,10 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
             size="large"
             onClick={handleSearchTasks}
             disabled={loading}
+            title="Search tasktube"
             sx={{ textTransform: 'none' }}
           >
-            {loading ? <CircularProgress size={24} /> : 'Search Tasks'}
+            {loading ? <CircularProgress size={24} /> : 'SEARCH'}
           </Button>
         </Box>
       </Paper>

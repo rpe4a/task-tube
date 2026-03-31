@@ -243,16 +243,16 @@ function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
           </TabPanel>
 
           <TabPanel value={tabIndex} index={2}>
-            {task.input && task.input !== 'undefined' ? (
-              <JsonView value={JSON.parse(task.input)} style={lightTheme} collapsed={2} />
+            {task.input ? (
+              <JsonView value={task.input} style={lightTheme} collapsed={2} />
             ) : (
               <Typography>No input data yet</Typography>
             )}
           </TabPanel>
 
           <TabPanel value={tabIndex} index={3}>
-            {task.output && task.output !== 'undefined' ? (
-              <JsonView value={JSON.parse(task.output)} style={lightTheme} collapsed={2} />
+            {task.output ? (
+              <JsonView value={task.output} style={lightTheme} collapsed={2} />
             ) : (
               <Typography>No output data yet</Typography>
             )}

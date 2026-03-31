@@ -4,9 +4,11 @@ select * from tasks order by started_at;
 select * from tasks order by heartbeat_at;
 
 select * from tasks
-where correlation_id = '1d3c8b57-1ceb-46d6-a499-84a608637d15'
+where id = '2f9adc94-68ca-43b7-b7be-0a38fb141fb9'
 order by created_at
-select * from barriers order by updated_at  asc LIMIT 10
+select * from barriers
+where task_id = '2f9adc94-68ca-43b7-b7be-0a38fb141fb9'
+order by updated_at  asc LIMIT 10
 
 
 

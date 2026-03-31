@@ -14,9 +14,9 @@ export interface TaskTubeTaskResponse {
   status: TaskStatus;
   correlationId: string;
 
-  input: string;
+  input: {}[];
 
-  output: string;
+  output: {} | null;
 
   updatedAt: string;
   createdAt: string;

@@ -72,8 +72,14 @@ public class TaskViewMapper {
         task.setStatus(Task.Status.valueOf(rs.getString("status")));
         task.setCorrelationId(rs.getString("correlation_id"));
         task.setParentId(rs.getObject("parent_id", UUID.class));
-        task.setInput(rs.getString("input"));
-        task.setOutput(rs.getString("output"));
+        task.setInput(rs.getString("input") != null
+                ? fromJson(rs.getString("input"), new TypeReference<>() {
+        })
+                : null);
+        task.setOutput(rs.getString("output") != null
+                ? fromJson(rs.getString("output"), new TypeReference<>() {
+        })
+                : null);
         task.setUpdatedAt(Instant.ofEpochMilli(rs.getTimestamp("updated_at").getTime()));
         task.setCreatedAt(Instant.ofEpochMilli(rs.getTimestamp("created_at").getTime()));
         task.setCanceledAt(rs.getTimestamp("canceled_at") != null

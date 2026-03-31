@@ -1,4 +1,4 @@
-package com.example.tasktube.server.api.requests;
+package com.example.tasktube.server.ui.responses;
 
 import com.example.tasktube.server.application.models.PushTaskDto;
 import com.example.tasktube.server.domain.values.slot.Slot;
@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-public record TaskRequest(
+public record TaskPushRequest(
         @NotNull(message = "id is invalid") UUID id,
         @NotBlank(message = "name is invalid") String name,
         @NotBlank(message = "tube is invalid") String tube,
@@ -20,7 +20,7 @@ public record TaskRequest(
         @Nullable Slot[] input,
         @Nullable UUID[] waitTasks,
         @NotNull(message = "createdAt is invalid") Instant createdAt,
-        @Nullable TaskSettingRequest settings
+        @Nullable TaskPushSettingRequest settings
 
 ) {
     public PushTaskDto to() {
@@ -33,7 +33,7 @@ public record TaskRequest(
                 Objects.isNull(waitTasks) ? null : Arrays.asList(waitTasks),
                 createdAt,
                 Optional.ofNullable(settings)
-                        .map(TaskSettingRequest::to)
+                        .map(TaskPushSettingRequest::to)
                         .orElse(null)
         );
     }

@@ -2,8 +2,10 @@ package com.example.tasktube.server.application.queries.views;
 
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.values.TaskSettings;
+import com.example.tasktube.server.domain.values.slot.Slot;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public class TaskTubeTaskView {
@@ -14,8 +16,8 @@ public class TaskTubeTaskView {
     private Task.Status status;
     private String correlationId;
     private UUID parentId;
-    private String input;
-    private String output;
+    private List<Slot> input;
+    private Slot output;
     private Instant updatedAt;
     private Instant createdAt;
     private Instant canceledAt;
@@ -80,19 +82,19 @@ public class TaskTubeTaskView {
         this.parentId = parentId;
     }
 
-    public String getInput() {
+    public List<Slot> getInput() {
         return input;
     }
 
-    public void setInput(final String input) {
+    public void setInput(final List<Slot> input) {
         this.input = input;
     }
 
-    public String getOutput() {
+    public Slot getOutput() {
         return output;
     }
 
-    public void setOutput(final String output) {
+    public void setOutput(final Slot output) {
         this.output = output;
     }
 

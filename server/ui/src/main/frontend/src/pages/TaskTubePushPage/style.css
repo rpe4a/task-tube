@@ -1,0 +1,19 @@
+.push-task-container {
+  display: grid;
+  grid-template-columns: 7fr 5fr;
+  align-items: start;
+}
+
+.pushed-tasks-wrapper {
+  position: relative;
+  height: 100%;
+  min-height: 0;
+}
+
+.pushed-tasks-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}

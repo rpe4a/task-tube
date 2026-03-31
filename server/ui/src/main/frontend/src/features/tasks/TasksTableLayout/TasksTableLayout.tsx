@@ -13,6 +13,7 @@ import {
   Typography,
   TablePagination,
   Tooltip,
+  Button,
 } from '@mui/material';
 import { JSX } from 'react';
 import TasksPageTaskDto from '../../../pages/TasksPage/models/TasksPageTaskDto';
@@ -21,6 +22,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { Link } from 'react-router';
 import { getStatusColor } from '../../../shared/utils/ColorUtils';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 dayjs.extend(utc);
 
 interface TaskTableLayoutProps {
@@ -65,7 +67,11 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
         <>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
             <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Typography variant="h5">Results</Typography>
+              <Link to={`/tasktube/push`} title="Push tasktube" target="_blank">
+                <Button variant="contained" size="large" sx={{ textTransform: 'none' }}>
+                  PUSH
+                </Button>
+              </Link>
               {isFetching && <CircularProgress size="1.5rem" sx={{ ml: 1 }} />}
             </Box>
             <TablePagination
@@ -82,7 +88,7 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
             <Table>
               <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 600 }}></TableCell>
+                  <TableCell sx={{ fontWeight: 600, width: '100px' }}></TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Id</TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
                   <TableCell sx={{ fontWeight: 600 }}>Tube</TableCell>
@@ -99,13 +105,22 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
                 {tasks.map((task) => (
                   <TableRow key={task.id} hover>
                     <TableCell>
-                      <Link
-                        to={`/tasktube/${task.correlationId}/tasks/${task.id}`}
-                        title="Show tasktube"
-                        target="_blank"
-                      >
-                        <AccountTreeIcon color="primary" />
-                      </Link>
+                      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5 }}>
+                        <Link
+                          to={`/tasktube/push?correlationId=${task.correlationId}&taskId=${task.id}`}
+                          title="Push"
+                          target="_blank"
+                        >
+                          <PlaylistAddIcon color="primary" />
+                        </Link>
+                        <Link
+                          to={`/tasktube/${task.correlationId}/tasks/${task.id}`}
+                          title="Show"
+                          target="_blank"
+                        >
+                          <AccountTreeIcon color="primary" />
+                        </Link>
+                      </Box>
                     </TableCell>
                     <TableCell onClick={handleCellClick}>
                       <Tooltip

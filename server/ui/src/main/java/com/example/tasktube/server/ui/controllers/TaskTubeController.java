@@ -1,20 +1,20 @@
 package com.example.tasktube.server.ui.controllers;
 
-import com.example.tasktube.server.application.queries.ParentTasksQuery;
+import com.example.tasktube.server.application.port.in.ITubeService;
 import com.example.tasktube.server.application.queries.TaskLogsQuery;
 import com.example.tasktube.server.application.queries.TaskTubeQuery;
-import com.example.tasktube.server.application.queries.TaskTubeTreeNodeQuery;
 import com.example.tasktube.server.application.queries.TaskTubeTaskQuery;
+import com.example.tasktube.server.application.queries.TaskTubeTreeNodeQuery;
 import com.example.tasktube.server.application.queries.handlers.TaskLogsQueryHandler;
-import com.example.tasktube.server.application.queries.handlers.TaskTubeTaskQueryHandler;
 import com.example.tasktube.server.application.queries.handlers.TaskTubeQueryHandler;
+import com.example.tasktube.server.application.queries.handlers.TaskTubeTaskQueryHandler;
 import com.example.tasktube.server.application.queries.handlers.TaskTubeTreeNodeQueryHandler;
-import com.example.tasktube.server.application.queries.views.ParentTaskView;
 import com.example.tasktube.server.application.queries.views.TaskLogView;
-import com.example.tasktube.server.application.queries.views.TaskTubeTreeNodeView;
 import com.example.tasktube.server.application.queries.views.TaskTubeTaskView;
+import com.example.tasktube.server.application.queries.views.TaskTubeTreeNodeView;
 import com.example.tasktube.server.application.queries.views.TaskTubeView;
-import com.example.tasktube.server.domain.enties.Task;
+import com.example.tasktube.server.application.services.TubeService;
+import com.example.tasktube.server.ui.responses.TaskPushRequest;
 import com.example.tasktube.server.ui.responses.TaskTubePageDto;
 import com.example.tasktube.server.ui.responses.TaskTubePageResponse;
 import com.example.tasktube.server.ui.responses.TaskTubeTaskLogDto;
@@ -22,10 +22,12 @@ import com.example.tasktube.server.ui.responses.TaskTubeTaskLogsResponse;
 import com.example.tasktube.server.ui.responses.TaskTubeTaskResponse;
 import com.example.tasktube.server.ui.responses.TaskTubeTreeNode;
 import com.example.tasktube.server.ui.responses.TaskTubeTreeNodeResponse;
-import com.example.tasktube.server.ui.responses.TasksPageDto;
-import com.example.tasktube.server.ui.responses.TasksPageResponse;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -44,17 +46,20 @@ public final class TaskTubeController extends AbstractController {
     private final TaskTubeTaskQueryHandler taskTubeTaskQueryHandler;
     private final TaskTubeTreeNodeQueryHandler taskTubeTreeNodeQueryHandler;
     private final TaskLogsQueryHandler taskLogsQueryHandler;
+    private final ITubeService tubeService;
 
     public TaskTubeController(
             final TaskTubeQueryHandler queryHandler,
             final TaskTubeTaskQueryHandler taskTubeTaskQueryHandler,
             final TaskTubeTreeNodeQueryHandler taskTubeTreeNodeQueryHandler,
-            final TaskLogsQueryHandler taskLogsQueryHandler
-    ) {
+            final TaskLogsQueryHandler taskLogsQueryHandler,
+            final ITubeService tubeService
+            ) {
         this.queryHandler = Objects.requireNonNull(queryHandler);
         this.taskTubeTaskQueryHandler = Objects.requireNonNull(taskTubeTaskQueryHandler);
         this.taskTubeTreeNodeQueryHandler = Objects.requireNonNull(taskTubeTreeNodeQueryHandler);
         this.taskLogsQueryHandler = Objects.requireNonNull(taskLogsQueryHandler);
+        this.tubeService = Objects.requireNonNull(tubeService);
     }
 
     @RequestMapping(
@@ -219,6 +224,23 @@ public final class TaskTubeController extends AbstractController {
                                 ? 0L
                                 : logs.getFirst().getTotalCount()
                 )
+        );
+    }
+
+    @RequestMapping(
+            method = RequestMethod.POST,
+            path = "/push"
+    )
+    public ResponseEntity<UUID> postPushTask(
+            @NotNull @Valid @RequestBody final TaskPushRequest request,
+            final BindingResult bindingResult
+    ) {
+        if (isInvalid(bindingResult)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.ok(
+                tubeService.push(request.to())
         );
     }
 }

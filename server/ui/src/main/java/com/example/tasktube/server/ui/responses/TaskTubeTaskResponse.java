@@ -2,8 +2,10 @@ package com.example.tasktube.server.ui.responses;
 
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.values.TaskSettings;
+import com.example.tasktube.server.domain.values.slot.Slot;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public record TaskTubeTaskResponse(
@@ -13,8 +15,8 @@ public record TaskTubeTaskResponse(
         Task.Status status,
         String correlationId,
         UUID parentId,
-        String input,
-        String output,
+        List<Slot> input,
+        Slot output,
         Instant updatedAt,
         Instant createdAt,
         Instant canceledAt,

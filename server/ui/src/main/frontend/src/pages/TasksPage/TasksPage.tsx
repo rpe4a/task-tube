@@ -140,7 +140,7 @@ function TasksPage(): React.JSX.Element {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ py: 3 }}>
+    <Container maxWidth="xl" sx={{ py: 1 }}>
       <TasksFormLayout
         createdFrom={createdFrom}
         createdTo={createdTo}
