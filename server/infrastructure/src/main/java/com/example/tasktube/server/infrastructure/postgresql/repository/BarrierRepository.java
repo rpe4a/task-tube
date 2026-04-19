@@ -21,6 +21,7 @@ import java.util.function.Function;
 
 @Repository
 public class BarrierRepository implements IBarrierRepository {
+
     public static final int BARRIER_PARTITION_SIZE = 1000;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BarrierRepository.class);

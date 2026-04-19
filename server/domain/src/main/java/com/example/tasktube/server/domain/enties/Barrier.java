@@ -1,5 +1,6 @@
 package com.example.tasktube.server.domain.enties;
 
+import com.example.tasktube.server.domain.events.logs.BarrierReleasedEvent;
 import com.example.tasktube.server.domain.exceptions.ValidationDomainException;
 import com.example.tasktube.server.domain.values.Lock;
 
@@ -121,6 +122,10 @@ public class Barrier extends Entity<UUID> {
         setReleasedAt(Instant.now());
         setUpdatedAt(Instant.now());
         unlock();
+
+        if (isReleased()) {
+            addEvent(new BarrierReleasedEvent(this, client));
+        }
     }
 
     public void unlock() {

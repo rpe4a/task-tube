@@ -1,14 +1,17 @@
 package com.example.tasktube.server.infrastructure.configuration;
 
+import com.example.tasktube.server.application.event.handlers.BarrierReleasedHandler;
 import com.example.tasktube.server.application.event.handlers.LogRecordHandler;
 import com.example.tasktube.server.domain.port.out.IEventHandler;
 import com.example.tasktube.server.domain.port.out.IEventPublisher;
 import com.example.tasktube.server.domain.port.out.ILogRecordRepository;
+import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import com.example.tasktube.server.infrastructure.event.ApplicationEventPublisher;
 import com.example.tasktube.server.infrastructure.event.EventHandlerRegistry;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 
 import java.util.List;
@@ -19,10 +22,13 @@ public class EventPublisherConfiguration {
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public List<IEventHandler<?>> registerEventHandlers(
-            final ILogRecordRepository repository
-    ) {
+            final ILogRecordRepository logRecordRepository,
+            final ITaskRepository taskRepository,
+            @Lazy final IEventPublisher eventPublisher
+            ) {
         return List.of(
-                new LogRecordHandler(repository)
+                new LogRecordHandler(logRecordRepository),
+                new BarrierReleasedHandler(taskRepository, eventPublisher)
         );
     }
 

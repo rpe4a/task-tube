@@ -2,7 +2,6 @@ package com.example.tasktube.server.infrastructure.postgresql.repository;
 
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.domain.enties.Task;
-import com.example.tasktube.server.domain.port.out.IEventPublisher;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskDataMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -29,16 +28,13 @@ public class TubeRepository implements ITubeRepository {
 
     private final NamedParameterJdbcTemplate db;
     private final TaskDataMapper mapper;
-    private final IEventPublisher eventPublisher;
 
     public TubeRepository(
             final NamedParameterJdbcTemplate db,
-            final TaskDataMapper mapper,
-            final IEventPublisher eventPublisher
+            final TaskDataMapper mapper
     ) {
         this.db = Objects.requireNonNull(db);
         this.mapper = Objects.requireNonNull(mapper);
-        this.eventPublisher = Objects.requireNonNull(eventPublisher);
     }
 
     private static String getInsertCommand() {
@@ -115,8 +111,6 @@ public class TubeRepository implements ITubeRepository {
             LOGGER.debug("Successfully pushed task with ID: '{}' to tube: '{}'.", task.getId(), task.getTube());
         }
 
-        eventPublisher.publish(task.pullEvents());
-
         return task;
     }
 
@@ -150,12 +144,6 @@ public class TubeRepository implements ITubeRepository {
                 LOGGER.debug("Batch pushed partition of '{}' tasks. Rows affected: '{}'.", partition.size(), affected.length);
             });
         }
-
-        eventPublisher.publish(
-                tasks.stream()
-                        .flatMap(t -> t.pullEvents().stream())
-                        .toList()
-        );
     }
 
     @Override

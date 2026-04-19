@@ -38,7 +38,7 @@ public class TaskSlotArgumentFiller implements IArgumentFiller {
         final UUID taskId = slot.getTaskReference();
         final Task task = taskRepository.get(taskId).get();
         if (!task.isCompleted()) {
-            throw new ApplicationException("Task is not completed");
+            throw new ApplicationException("Task is not completed.");
         }
 
         return fill(task.getOutput());

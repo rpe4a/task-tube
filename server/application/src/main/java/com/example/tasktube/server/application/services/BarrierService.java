@@ -5,6 +5,7 @@ import com.example.tasktube.server.application.port.in.IBarrierService;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
+import com.example.tasktube.server.domain.port.out.IEventPublisher;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import com.google.common.base.Strings;
 import org.slf4j.Logger;
@@ -21,13 +22,16 @@ public class BarrierService implements IBarrierService {
 
     private final IBarrierRepository barrierRepository;
     private final ITaskRepository taskRepository;
+    private final IEventPublisher eventPublisher;
 
     public BarrierService(
             final IBarrierRepository barrierRepository,
-            final ITaskRepository taskRepository
+            final ITaskRepository taskRepository,
+            final IEventPublisher eventPublisher
     ) {
         this.barrierRepository = Objects.requireNonNull(barrierRepository);
         this.taskRepository = Objects.requireNonNull(taskRepository);
+        this.eventPublisher = Objects.requireNonNull(eventPublisher);
     }
 
     @Override
@@ -63,15 +67,8 @@ public class BarrierService implements IBarrierService {
             }
         }
 
-        if (barrier.isReleased()) {
-            final Task task = taskRepository.get(barrier.getTaskId(), client).orElseThrow();
-
-            task.releaseBarrier(barrier, client);
-
-            taskRepository.update(task);
-        }
-
         barrierRepository.update(barrier);
+        eventPublisher.publish(barrier.pullEvents());
     }
 
     @Override

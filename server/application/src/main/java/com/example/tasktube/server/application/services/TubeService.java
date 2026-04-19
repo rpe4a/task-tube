@@ -7,11 +7,9 @@ import com.example.tasktube.server.application.port.in.ITubeService;
 import com.example.tasktube.server.application.utils.SlotUtils;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
-import com.example.tasktube.server.domain.port.out.IArgumentFiller;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
+import com.example.tasktube.server.domain.port.out.IEventPublisher;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
-import com.example.tasktube.server.domain.values.argument.Argument;
-import com.example.tasktube.server.domain.values.slot.Slot;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,13 +29,16 @@ public class TubeService implements ITubeService {
 
     private final ITubeRepository tubeRepository;
     private final IBarrierRepository barrierRepository;
+    private final IEventPublisher eventPublisher;
 
     public TubeService(
             final ITubeRepository tubeRepository,
-            final IBarrierRepository barrierRepository
+            final IBarrierRepository barrierRepository,
+            final IEventPublisher eventPublisher
     ) {
         this.tubeRepository = Objects.requireNonNull(tubeRepository);
         this.barrierRepository = Objects.requireNonNull(barrierRepository);
+        this.eventPublisher = Objects.requireNonNull(eventPublisher);
     }
 
     @Override
@@ -66,7 +66,10 @@ public class TubeService implements ITubeService {
         final Barrier barrier = task.addStartBarrier(waitingTaskIdList);
         barrierRepository.save(barrier);
 
-        return tubeRepository.push(task).getId();
+        final Task pushedTask = tubeRepository.push(task);
+        eventPublisher.publish(task.pullEvents());
+
+        return pushedTask.getId();
     }
     // TODO: add tests
 

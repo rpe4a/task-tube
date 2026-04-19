@@ -2,16 +2,16 @@ package com.example.tasktube.server.application.services;
 
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.application.models.FinishTaskDto;
-import com.example.tasktube.server.application.models.LogRecordDto;
 import com.example.tasktube.server.application.port.in.ITaskService;
 import com.example.tasktube.server.application.utils.SlotUtils;
 import com.example.tasktube.server.domain.enties.Barrier;
+import com.example.tasktube.server.domain.enties.LogRecord;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IArgumentFiller;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
+import com.example.tasktube.server.domain.port.out.IEventPublisher;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
-import com.example.tasktube.server.domain.enties.LogRecord;
 import com.example.tasktube.server.domain.values.argument.Argument;
 import com.example.tasktube.server.domain.values.slot.Slot;
 import com.google.common.base.Strings;
@@ -40,18 +40,21 @@ public class TaskService implements ITaskService {
     private final ITaskRepository taskRepository;
     private final IBarrierRepository barrierRepository;
     private final IArgumentFiller argumentFiller;
+    private final IEventPublisher eventPublisher;
 
     public TaskService(
             final ITubeRepository tubeRepository,
             final ITaskRepository taskRepository,
             final IBarrierRepository barrierRepository,
-            final IArgumentFiller argumentFiller
+            final IArgumentFiller argumentFiller,
+            final IEventPublisher eventPublisher
 
     ) {
         this.tubeRepository = Objects.requireNonNull(tubeRepository);
         this.taskRepository = Objects.requireNonNull(taskRepository);
         this.barrierRepository = Objects.requireNonNull(barrierRepository);
         this.argumentFiller = Objects.requireNonNull(argumentFiller);
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
@@ -79,6 +82,7 @@ public class TaskService implements ITaskService {
         task.start(startedAt, client);
 
         taskRepository.update(task);
+        eventPublisher.publish(task.pullEvents());
 
         return arguments;
     }
@@ -102,6 +106,7 @@ public class TaskService implements ITaskService {
         task.process(processedAt, client);
 
         taskRepository.update(task);
+        eventPublisher.publish(task.pullEvents());
     }
 
     @Override
@@ -137,6 +142,11 @@ public class TaskService implements ITaskService {
             });
 
             tubeRepository.push(children);
+            eventPublisher.publish(
+                    children.stream()
+                            .flatMap(t -> t.pullEvents().stream())
+                            .toList()
+            );
         }
 
         barriers.add(
@@ -162,6 +172,7 @@ public class TaskService implements ITaskService {
         );
 
         taskRepository.update(task);
+        eventPublisher.publish(task.pullEvents());
     }
 
     @Override
@@ -186,6 +197,7 @@ public class TaskService implements ITaskService {
         task.fail(failedAt, failedReason, client);
 
         taskRepository.update(task);
+        eventPublisher.publish(task.pullEvents());
     }
 
     @Override
@@ -204,5 +216,6 @@ public class TaskService implements ITaskService {
         task.unblock(lockedTimeoutSeconds);
 
         taskRepository.update(task);
+        eventPublisher.publish(task.pullEvents());
     }
 }

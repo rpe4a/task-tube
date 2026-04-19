@@ -3,7 +3,6 @@ package com.example.tasktube.server.infrastructure.configuration;
 import com.example.tasktube.server.application.queries.repositories.ITaskLogViewRepository;
 import com.example.tasktube.server.application.queries.repositories.ITaskViewRepository;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
-import com.example.tasktube.server.domain.port.out.IEventPublisher;
 import com.example.tasktube.server.domain.port.out.IJobRepository;
 import com.example.tasktube.server.domain.port.out.ILogRecordRepository;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
@@ -17,8 +16,8 @@ import com.example.tasktube.server.infrastructure.postgresql.repository.BarrierR
 import com.example.tasktube.server.infrastructure.postgresql.repository.JobRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.LogRecordRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.TaskLogViewRepository;
-import com.example.tasktube.server.infrastructure.postgresql.repository.TaskViewRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.TaskRepository;
+import com.example.tasktube.server.infrastructure.postgresql.repository.TaskViewRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.TubeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -60,17 +59,16 @@ public class PostgresqlConfiguration {
         return new TaskLogViewMapper();
     }
 
-
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public ITaskRepository registerTaskRepository(final NamedParameterJdbcTemplate db, final TaskDataMapper mapper, final IEventPublisher eventPublisher) {
-        return new TaskRepository(db, mapper, eventPublisher);
+    public ITaskRepository registerTaskRepository(final NamedParameterJdbcTemplate db, final TaskDataMapper mapper) {
+        return new TaskRepository(db, mapper);
     }
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public ITubeRepository registerTubeRepository(final NamedParameterJdbcTemplate db, final TaskDataMapper mapper, final IEventPublisher eventPublisher) {
-        return new TubeRepository(db, mapper, eventPublisher);
+    public ITubeRepository registerTubeRepository(final NamedParameterJdbcTemplate db, final TaskDataMapper mapper) {
+        return new TubeRepository(db, mapper);
     }
 
     @Bean

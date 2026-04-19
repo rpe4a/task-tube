@@ -38,9 +38,8 @@ public class ApplicationEventPublisher implements IEventPublisher {
                 throw new IllegalArgumentException("No handler registered for " + eventType);
             }
 
-            handlers.forEach(handler -> {
-                        handler.handle(eventMap.get(eventType));
-                    }
+            handlers.forEach(
+                    handler -> handler.handle(eventMap.get(eventType))
             );
         });
     }
