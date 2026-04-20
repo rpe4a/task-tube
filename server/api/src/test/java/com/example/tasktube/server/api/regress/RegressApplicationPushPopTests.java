@@ -39,7 +39,6 @@ class RegressApplicationPushPopTests extends AbstractRegressApplicationTests {
         assertThat(task.get().getParentId()).isNull();
         assertThat(task.get().getInput()).isEqualTo(pushTaskDto.input());
         assertThat(task.get().getOutput()).isNull();
-        assertThat(task.get().isRoot()).isTrue();
         assertThat(task.get().getUpdatedAt()).isNotNull();
         assertThat(task.get().getCreatedAt().toEpochMilli()).isEqualTo(pushTaskDto.createdAt().toEpochMilli());
         assertThat(task.get().getScheduledAt()).isNull();
@@ -72,7 +71,6 @@ class RegressApplicationPushPopTests extends AbstractRegressApplicationTests {
         assertThat(task.get().getParentId()).isNull();
         assertThat(task.get().getInput()).isEqualTo(pushTaskDto.input());
         assertThat(task.get().getOutput()).isNull();
-        assertThat(task.get().isRoot()).isTrue();
 
         final Optional<Barrier> barrier = barrierRepository.getByTaskId(task.get().getId()).stream().findFirst();
         assertThat(barrier.isPresent()).isTrue();

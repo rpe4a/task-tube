@@ -152,7 +152,6 @@ public class TaskRepository implements ITaskRepository {
                         parent_id = :parent_id,
                         input = :input::jsonb,
                         output = :output::jsonb,
-                        is_root = :is_root,
                         updated_at = current_timestamp,
                         created_at = :created_at,
                         scheduled_at = :scheduled_at,

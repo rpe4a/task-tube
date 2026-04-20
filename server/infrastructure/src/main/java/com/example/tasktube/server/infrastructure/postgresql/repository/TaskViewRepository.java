@@ -159,7 +159,6 @@ public class TaskViewRepository implements ITaskViewRepository {
                                t1.parent_id,
                                t1.input,
                                t1.output,
-                               t1.is_root,
                                t1.updated_at,
                                t1.created_at,
                                t1.canceled_at,

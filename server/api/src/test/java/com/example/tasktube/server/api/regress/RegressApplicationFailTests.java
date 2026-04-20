@@ -58,7 +58,6 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
         assertThat(taskScheduled.get().getParentId()).isNull();
         assertThat(taskScheduled.get().getInput()).isEqualTo(taskProcessing.get().getInput());
         assertThat(taskScheduled.get().getOutput()).isNull();
-        assertThat(taskScheduled.get().isRoot()).isTrue();
         assertThat(taskScheduled.get().getUpdatedAt().toEpochMilli()).isGreaterThan(taskProcessing.get().getUpdatedAt().toEpochMilli());
         assertThat(taskScheduled.get().getCreatedAt().toEpochMilli()).isEqualTo(taskProcessing.get().getCreatedAt().toEpochMilli());
         assertThat(taskScheduled.get().getScheduledAt()).isNotNull();
@@ -283,7 +282,6 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
         assertThat(taskAborted.get().getParentId()).isNull();
         assertThat(taskAborted.get().getInput()).isEqualTo(taskProcessing.get().getInput());
         assertThat(taskAborted.get().getOutput()).isNull();
-        assertThat(taskAborted.get().isRoot()).isTrue();
         assertThat(taskAborted.get().getUpdatedAt().toEpochMilli()).isGreaterThan(taskFailed.get().getUpdatedAt().toEpochMilli());
         assertThat(taskAborted.get().getCreatedAt().toEpochMilli()).isEqualTo(taskFailed.get().getCreatedAt().toEpochMilli());
         assertThat(taskAborted.get().getScheduledAt().toEpochMilli()).isEqualTo(taskFailed.get().getScheduledAt().toEpochMilli());

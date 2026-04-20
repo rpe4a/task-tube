@@ -213,7 +213,6 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
         assertThat(taskChild.get().getParentId()).isEqualTo(taskFinished.get().getId());
         assertThat(taskChild.get().getInput()).isEqualTo(child.input());
         assertThat(taskChild.get().getOutput()).isNull();
-        assertThat(taskChild.get().isRoot()).isFalse();
         assertThat(taskChild.get().getUpdatedAt()).isNotNull();
         assertThat(taskChild.get().getCreatedAt().toEpochMilli()).isEqualTo(child.createdAt().toEpochMilli());
         assertThat(taskChild.get().getScheduledAt()).isNull();

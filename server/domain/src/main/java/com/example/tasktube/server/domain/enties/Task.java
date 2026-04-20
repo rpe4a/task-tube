@@ -32,7 +32,6 @@ public class Task extends Entity<UUID> {
     private UUID parentId;
     private List<Slot> input;
     private Slot output;
-    private boolean isRoot;
     private Instant updatedAt;
     private Instant createdAt;
     private Instant canceledAt;
@@ -81,7 +80,6 @@ public class Task extends Entity<UUID> {
         this.status = status;
         this.input = input;
         this.output = output;
-        this.isRoot = false;
         this.updatedAt = updatedAt;
         this.createdAt = createdAt;
         this.canceledAt = canceledAt;
@@ -199,13 +197,6 @@ public class Task extends Entity<UUID> {
         this.input = input;
     }
 
-    public boolean isRoot() {
-        return isRoot;
-    }
-
-    public void setRoot(final boolean root) {
-        isRoot = root;
-    }
 
     public Instant getCreatedAt() {
         return createdAt;

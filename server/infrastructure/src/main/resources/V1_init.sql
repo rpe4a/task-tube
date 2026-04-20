@@ -33,7 +33,6 @@ CREATE TABLE tasks
     parent_id      UUID,                                 -- id родительской таски
     input          JSONB,                                -- входные данные (Map<String, Object>)
     output         JSONB,                                -- результат выполнения (Map<String, Object>)
-    is_root        BOOLEAN       NOT NULL DEFAULT FALSE, -- флаг корневой задачи
     updated_at     TIMESTAMPTZ   NOT NULL DEFAULT NOW(), -- время последнего обновления
     created_at     TIMESTAMPTZ   NOT NULL DEFAULT NOW(), -- время создания
     canceled_at    TIMESTAMPTZ,                          -- время отмены задачи
