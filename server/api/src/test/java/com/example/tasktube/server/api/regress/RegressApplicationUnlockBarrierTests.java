@@ -3,7 +3,6 @@ package com.example.tasktube.server.api.regress;
 import com.example.tasktube.server.api.RestApiApplication;
 import com.example.tasktube.server.application.models.PushTaskDto;
 import com.example.tasktube.server.domain.enties.Barrier;
-import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.values.Lock;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,7 +25,7 @@ class RegressApplicationUnlockBarrierTests extends AbstractRegressApplicationTes
     void shouldNotGetLockedBarriers() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(List.of(UUID.randomUUID(), UUID.randomUUID()));
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
 
@@ -43,7 +42,7 @@ class RegressApplicationUnlockBarrierTests extends AbstractRegressApplicationTes
     void shouldGetLockedBarriers() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(List.of(UUID.randomUUID(), UUID.randomUUID()));
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
 
@@ -60,7 +59,7 @@ class RegressApplicationUnlockBarrierTests extends AbstractRegressApplicationTes
     void shouldUnlockedCreatedTasks() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(List.of(UUID.randomUUID(), UUID.randomUUID()));
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
 

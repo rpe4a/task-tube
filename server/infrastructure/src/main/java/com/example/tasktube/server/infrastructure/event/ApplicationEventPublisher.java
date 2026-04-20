@@ -3,7 +3,10 @@ package com.example.tasktube.server.infrastructure.event;
 import com.example.tasktube.server.domain.events.DomainEvent;
 import com.example.tasktube.server.domain.port.out.IEventHandler;
 import com.example.tasktube.server.domain.port.out.IEventPublisher;
+import com.example.tasktube.server.infrastructure.postgresql.repository.TaskViewRepository;
 import com.google.common.collect.HashMultimap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +15,8 @@ import java.util.Set;
 
 @Service
 public class ApplicationEventPublisher implements IEventPublisher {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TaskViewRepository.class);
 
     private final EventHandlerRegistry registry;
 
@@ -39,7 +44,10 @@ public class ApplicationEventPublisher implements IEventPublisher {
             }
 
             handlers.forEach(
-                    handler -> handler.handle(eventMap.get(eventType))
+                    handler -> {
+                        LOGGER.debug("'{}' starts handling '{}' events of type '{}'.", handler.getClass(), eventMap.get(eventType).size(), eventType);
+                        handler.handle(eventMap.get(eventType));
+                    }
             );
         });
     }

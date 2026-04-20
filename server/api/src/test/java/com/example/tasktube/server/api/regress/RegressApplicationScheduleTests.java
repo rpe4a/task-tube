@@ -41,7 +41,7 @@ class RegressApplicationScheduleTests extends AbstractRegressApplicationTests {
     void shouldCreatedTaskStartFailed() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         assertThatThrownBy(() -> taskService.startTask(taskId, Instant.now(), instanceIdProvider.get()));
     }
@@ -50,7 +50,7 @@ class RegressApplicationScheduleTests extends AbstractRegressApplicationTests {
     void shouldCreatedTaskProcessFailed() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         assertThatThrownBy(() -> taskService.processTask(taskId, Instant.now(), instanceIdProvider.get()));
     }
@@ -59,7 +59,7 @@ class RegressApplicationScheduleTests extends AbstractRegressApplicationTests {
     void shouldCreatedTaskFinishFailed() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         assertThatThrownBy(() -> taskService.finishTask(new FinishTaskDto(taskId, null, null, new ConstantSlot(), CLIENT, Instant.now())));
     }
@@ -68,7 +68,7 @@ class RegressApplicationScheduleTests extends AbstractRegressApplicationTests {
     void shouldCreatedTaskFailFailed() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         assertThatThrownBy(() -> taskService.failTask(taskId, Instant.now(), "fail reason", instanceIdProvider.get()));
     }
@@ -78,7 +78,7 @@ class RegressApplicationScheduleTests extends AbstractRegressApplicationTests {
     void shouldScheduledTaskWithBarrier(final List<UUID> waitFor) {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(waitFor);
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Optional<Task> pushTask = taskRepository.get(taskId);
         assertThat(pushTask.isPresent()).isTrue();

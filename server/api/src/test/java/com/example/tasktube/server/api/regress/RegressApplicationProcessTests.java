@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,7 +26,7 @@ class RegressApplicationProcessTests extends AbstractRegressApplicationTests {
     void shouldProcessTask() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).getFirst();

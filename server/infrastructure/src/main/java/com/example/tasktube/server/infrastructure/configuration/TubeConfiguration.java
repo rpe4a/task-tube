@@ -2,7 +2,6 @@ package com.example.tasktube.server.infrastructure.configuration;
 
 import com.example.tasktube.server.application.port.in.ITubeService;
 import com.example.tasktube.server.application.services.TubeService;
-import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.IEventPublisher;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -17,9 +16,8 @@ public class TubeConfiguration {
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public ITubeService registerTubeService(
             final ITubeRepository tubeRepository,
-            final IBarrierRepository barrierRepository,
             final IEventPublisher eventPublisher
     ) {
-        return new TubeService(tubeRepository, barrierRepository, eventPublisher);
+        return new TubeService(tubeRepository, eventPublisher);
     }
 }

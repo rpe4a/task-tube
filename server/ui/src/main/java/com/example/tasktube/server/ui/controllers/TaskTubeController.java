@@ -13,7 +13,7 @@ import com.example.tasktube.server.application.queries.views.TaskLogView;
 import com.example.tasktube.server.application.queries.views.TaskTubeTaskView;
 import com.example.tasktube.server.application.queries.views.TaskTubeTreeNodeView;
 import com.example.tasktube.server.application.queries.views.TaskTubeView;
-import com.example.tasktube.server.application.services.TubeService;
+import com.example.tasktube.server.infrastructure.configuration.InstanceIdProvider;
 import com.example.tasktube.server.ui.responses.TaskPushRequest;
 import com.example.tasktube.server.ui.responses.TaskTubePageDto;
 import com.example.tasktube.server.ui.responses.TaskTubePageResponse;
@@ -47,19 +47,22 @@ public final class TaskTubeController extends AbstractController {
     private final TaskTubeTreeNodeQueryHandler taskTubeTreeNodeQueryHandler;
     private final TaskLogsQueryHandler taskLogsQueryHandler;
     private final ITubeService tubeService;
+    private final InstanceIdProvider instanceId;
 
     public TaskTubeController(
             final TaskTubeQueryHandler queryHandler,
             final TaskTubeTaskQueryHandler taskTubeTaskQueryHandler,
             final TaskTubeTreeNodeQueryHandler taskTubeTreeNodeQueryHandler,
             final TaskLogsQueryHandler taskLogsQueryHandler,
-            final ITubeService tubeService
+            final ITubeService tubeService,
+            final InstanceIdProvider instanceId
             ) {
         this.queryHandler = Objects.requireNonNull(queryHandler);
         this.taskTubeTaskQueryHandler = Objects.requireNonNull(taskTubeTaskQueryHandler);
         this.taskTubeTreeNodeQueryHandler = Objects.requireNonNull(taskTubeTreeNodeQueryHandler);
         this.taskLogsQueryHandler = Objects.requireNonNull(taskLogsQueryHandler);
         this.tubeService = Objects.requireNonNull(tubeService);
+        this.instanceId = Objects.requireNonNull(instanceId);
     }
 
     @RequestMapping(
@@ -240,7 +243,7 @@ public final class TaskTubeController extends AbstractController {
         }
 
         return ResponseEntity.ok(
-                tubeService.push(request.to())
+                tubeService.push(request.to(), instanceId.get())
         );
     }
 }

@@ -3,11 +3,9 @@ package com.example.tasktube.server.application.services;
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.application.models.PopTaskDto;
 import com.example.tasktube.server.application.models.PushTaskDto;
+import com.example.tasktube.server.application.models.TaskSettingsDto;
 import com.example.tasktube.server.application.port.in.ITubeService;
-import com.example.tasktube.server.application.utils.SlotUtils;
-import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
-import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.IEventPublisher;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -16,7 +14,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -28,51 +25,46 @@ public class TubeService implements ITubeService {
     private static final Logger LOGGER = LoggerFactory.getLogger(TubeService.class);
 
     private final ITubeRepository tubeRepository;
-    private final IBarrierRepository barrierRepository;
     private final IEventPublisher eventPublisher;
 
     public TubeService(
             final ITubeRepository tubeRepository,
-            final IBarrierRepository barrierRepository,
             final IEventPublisher eventPublisher
     ) {
         this.tubeRepository = Objects.requireNonNull(tubeRepository);
-        this.barrierRepository = Objects.requireNonNull(barrierRepository);
         this.eventPublisher = Objects.requireNonNull(eventPublisher);
     }
 
     @Override
     @Transactional
-    public UUID push(final PushTaskDto pushTaskDto) {
+    public UUID push(final PushTaskDto pushTaskDto, final String client) {
         if (Objects.isNull(pushTaskDto)) {
             throw new ApplicationException("Parameter pushTaskDto cannot be null.");
         }
-        LOGGER.info("Push task: '{}'.", pushTaskDto);
-
-        final Task task = pushTaskDto.to(true);
-
-        final List<UUID> waitingTaskIdList = new ArrayList<>();
-        if (pushTaskDto.waitTasks() != null && !pushTaskDto.waitTasks().isEmpty()) {
-            LOGGER.debug("Task has '{}' waiting tasks.", pushTaskDto.waitTasks().size());
-            waitingTaskIdList.addAll(pushTaskDto.waitTasks());
+        if (StringUtils.isEmpty(client)) {
+            throw new ApplicationException("Parameter client name cannot be null or empty.");
         }
-        // TODO: add tests
-        if (pushTaskDto.input() != null && !pushTaskDto.input().isEmpty()) {
-            final List<UUID> taskSlots = SlotUtils.getTaskIdList(pushTaskDto.input());
-            LOGGER.debug("Task has '{}' task slots.", taskSlots.size());
-            waitingTaskIdList.addAll(taskSlots);
-        }
+        LOGGER.info("Push task: '{}' by client '{}'.", pushTaskDto, client);
 
-        final Barrier barrier = task.addStartBarrier(waitingTaskIdList);
-        barrierRepository.save(barrier);
+        final Task task = Task.pushNew(
+                pushTaskDto.id(),
+                pushTaskDto.name(),
+                pushTaskDto.tube(),
+                pushTaskDto.correlationId(),
+                pushTaskDto.input(),
+                pushTaskDto.createdAt(),
+                pushTaskDto.getSettings(),
+                pushTaskDto.getWaitingTaskIdList(),
+                client
+        );
 
         final Task pushedTask = tubeRepository.push(task);
         eventPublisher.publish(task.pullEvents());
 
         return pushedTask.getId();
     }
-    // TODO: add tests
 
+    // TODO: add tests
     @Override
     @Transactional
     public Optional<PopTaskDto> pop(final String tube, final String client) {
@@ -90,7 +82,6 @@ public class TubeService implements ITubeService {
     }
 
     // TODO: add tests
-
     @Override
     @Transactional
     public List<PopTaskDto> popList(final String tube, final String client, final int count) {

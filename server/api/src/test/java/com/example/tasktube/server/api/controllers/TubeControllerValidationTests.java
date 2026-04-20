@@ -211,7 +211,7 @@ class TubeControllerValidationTests {
                 null
         );
 
-        Mockito.when(mockTubeService.push(Mockito.any()))
+        Mockito.when(mockTubeService.push(Mockito.any(), Mockito.anyString()))
                 .thenReturn(UUID.randomUUID());
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/tube/test-tube/push")

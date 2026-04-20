@@ -43,7 +43,7 @@ public class BarrierReleasingJob {
         final List<UUID> waitingBarrierIdList = jobService.getBarrierIdList(Barrier.Status.WAITING, count, instanceId.get());
 
         if (waitingBarrierIdList.isEmpty()) {
-            LOGGER.info("No barriers found.");
+            LOGGER.info("There aren't any barriers has been found.");
             return;
         }
 

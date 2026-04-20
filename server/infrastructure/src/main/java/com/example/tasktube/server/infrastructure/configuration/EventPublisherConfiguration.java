@@ -1,11 +1,15 @@
 package com.example.tasktube.server.infrastructure.configuration;
 
+import com.example.tasktube.server.application.event.handlers.BarrierAddedHandler;
 import com.example.tasktube.server.application.event.handlers.BarrierReleasedHandler;
 import com.example.tasktube.server.application.event.handlers.LogRecordHandler;
+import com.example.tasktube.server.application.event.handlers.TaskChildrenAddedHandler;
+import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.IEventHandler;
 import com.example.tasktube.server.domain.port.out.IEventPublisher;
 import com.example.tasktube.server.domain.port.out.ILogRecordRepository;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
+import com.example.tasktube.server.domain.port.out.ITubeRepository;
 import com.example.tasktube.server.infrastructure.event.ApplicationEventPublisher;
 import com.example.tasktube.server.infrastructure.event.EventHandlerRegistry;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -24,11 +28,15 @@ public class EventPublisherConfiguration {
     public List<IEventHandler<?>> registerEventHandlers(
             final ILogRecordRepository logRecordRepository,
             final ITaskRepository taskRepository,
+            final IBarrierRepository barrierRepository,
+            final ITubeRepository tubeRepository,
             @Lazy final IEventPublisher eventPublisher
-            ) {
+    ) {
         return List.of(
                 new LogRecordHandler(logRecordRepository),
-                new BarrierReleasedHandler(taskRepository, eventPublisher)
+                new BarrierReleasedHandler(taskRepository, eventPublisher),
+                new BarrierAddedHandler(barrierRepository),
+                new TaskChildrenAddedHandler(tubeRepository, eventPublisher)
         );
     }
 

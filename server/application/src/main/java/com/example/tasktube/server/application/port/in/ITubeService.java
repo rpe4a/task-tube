@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface ITubeService {
-    UUID push(PushTaskDto task);
+    UUID push(PushTaskDto task, final String client);
 
     Optional<PopTaskDto> pop(String tube, String client);
 

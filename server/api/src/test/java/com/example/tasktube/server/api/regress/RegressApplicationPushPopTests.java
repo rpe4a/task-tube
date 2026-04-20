@@ -28,7 +28,7 @@ class RegressApplicationPushPopTests extends AbstractRegressApplicationTests {
     void shouldPushTaskWithoutStartBarrier() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Optional<Task> task = taskRepository.get(taskId);
         assertThat(task.isPresent()).isTrue();
@@ -61,7 +61,7 @@ class RegressApplicationPushPopTests extends AbstractRegressApplicationTests {
     void shouldPushTaskWithStartBarrier() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(List.of(UUID.randomUUID()));
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Optional<Task> task = taskRepository.get(taskId);
         assertThat(task.isPresent()).isTrue();
@@ -107,7 +107,7 @@ class RegressApplicationPushPopTests extends AbstractRegressApplicationTests {
     void shouldPopTaskAfterPushFailed() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Optional<Task> pushTask = taskRepository.get(taskId);
         assertThat(pushTask.isPresent()).isTrue();
@@ -120,7 +120,7 @@ class RegressApplicationPushPopTests extends AbstractRegressApplicationTests {
     void shouldPopTask() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Optional<Task> pushTask = taskRepository.get(taskId);
 
@@ -147,7 +147,7 @@ class RegressApplicationPushPopTests extends AbstractRegressApplicationTests {
     void shouldPopTaskOneTime() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();

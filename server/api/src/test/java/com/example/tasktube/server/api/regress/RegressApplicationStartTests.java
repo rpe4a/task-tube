@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,7 +27,7 @@ class RegressApplicationStartTests extends AbstractRegressApplicationTests {
     void shouldStartTask() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -55,7 +54,7 @@ class RegressApplicationStartTests extends AbstractRegressApplicationTests {
     void shouldStartTaskOneTime() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -76,7 +75,7 @@ class RegressApplicationStartTests extends AbstractRegressApplicationTests {
     void shouldStartTaskDifferentClientFailed() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();

@@ -5,6 +5,7 @@ import com.example.tasktube.server.api.responses.PopTaskResponse;
 import com.example.tasktube.server.api.requests.PopTasksRequest;
 import com.example.tasktube.server.api.requests.TaskRequest;
 import com.example.tasktube.server.application.port.in.ITubeService;
+import com.example.tasktube.server.infrastructure.configuration.InstanceIdProvider;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +25,15 @@ import java.util.UUID;
 public final class TubeController extends AbstractController {
 
     private final ITubeService tubeService;
+    private final InstanceIdProvider instanceId;
 
     public TubeController(
-            final ITubeService tubeService
+            final ITubeService tubeService,
+            final InstanceIdProvider instanceId
+
     ) {
         this.tubeService = Objects.requireNonNull(tubeService);
+        this.instanceId = Objects.requireNonNull(instanceId);
     }
 
     @RequestMapping(
@@ -45,7 +50,7 @@ public final class TubeController extends AbstractController {
         }
 
         return ResponseEntity.ok(
-                tubeService.push(request.to())
+                tubeService.push(request.to(), instanceId.get())
         );
     }
 

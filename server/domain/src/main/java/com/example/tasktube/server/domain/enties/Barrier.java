@@ -21,9 +21,24 @@ public class Barrier extends Entity<UUID> {
     private Instant releasedAt;
     private Lock lock;
 
+    public static Barrier create(final UUID taskId, final List<UUID> waitForList, final Barrier.Type type) {
+        return new Barrier(
+                UUID.randomUUID(),
+                taskId,
+                waitForList,
+                type,
+                Barrier.Status.WAITING,
+                Instant.now(),
+                Instant.now(),
+                null,
+                Lock.free()
+        );
+    }
+
     public Barrier() {
         super(UUID.randomUUID());
     }
+
 
     public Barrier(
             final UUID id,

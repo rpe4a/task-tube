@@ -87,5 +87,6 @@ public class BarrierService implements IBarrierService {
         barrier.unblock(lockedTimeoutSeconds);
 
         barrierRepository.update(barrier);
+        eventPublisher.publish(barrier.pullEvents());
     }
 }

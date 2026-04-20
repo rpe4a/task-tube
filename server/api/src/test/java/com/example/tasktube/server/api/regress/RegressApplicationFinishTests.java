@@ -31,7 +31,7 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
     void shouldFinishedTaskProcess() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -62,7 +62,7 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
     void shouldFinishedTaskFail() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -93,7 +93,7 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
     void shouldFinishedTaskTwoTimes() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -124,7 +124,7 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
     void shouldFinishedTaskWithoutChildren() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier startBarrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -163,7 +163,7 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
     void shouldFinishedTaskWithOneChildrenWithoutWaitingTasks() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier startBarrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -234,7 +234,7 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
     void shouldFinishedTaskWithOneChildrenWithWaitingTasks() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier startBarrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -279,7 +279,7 @@ class RegressApplicationFinishTests extends AbstractRegressApplicationTests {
     void shouldFinishedTaskWithTwoChildrenWithWaitingTasks() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier startBarrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();

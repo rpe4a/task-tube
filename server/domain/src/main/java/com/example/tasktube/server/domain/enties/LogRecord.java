@@ -60,6 +60,18 @@ public class LogRecord extends Entity<UUID> {
         );
     }
 
+    public static LogRecord info(final UUID taskId, final String message, final Instant timestamp) {
+        return new LogRecord(
+                taskId,
+                LogRecordType.SERVER,
+                timestamp,
+                LogRecordLevel.INFO,
+                message,
+                null,
+                null
+        );
+    }
+
     public LogRecordType getType() {
         return type;
     }

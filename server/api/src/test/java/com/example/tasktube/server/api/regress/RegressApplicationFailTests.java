@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +31,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
     void shouldFailTask() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -82,7 +81,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
         final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(3, 15, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -114,7 +113,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
     void shouldFailTaskAndPostponeTask() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -145,7 +144,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
         final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(3, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -181,7 +180,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
         final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(2, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -239,7 +238,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
         final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -307,7 +306,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
         final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).getFirst();
@@ -353,7 +352,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
         final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -399,7 +398,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
         final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();
@@ -445,7 +444,7 @@ class RegressApplicationFailTests extends AbstractRegressApplicationTests {
         final TaskSettingsDto taskSettingsDto = new TaskSettingsDto(1, 1, 10, 10);
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto(taskSettingsDto);
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         jobService.getBarrierIdList(Barrier.Status.WAITING, 10, instanceIdProvider.get());
         final Barrier barrier = barrierRepository.getByTaskId(taskId).stream().findFirst().orElseThrow();

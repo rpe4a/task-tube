@@ -3,17 +3,12 @@ package com.example.tasktube.server.application.services;
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.application.models.FinishTaskDto;
 import com.example.tasktube.server.application.port.in.ITaskService;
-import com.example.tasktube.server.application.utils.SlotUtils;
-import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.LogRecord;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IArgumentFiller;
-import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.IEventPublisher;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
-import com.example.tasktube.server.domain.port.out.ITubeRepository;
 import com.example.tasktube.server.domain.values.argument.Argument;
-import com.example.tasktube.server.domain.values.slot.Slot;
 import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -31,30 +26,21 @@ import java.util.UUID;
 @Service
 public class TaskService implements ITaskService {
 
-    public static final String CHILDREN_ARE_FINALIZED = "Some children are finalized.";
-    public static final String WAITING_TASKS_ARE_FINALIZED = "Some waiting tasks are finalized.";
-
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskService.class);
 
-    private final ITubeRepository tubeRepository;
     private final ITaskRepository taskRepository;
-    private final IBarrierRepository barrierRepository;
     private final IArgumentFiller argumentFiller;
     private final IEventPublisher eventPublisher;
 
     public TaskService(
-            final ITubeRepository tubeRepository,
             final ITaskRepository taskRepository,
-            final IBarrierRepository barrierRepository,
             final IArgumentFiller argumentFiller,
             final IEventPublisher eventPublisher
 
     ) {
-        this.tubeRepository = Objects.requireNonNull(tubeRepository);
         this.taskRepository = Objects.requireNonNull(taskRepository);
-        this.barrierRepository = Objects.requireNonNull(barrierRepository);
         this.argumentFiller = Objects.requireNonNull(argumentFiller);
-        this.eventPublisher = eventPublisher;
+        this.eventPublisher = Objects.requireNonNull(eventPublisher);
     }
 
     @Override
@@ -73,18 +59,12 @@ public class TaskService implements ITaskService {
 
         final Task task = taskRepository.get(taskId).orElseThrow();
 
-        final List<Argument> arguments = new LinkedList<>();
-
-        for (final Slot slot : task.getInput()) {
-            arguments.add(slot.fill(argumentFiller));
-        }
-
         task.start(startedAt, client);
 
         taskRepository.update(task);
         eventPublisher.publish(task.pullEvents());
 
-        return arguments;
+        return task.getArguments(argumentFiller);
     }
 
     @Override
@@ -119,45 +99,23 @@ public class TaskService implements ITaskService {
 
         final Task task = taskRepository.get(taskDto.taskId()).orElseThrow();
 
-        final List<Task> children = new ArrayList<>();
-        final List<Barrier> barriers = new ArrayList<>();
-        if (taskDto.children() != null && !taskDto.children().isEmpty()) {
-            LOGGER.debug("Task has '{}' children.", taskDto.children().size());
-
-            taskDto.children().forEach(childDto -> {
-                final Task child = childDto.to(false);
-                final List<UUID> waitingTaskIdList = new ArrayList<>();
-                if (childDto.waitTasks() != null && !childDto.waitTasks().isEmpty()) {
-                    waitingTaskIdList.addAll(childDto.waitTasks());
-                }
-                if (childDto.input() != null && !childDto.input().isEmpty()) {
-                    final List<UUID> taskSlots = SlotUtils.getTaskIdList(childDto.input());
-                    waitingTaskIdList.addAll(taskSlots);
-                }
-
-                child.attachToParent(task);
-
-                barriers.add(child.addStartBarrier(waitingTaskIdList));
-                children.add(child);
-            });
-
-            tubeRepository.push(children);
-            eventPublisher.publish(
-                    children.stream()
-                            .flatMap(t -> t.pullEvents().stream())
-                            .toList()
-            );
-        }
-
-        barriers.add(
-                task.addFinishBarrier(
-                        children.stream()
-                                .map(Task::getId)
-                                .toList()
-                )
-        );
-
-        barrierRepository.save(barriers);
+        final List<Task> children =
+                taskDto.children() == null
+                        ? Collections.emptyList()
+                        : taskDto.children().stream().map(c ->
+                                Task.pushNew(
+                                        c.id(),
+                                        c.name(),
+                                        c.tube(),
+                                        c.correlationId(),
+                                        c.input(),
+                                        c.createdAt(),
+                                        c.getSettings(),
+                                        c.getWaitingTaskIdList(),
+                                        taskDto.client()
+                                )
+                        )
+                        .toList();
 
         final List<LogRecord> logs = new LinkedList<>();
         if (!CollectionUtils.isEmpty(taskDto.logs())) {
@@ -167,6 +125,7 @@ public class TaskService implements ITaskService {
         task.finish(
                 taskDto.finishedAt(),
                 taskDto.output(),
+                children,
                 logs,
                 taskDto.client()
         );

@@ -1,10 +1,14 @@
 package com.example.tasktube.server.domain.enties;
 
 import com.example.tasktube.server.domain.events.DomainEvent;
+import com.example.tasktube.server.domain.events.logs.BarrierAddedEvent;
 import com.example.tasktube.server.domain.events.logs.LogRecordsAddedEvent;
+import com.example.tasktube.server.domain.events.logs.TaskChildrenAddedEvent;
 import com.example.tasktube.server.domain.exceptions.ValidationDomainException;
+import com.example.tasktube.server.domain.port.out.IArgumentFiller;
 import com.example.tasktube.server.domain.values.Lock;
 import com.example.tasktube.server.domain.values.TaskSettings;
+import com.example.tasktube.server.domain.values.argument.Argument;
 import com.example.tasktube.server.domain.values.slot.Slot;
 
 import java.time.Instant;
@@ -45,40 +49,39 @@ public class Task extends Entity<UUID> {
     private TaskSettings settings;
     private String handledBy;
 
-    public Task(final UUID id,
-                final String name,
-                final String tube,
-                final Status status,
-                final String correlationId,
-                final UUID parentId,
-                final List<Slot> input,
-                final Slot output,
-                final boolean isRoot,
-                final Instant updatedAt,
-                final Instant createdAt,
-                final Instant canceledAt,
-                final Instant scheduledAt,
-                final Instant startedAt,
-                final Instant heartbeatAt,
-                final Instant finishedAt,
-                final Instant failedAt,
-                final Instant abortedAt,
-                final Instant completedAt,
-                final int failures,
-                final String failedReason,
-                final Lock lock,
-                final TaskSettings settings,
-                final String handledBy
+    private Task(final UUID id,
+                 final String name,
+                 final String tube,
+                 final String correlationId,
+                 final UUID parentId,
+                 final Status status,
+                 final List<Slot> input,
+                 final Slot output,
+                 final Instant updatedAt,
+                 final Instant createdAt,
+                 final Instant canceledAt,
+                 final Instant scheduledAt,
+                 final Instant startedAt,
+                 final Instant heartbeatAt,
+                 final Instant finishedAt,
+                 final Instant failedAt,
+                 final Instant abortedAt,
+                 final Instant completedAt,
+                 final int failures,
+                 final String failedReason,
+                 final Lock lock,
+                 final TaskSettings settings,
+                 final String handledBy
     ) {
         super(id);
         this.name = name;
         this.tube = tube;
-        this.status = status;
         this.correlationId = correlationId;
         this.parentId = parentId;
+        this.status = status;
         this.input = input;
         this.output = output;
-        this.isRoot = isRoot;
+        this.isRoot = false;
         this.updatedAt = updatedAt;
         this.createdAt = createdAt;
         this.canceledAt = canceledAt;
@@ -97,11 +100,63 @@ public class Task extends Entity<UUID> {
                 .ofNullable(settings)
                 .orElse(TaskSettings.getDefault());
 
-        addLog("Task has been created.");
+        addLog("Task has been created.", createdAt);
     }
 
     public Task() {
         super(UUID.randomUUID());
+    }
+
+    public static Task pushNew(
+            final UUID id,
+            final String name,
+            final String tube,
+            final String correlationId,
+            final List<Slot> input,
+            final Instant createdAt,
+            final TaskSettings settings,
+            final List<UUID> waitingTaskIdList,
+            final String client
+    ) {
+        final Task task = new Task(
+                id,
+                name,
+                tube,
+                correlationId,
+                null,
+                Status.CREATED,
+                input,
+                null,
+                Instant.now(),
+                createdAt,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                0,
+                null,
+                new Lock(Instant.now(), true, client),
+                settings,
+                null
+        );
+
+        task.addWaitingTasks(waitingTaskIdList, client);
+
+        return task;
+    }
+
+    private void addWaitingTasks(final List<UUID> waitingTaskIdList, final String client) {
+        if (waitingTaskIdList.isEmpty()) {
+            schedule(Instant.now(), client);
+        } else {
+            addEvent(new BarrierAddedEvent(getId(), waitingTaskIdList, Barrier.Type.START));
+            addLog(String.format("Waiting '%s' tasks before being scheduled.", waitingTaskIdList.size()));
+            unlock();
+        }
     }
 
     public String getCorrelationId() {
@@ -278,6 +333,7 @@ public class Task extends Entity<UUID> {
     public void start(final Instant startedAt, final String client) {
         checkStart(client);
         setStartedAt(startedAt);
+        setHeartbeatAt(startedAt);
         setStatus(Status.PROCESSING);
         addLog("Task has been started.");
         setLock(getLock().prolong());
@@ -291,14 +347,33 @@ public class Task extends Entity<UUID> {
         setLock(getLock().prolong());
     }
 
-    public void finish(final Instant finishedAt, final Slot output, final List<LogRecord> logs, final String client) {
+    public void finish(
+            final Instant finishedAt,
+            final Slot output,
+            final List<Task> children,
+            final List<LogRecord> logs,
+            final String client
+    ) {
         checkFinish(output, client);
         setFinishedAt(finishedAt);
         setStatus(Status.FINISHED);
         setOutput(output);
         setHandledBy(client);
-        addLogs(logs);
-        addLog("Task has been finished.");
+
+        if (!logs.isEmpty()) {
+            addLogs(logs);
+        }
+
+        addLog("Task has been finished.", finishedAt);
+
+        if (!children.isEmpty()) {
+            children.forEach(c -> c.attachToParent(this));
+            addEvent(new TaskChildrenAddedEvent(getId(), children));
+            addLog(String.format("Waiting '%s' children before being terminated.", children.size()));
+        } else {
+            complete(Instant.now(), client);
+        }
+
         unlock();
     }
 
@@ -359,20 +434,6 @@ public class Task extends Entity<UUID> {
 
     public void setParentId(final UUID parentId) {
         this.parentId = parentId;
-    }
-
-    public Barrier addStartBarrier(final List<UUID> taskIdList) {
-        return new Barrier(
-                UUID.randomUUID(),
-                getId(),
-                taskIdList,
-                Barrier.Type.START,
-                Barrier.Status.WAITING,
-                Instant.now(),
-                Instant.now(),
-                null,
-                Lock.free()
-        );
     }
 
     public Barrier addFinishBarrier(final List<UUID> taskIdList) {
@@ -549,6 +610,10 @@ public class Task extends Entity<UUID> {
         this.logs.add(LogRecord.info(getId(), message));
     }
 
+    public void addLog(final String message, final Instant timestamp) {
+        this.logs.add(LogRecord.info(getId(), message, timestamp));
+    }
+
     public void addLogs(final Collection<LogRecord> logs) {
         this.logs.addAll(logs);
     }
@@ -557,10 +622,20 @@ public class Task extends Entity<UUID> {
     public List<DomainEvent> pullEvents() {
         final List<DomainEvent> events = new ArrayList<>(super.pullEvents());
 
-        if(!logs.isEmpty()) {
+        if (!logs.isEmpty()) {
             events.add(new LogRecordsAddedEvent(logs));
         }
         return events;
+    }
+
+    public List<Argument> getArguments(final IArgumentFiller argumentFiller) {
+        if (Objects.isNull(argumentFiller)) {
+            throw new ValidationDomainException("Parameter argumentFiller cannot be null.");
+        }
+
+        return getInput().stream()
+                .map(slot -> slot.fill(argumentFiller))
+                .toList();
     }
 
     public enum Status {

@@ -26,7 +26,7 @@ class RegressApplicationUnlockTaskTests extends AbstractRegressApplicationTests 
     void shouldNotGetLockedTasks() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Optional<Task> task = taskRepository.get(taskId);
         assertThat(task.isPresent()).isTrue();
@@ -45,7 +45,7 @@ class RegressApplicationUnlockTaskTests extends AbstractRegressApplicationTests 
     void shouldGetLockedTasks() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Optional<Task> task = taskRepository.get(taskId);
         assertThat(task.isPresent()).isTrue();
@@ -64,7 +64,7 @@ class RegressApplicationUnlockTaskTests extends AbstractRegressApplicationTests 
     void shouldUnlockedCreatedTasks() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Optional<Task> task = taskRepository.get(taskId);
         assertThat(task.isPresent()).isTrue();
@@ -99,7 +99,7 @@ class RegressApplicationUnlockTaskTests extends AbstractRegressApplicationTests 
     void shouldUnlockedScheduledTasks() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Optional<Task> task = taskRepository.get(taskId);
         assertThat(task.isPresent()).isTrue();
@@ -135,7 +135,7 @@ class RegressApplicationUnlockTaskTests extends AbstractRegressApplicationTests 
     void shouldUnlockedProcessingTasks() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Optional<Task> task = taskRepository.get(taskId);
         assertThat(task.isPresent()).isTrue();
@@ -175,7 +175,7 @@ class RegressApplicationUnlockTaskTests extends AbstractRegressApplicationTests 
     void shouldUnlockedFinishedTasks() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Optional<Task> task = taskRepository.get(taskId);
         assertThat(task.isPresent()).isTrue();
@@ -211,7 +211,7 @@ class RegressApplicationUnlockTaskTests extends AbstractRegressApplicationTests 
     void shouldUnlockedCanceledTasks() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Optional<Task> task = taskRepository.get(taskId);
         assertThat(task.isPresent()).isTrue();
@@ -247,7 +247,7 @@ class RegressApplicationUnlockTaskTests extends AbstractRegressApplicationTests 
     void shouldUnlockedAbortedTasks() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Optional<Task> task = taskRepository.get(taskId);
         assertThat(task.isPresent()).isTrue();
@@ -283,7 +283,7 @@ class RegressApplicationUnlockTaskTests extends AbstractRegressApplicationTests 
     void shouldUnlockedCompletedTasks() {
         final PushTaskDto pushTaskDto = TestUtils.createPushTaskDto();
 
-        final UUID taskId = tubeService.push(pushTaskDto);
+        final UUID taskId = tubeService.push(pushTaskDto, "test_client");
 
         final Optional<Task> task = taskRepository.get(taskId);
         assertThat(task.isPresent()).isTrue();
