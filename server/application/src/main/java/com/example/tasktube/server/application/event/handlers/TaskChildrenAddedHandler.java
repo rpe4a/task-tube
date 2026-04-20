@@ -47,10 +47,11 @@ public class TaskChildrenAddedHandler implements IEventHandler<TaskChildrenAdded
                             .toList());
 
             childrenEvents.add(
-                    new BarrierAddedEvent(
+                    BarrierAddedEvent.create(
                             taskId,
                             children.stream().map(Entity::getId).toList(),
-                            Barrier.Type.FINISH)
+                            Barrier.Type.FINISH
+                    )
             );
 
             eventPublisher.publish(childrenEvents);

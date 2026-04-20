@@ -7,6 +7,7 @@ import com.example.tasktube.server.domain.port.out.IEventHandler;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -31,9 +32,11 @@ public class BarrierAddedHandler implements IEventHandler<BarrierAddedEvent> {
                         Barrier.create(
                                 e.taskId(),
                                 e.waitForList(),
-                                e.type()
+                                e.type(),
+                                e.createdAt()
                         )
                 )
+                .sorted(Comparator.comparing(Barrier::getCreatedAt))
                 .toList();
 
         repository.save(barriers);

@@ -151,7 +151,7 @@ public class Task extends Entity<UUID> {
         if (waitingTaskIdList.isEmpty()) {
             schedule(Instant.now(), client);
         } else {
-            addEvent(new BarrierAddedEvent(getId(), waitingTaskIdList, Barrier.Type.START));
+            addEvent(BarrierAddedEvent.create(getId(), waitingTaskIdList, Barrier.Type.START));
             addLog(String.format("Waiting '%s' tasks before being scheduled.", waitingTaskIdList.size()));
             unlock();
         }
