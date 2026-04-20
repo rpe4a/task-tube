@@ -46,25 +46,31 @@ public class BarrierService implements IBarrierService {
         LOGGER.info("Release barrier id: '{}'.", barrierId);
 
         final Barrier barrier = barrierRepository.getById(barrierId).orElseThrow();
-        if (barrier.getWaitFor().isEmpty()) {
-            LOGGER.debug("Barrier '{}' doesn't have any waiting tasks.", barrierId);
-            barrier.release(client, Barrier.Status.COMPLETED);
-        } else {
-            LOGGER.debug("Barrier '{}' has '{}' waiting tasks.", barrierId, barrier.getWaitFor().size());
-            final List<Task> tasks = taskRepository.get(barrier.getWaitFor());
-            final boolean allTasksTerminatedState = tasks.stream().allMatch(Task::isTerminated);
-            if (allTasksTerminatedState) {
-                if (tasks.stream().allMatch(Task::isCompleted)) {
-                    barrier.release(client, Barrier.Status.COMPLETED);
-                } else {
-                    barrier.release(client, Barrier.Status.FAILED);
-                }
 
-                LOGGER.debug("Barrier '{}' has released with status '{}'.", barrierId, barrier.getStatus());
+        try{
+            if (barrier.getWaitFor().isEmpty()) {
+                LOGGER.debug("Barrier '{}' doesn't have any waiting tasks.", barrierId);
+                barrier.release(client, Barrier.Status.COMPLETED);
             } else {
-                LOGGER.debug("Not all tasks have terminated state.");
-                barrier.unlock();
+                LOGGER.debug("Barrier '{}' has '{}' waiting tasks.", barrierId, barrier.getWaitFor().size());
+                final List<Task> tasks = taskRepository.get(barrier.getWaitFor());
+                final boolean allTasksTerminatedState = tasks.stream().allMatch(Task::isTerminated);
+                if (allTasksTerminatedState) {
+                    if (tasks.stream().allMatch(Task::isCompleted)) {
+                        barrier.release(client, Barrier.Status.COMPLETED);
+                    } else {
+                        barrier.release(client, Barrier.Status.FAILED);
+                    }
+
+                    LOGGER.debug("Barrier '{}' has released with status '{}'.", barrierId, barrier.getStatus());
+                } else {
+                    LOGGER.debug("Not all tasks have terminated state.");
+                    barrier.unlock();
+                }
             }
+        }catch (final Exception ex){
+            LOGGER.error(ex.getMessage(), ex);
+            barrier.unlock();
         }
 
         barrierRepository.update(barrier);
@@ -73,7 +79,7 @@ public class BarrierService implements IBarrierService {
 
     @Override
     @Transactional
-    public void unlock(final UUID barrierId, final int lockedTimeoutSeconds) {
+    public void unblock(final UUID barrierId, final int lockedTimeoutSeconds) {
         if (Objects.isNull(barrierId)) {
             throw new ApplicationException("Parameter barrierId cannot be null.");
         }

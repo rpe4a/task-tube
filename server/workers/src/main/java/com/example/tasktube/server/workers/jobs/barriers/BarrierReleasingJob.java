@@ -22,9 +22,6 @@ public class BarrierReleasingJob {
     private final IBarrierService barrierService;
     private final InstanceIdProvider instanceId;
 
-    @Value("${spring.application.jobs.barriers.releasing.delay}")
-    private long delay;
-
     @Value("${spring.application.jobs.barriers.releasing.count}")
     private int count;
 

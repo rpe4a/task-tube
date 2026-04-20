@@ -7,6 +7,8 @@ import com.example.tasktube.client.sdk.core.task.TaskResult;
 import com.example.tasktube.client.sdk.core.task.Value;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.time.Duration;
+
 public class ParentTaskReturnString0String extends Task1<String, String> {
 
     private ITaskTubeClient ITaskTubeClient;
@@ -26,7 +28,7 @@ public class ParentTaskReturnString0String extends Task1<String, String> {
     }
 
     @Override
-    public Value<String> run(final String arg0) {
+    public Value<String> run(final String arg0) throws InterruptedException {
         final TaskResult<Integer> childTaskResult0 = pushIn(new ChildTaskReturnInteger());
 
         final TaskResult<Integer> childTaskResult1 =

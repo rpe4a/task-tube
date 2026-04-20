@@ -26,6 +26,7 @@ import java.util.concurrent.TimeoutException;
 
 @Order(Integer.MAX_VALUE)
 public final class HeartbeatMiddleware extends AbstractMiddleware {
+
     private static final String TASK_HANDLER_GROUP = "task-handler";
     private final ITaskTubeClient ITaskTubeClient;
     private final IInstanceIdProvider IInstanceIdProvider;
@@ -57,7 +58,7 @@ public final class HeartbeatMiddleware extends AbstractMiddleware {
         final CompletableFuture<Void> handleFuture =
                 CompletableFuture
                         .runAsync(() -> {
-                            try(final MDC.MDCCloseable taskId = MDC.putCloseable(MDCMiddleware.TASK_ID, input.getId().toString())){
+                            try (final MDC.MDCCloseable taskId = MDC.putCloseable(MDCMiddleware.TASK_ID, input.getId().toString())) {
                                 next.handle(input, output);
                             }
                         }, taskHandlerPool);
@@ -89,6 +90,13 @@ public final class HeartbeatMiddleware extends AbstractMiddleware {
 
         try {
             handleFuture.get();
+
+            heartBeatFuture.cancel(false);
+            heartBeatPool.shutdown();
+            // if heartbeat future is running, waiting until it will be finished.
+            if (!heartBeatPool.awaitTermination(30, TimeUnit.SECONDS)) {
+                heartBeatPool.shutdownNow();
+            }
         } catch (final InterruptedException e) {
             throw new TaskInterruptedException("Task execution has been interrupted.");
         } catch (final ExecutionException e) {
@@ -105,14 +113,11 @@ public final class HeartbeatMiddleware extends AbstractMiddleware {
             } else {
                 throw new RuntimeException(throwable);
             }
-        } finally {
-            heartBeatFuture.cancel(true);
-            heartBeatPool.shutdownNow();
         }
     }
 
     private void extendLockTimeoutTask(final TaskInput input) throws InterruptedException {
-        logger.debug("Let's extend a lease of task '{}' of type '{}' by client '{}'.",
+        logger.info("Let's extend a lease of task '{}' of type '{}' by client '{}'.",
                 input.getId(),
                 input.getName(),
                 IInstanceIdProvider.get()

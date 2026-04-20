@@ -36,7 +36,6 @@ public class TaskService implements ITaskService {
             final ITaskRepository taskRepository,
             final IArgumentFiller argumentFiller,
             final IEventPublisher eventPublisher
-
     ) {
         this.taskRepository = Objects.requireNonNull(taskRepository);
         this.argumentFiller = Objects.requireNonNull(argumentFiller);
@@ -82,11 +81,17 @@ public class TaskService implements ITaskService {
         LOGGER.info("Process task id: '{}'.", taskId);
 
         final Task task = taskRepository.get(taskId).orElseThrow();
+        if (task.isProcessing()) {
+            if (task.isExpired(client)) {
+                LOGGER.warn("Timeout of processing task id: '{}' has expired.", taskId);
+                task.abort(Instant.now(), "Task timeout is expired.", client);
+            } else {
+                task.process(processedAt, client);
+            }
 
-        task.process(processedAt, client);
-
-        taskRepository.update(task);
-        eventPublisher.publish(task.pullEvents());
+            taskRepository.update(task);
+            eventPublisher.publish(task.pullEvents());
+        }
     }
 
     @Override
@@ -171,10 +176,11 @@ public class TaskService implements ITaskService {
         LOGGER.warn("Locked task id: '{}'.", taskId);
 
         final Task task = taskRepository.get(taskId).orElseThrow();
+        if (task.isLocked()) {
+            task.unblock(lockedTimeoutSeconds);
 
-        task.unblock(lockedTimeoutSeconds);
-
-        taskRepository.update(task);
-        eventPublisher.publish(task.pullEvents());
+            taskRepository.update(task);
+            eventPublisher.publish(task.pullEvents());
+        }
     }
 }

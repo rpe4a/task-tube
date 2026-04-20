@@ -18,4 +18,5 @@ public interface ITaskService {
     void failTask(UUID taskId, Instant failedAt, String failedReason, String client);
 
     void unlockTask(UUID taskId, int lockedTimeoutSeconds);
+
 }

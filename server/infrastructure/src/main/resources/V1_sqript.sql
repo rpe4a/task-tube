@@ -4,7 +4,7 @@ select * from tasks order by started_at;
 select * from tasks order by heartbeat_at;
 
 select * from tasks
-where id = '2f9adc94-68ca-43b7-b7be-0a38fb141fb9'
+where id = 'b58e2baa-1ff3-429a-8135-b86fc49d7a37'
 order by created_at
 select * from barriers
 where task_id = '2f9adc94-68ca-43b7-b7be-0a38fb141fb9'

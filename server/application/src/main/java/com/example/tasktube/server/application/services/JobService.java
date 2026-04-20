@@ -3,9 +3,9 @@ package com.example.tasktube.server.application.services;
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.application.port.in.IJobService;
 import com.example.tasktube.server.domain.enties.Barrier;
-import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IJobRepository;
 import com.google.common.base.Strings;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ public class JobService implements IJobService {
         }
         LOGGER.info("Try get '{}' locked tasks.", count);
 
-        return jobRepository.getLockedTaskIdList(count, lockedTimeoutSeconds);
+        return jobRepository.getLockedServerTaskIdList(count, lockedTimeoutSeconds);
     }
 
     @Override

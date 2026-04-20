@@ -19,9 +19,6 @@ public class TaskUnlockingJob {
     private final IJobService jobService;
     private final ITaskService taskService;
 
-    @Value("${spring.application.jobs.tasks.locked.delay}")
-    private long delay;
-
     @Value("${spring.application.jobs.tasks.locked.count}")
     private int count;
 

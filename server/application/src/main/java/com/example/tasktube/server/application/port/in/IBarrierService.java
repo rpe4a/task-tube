@@ -5,5 +5,5 @@ import java.util.UUID;
 public interface IBarrierService {
     void release(UUID barrierId, String client);
 
-    void unlock(UUID barrierId, int lockedTimeoutSeconds);
+    void unblock(UUID barrierId, int lockedTimeoutSeconds);
 }

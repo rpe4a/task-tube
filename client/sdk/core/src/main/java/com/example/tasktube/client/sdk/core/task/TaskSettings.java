@@ -3,6 +3,7 @@ package com.example.tasktube.client.sdk.core.task;
 import jakarta.annotation.Nonnull;
 
 public final class TaskSettings {
+
     private int heartbeatTimeoutSeconds;
     private int timeoutSeconds;
     private int maxFailures;
@@ -25,7 +26,7 @@ public final class TaskSettings {
 
     @Nonnull
     public static TaskSettings DEFAULT() {
-        return new TaskSettings(3, 60, 60 * 60, 10 * 60);
+        return new TaskSettings(3, 60, 60 * 60, 60);
     }
 
     public int getMaxFailures() {

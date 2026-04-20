@@ -77,7 +77,7 @@ class RegressApplicationUnlockBarrierTests extends AbstractRegressApplicationTes
         assertThat(lockedBarrier.getLock().lockedAt().toEpochMilli()).isEqualTo(lock.lockedAt().toEpochMilli());
         assertThat(lockedBarrier.getLock().locked()).isEqualTo(lock.locked());
 
-        barrierService.unlock(barrier.getId(), 600);
+        barrierService.unblock(barrier.getId(), 600);
 
         final Barrier unlockedBarrier = barrierRepository.getById(barrier.getId()).orElseThrow();
         assertThat(unlockedBarrier.getCreatedAt().toEpochMilli()).isEqualTo(barrier.getCreatedAt().toEpochMilli());

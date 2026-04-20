@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -197,7 +198,6 @@ public class Task extends Entity<UUID> {
         this.input = input;
     }
 
-
     public Instant getCreatedAt() {
         return createdAt;
     }
@@ -255,49 +255,49 @@ public class Task extends Entity<UUID> {
     }
 
     private void checkSchedule(final String client) {
-        checkHandleBy(Status.CREATED, client);
+        checkHandleBy(Collections.singletonList(Status.CREATED), client);
     }
 
     private void checkCancel(final String client) {
-        checkHandleBy(Status.CREATED, client);
+        checkHandleBy(Collections.singletonList(Status.CREATED), client);
     }
 
     private void checkStart(final String client) {
-        checkHandleBy(Status.SCHEDULED, client);
+        checkHandleBy(Collections.singletonList(Status.SCHEDULED), client);
     }
 
     private void checkProcess(final String client) {
-        checkHandleBy(Status.PROCESSING, client);
+        checkHandleBy(Collections.singletonList(Status.PROCESSING), client);
     }
 
     private void checkFinish(final Slot output, final String client) {
-        checkHandleBy(Status.PROCESSING, client);
+        checkHandleBy(Collections.singletonList(Status.PROCESSING), client);
         if (Objects.isNull(output)) {
             throw new ValidationDomainException("Parameter output cannot be null.");
         }
     }
 
     private void checkFail(final String client) {
-        checkHandleBy(Status.PROCESSING, client);
+        checkHandleBy(Collections.singletonList(Status.PROCESSING), client);
     }
 
     private void checkAbort(final String client) {
-        checkHandleBy(Status.FINISHED, client);
+        checkHandleBy(List.of(Status.PROCESSING, Status.FINISHED), client);
     }
 
     private void checkComplete(final String client) {
-        checkHandleBy(Status.FINISHED, client);
+        checkHandleBy(Collections.singletonList(Status.FINISHED), client);
     }
 
-    private void checkHandleBy(final Status expectedStatus, final String client) {
+    private void checkHandleBy(final List<Status> expectedStatuses, final String client) {
         if (Objects.isNull(client)) {
             throw new ValidationDomainException("Parameter client cannot be null.");
         }
-        if (Objects.isNull(expectedStatus)) {
+        if (Objects.isNull(expectedStatuses)) {
             throw new ValidationDomainException("Parameter expected status cannot be null.");
         }
-        if (getStatus().isNotEqual(expectedStatus)) {
-            throw new ValidationDomainException("Invalid task state. Expected '%s' but was '%s'.".formatted(expectedStatus, getStatus()));
+        if (!expectedStatuses.contains(getStatus())) {
+            throw new ValidationDomainException("'%s' is invalid task state.".formatted(getStatus()));
         }
         if (!getLock().isLockedBy(client)) {
             throw new ValidationDomainException("Task is not locked by the client '%s'.".formatted(client));
@@ -383,18 +383,11 @@ public class Task extends Entity<UUID> {
             addLog("Task has been failed.");
             unlock();
         } else {
-            setStatus(Status.ABORTED);
-            setAbortedAt(Instant.now());
-            setFinishedAt(null);
-            setFailedAt(failedAt);
-            setFailedReason(failedReason);
-            setOutput(null);
-            addLog("Task has been aborted.");
-            unlock();
+            abort(failedAt, failedReason, client);
         }
     }
 
-    private void abort(final Instant abortedAt, final String failedReason, final String client) {
+    public void abort(final Instant abortedAt, final String failedReason, final String client) {
         checkAbort(client);
         setStatus(Status.ABORTED);
         setAbortedAt(abortedAt);
@@ -539,34 +532,34 @@ public class Task extends Entity<UUID> {
 
         if (getLock().isLockedBefore(lockedTimeout)) {
             if (Status.CREATED.equals(getStatus())) {
-                addLog("Execution of task is blocked in CREATED state, has been unlocked and returned to queue.");
+                addLog("Task has stuck in CREATED state. It has been unlocked and returned to the queue.");
                 setCreatedAt(Instant.now());
             }
             if (Status.SCHEDULED.equals(getStatus())) {
-                addLog("Execution of task is blocked in SCHEDULED state, has been unlocked and returned to queue.");
+                addLog("Task has stuck in SCHEDULED state. It has been unlocked and returned to the queue.");
                 setScheduledAt(Instant.now());
             }
             if (Status.PROCESSING.equals(getStatus())) {
-                addLog("Execution of task is blocked in PROCESSING state, has been unlocked and returned to queue.");
+                addLog("Task has stuck in PROCESSING state. It has been unlocked and returned to the queue.");
                 setStatus(Status.SCHEDULED);
                 setScheduledAt(Instant.now());
                 setStartedAt(null);
                 setHeartbeatAt(null);
             }
             if (Status.FINISHED.equals(getStatus())) {
-                addLog("Execution of task is blocked in FINISHED state, has been unlocked and returned to queue.");
+                addLog("Task has stuck in FINISHED state. It has been unlocked and returned to the queue.");
                 setFinishedAt(Instant.now());
             }
             if (Status.CANCELED.equals(getStatus())) {
-                addLog("Execution of task is blocked in CANCELED state, has been unlocked and returned to queue.");
+                addLog("Task has stuck in CANCELED state. It has been unlocked and returned to the queue.");
                 setCanceledAt(Instant.now());
             }
             if (Status.ABORTED.equals(getStatus())) {
-                addLog("Execution of task is blocked in ABORTED state, has been unlocked and returned to queue.");
+                addLog("Task has stuck in ABORTED state. It has been unlocked and returned to the queue.");
                 setAbortedAt(Instant.now());
             }
             if (Status.COMPLETED.equals(getStatus())) {
-                addLog("Execution of task is blocked in COMPLETED state, has been unlocked and returned to queue.");
+                addLog("Task has stuck in COMPLETED state. It has been unlocked and returned to the queue.");
                 setCompletedAt(Instant.now());
             }
 
@@ -627,6 +620,23 @@ public class Task extends Entity<UUID> {
         return getInput().stream()
                 .map(slot -> slot.fill(argumentFiller))
                 .toList();
+    }
+
+    public boolean isExpired(final String client) {
+        checkProcess(client);
+
+        final Instant timeout = getStartedAt().plus(settings.timeoutSeconds(), ChronoUnit.SECONDS);
+        final Instant now = Instant.now();
+
+        return now.isAfter(timeout);
+    }
+
+    public boolean isProcessing() {
+        return getStatus().equals(Status.PROCESSING);
+    }
+
+    public boolean isLocked() {
+        return getLock().locked();
     }
 
     public enum Status {

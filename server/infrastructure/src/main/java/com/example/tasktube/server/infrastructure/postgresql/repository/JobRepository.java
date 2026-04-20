@@ -6,6 +6,7 @@ import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IJobRepository;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.BarrierDataMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -130,7 +131,7 @@ public class JobRepository implements IJobRepository {
     }
 
     @Override
-    public List<UUID> getLockedTaskIdList(final int count, final int lockedTimeoutSeconds) {
+    public List<UUID> getLockedServerTaskIdList(final int count, final int lockedTimeoutSeconds) {
         if (count <= 0) {
             throw new ApplicationException("Parameter count must be more than zero.");
         }
@@ -141,10 +142,11 @@ public class JobRepository implements IJobRepository {
 
         final String queryCommand = """
                     SELECT id
-                        FROM tasks
-                        WHERE locked_at <= (current_timestamp - (:lockedTimeoutSeconds * interval '1 second'))
-                        ORDER BY locked_at
-                        LIMIT :count
+                    FROM tasks
+                    WHERE locked_at <= (current_timestamp - (:lockedTimeoutSeconds * interval '1 second'))
+                        AND locked = true
+                    ORDER BY locked_at
+                    LIMIT :count
                 """;
 
         final RowMapper<UUID> rsMapper = (rs, rowNum) -> rs.getObject("id", UUID.class);
@@ -174,10 +176,11 @@ public class JobRepository implements IJobRepository {
 
         final String queryCommand = """
                     SELECT id
-                        FROM barriers
-                        WHERE locked_at <= (current_timestamp - (:lockedTimeoutSeconds * interval '1 second'))
-                        ORDER BY locked_at
-                        LIMIT :count
+                    FROM barriers
+                    WHERE locked_at <= (current_timestamp - (:lockedTimeoutSeconds * interval '1 second'))
+                        AND locked = true
+                    ORDER BY locked_at
+                    LIMIT :count
                 """;
 
         final RowMapper<UUID> rsMapper = (rs, rowNum) -> rs.getObject("id", UUID.class);
@@ -193,5 +196,33 @@ public class JobRepository implements IJobRepository {
         LOGGER.debug("Got '{}' locked barrier IDs.", barrierIds.size());
 
         return barrierIds;
+    }
+
+    @Override
+    public List<UUID> getHeartbeatTimeoutTaskIdList(final int count) {
+        if (count <= 0) {
+            throw new ApplicationException("Parameter count must be more than zero.");
+        }
+        LOGGER.debug("Attempting to get '{}' heartbeat timeout task IDs.", count);
+
+        final String queryCommand = """
+                    SELECT id
+                    FROM tasks
+                    WHERE status = 'PROCESSING'
+                      AND heartbeat_at <= (current_timestamp - ((settings->>'heartbeatTimeoutSeconds')::int * interval '1 second'))
+                    ORDER BY heartbeat_at
+                    LIMIT :count
+                """;
+
+        final RowMapper<UUID> rsMapper = (rs, rowNum) -> rs.getObject("id", UUID.class);
+
+        final List<UUID> taskIds = db.query(
+                queryCommand,
+                Map.of("count", count),
+                rsMapper
+        );
+        LOGGER.debug("Got '{}' heartbeat timeout task IDs.", taskIds.size());
+
+        return taskIds;
     }
 }
