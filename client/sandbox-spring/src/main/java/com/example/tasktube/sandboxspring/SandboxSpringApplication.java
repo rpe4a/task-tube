@@ -14,7 +14,7 @@ import java.util.UUID;
 @SpringBootApplication
 public class SandboxSpringApplication {
 
-    public static final int TASK_COUNT = 1;
+    public static final int TASK_COUNT = 15;
 
     public static void main(final String[] args) {
         final ConfigurableApplicationContext context = SpringApplication.run(SandboxSpringApplication.class, args);

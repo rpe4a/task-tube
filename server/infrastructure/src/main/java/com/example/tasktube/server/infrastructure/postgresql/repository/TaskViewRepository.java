@@ -86,12 +86,12 @@ public class TaskViewRepository implements ITaskViewRepository {
                 params.put("status", status.name());
             }
             if (createdFrom != null) {
-                sbQuery.append(" AND created_at >= :created_at");
-                params.put("created_at", Timestamp.from(createdFrom));
+                sbQuery.append(" AND created_at >= :created_from");
+                params.put("created_from", Timestamp.from(createdFrom));
             }
             if (createdTo != null) {
-                sbQuery.append(" AND created_at <= :created_at");
-                params.put("created_at", Timestamp.from(createdTo));
+                sbQuery.append(" AND created_at <= :created_to");
+                params.put("created_to", Timestamp.from(createdTo));
             }
         }
         sbQuery.append(" ORDER BY created_at DESC");

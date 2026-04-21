@@ -7,6 +7,7 @@ export const DateTimeFormater = {
   DATE: 'YYYY-MM-DD',
   TIME: 'HH:mm:ss',
   CALENDAR: 'DD/MM/YYYY HH:mm',
+  URL: 'YYYY-MM-DD HH:mm:ss',
 };
 
 export const formatDateTime = (

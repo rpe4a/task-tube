@@ -20,8 +20,6 @@ import { Dayjs } from 'dayjs';
 import 'dayjs/locale/en-gb';
 import { isUUID } from '../../../shared/utils/UuidUtils';
 
-
-
 interface TasksFormLayoutProps {
   createdFrom: Dayjs | null;
   createdTo: Dayjs | null;
@@ -142,6 +140,7 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
               onChange={handleCreatedFromChange}
               disabled={loading}
               timezone="UTC"
+              slotProps={{ field: { clearable: true } }}
             />
             <DateTimePicker
               label="Created - To"
@@ -149,6 +148,7 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
               onChange={handleCreatedToChange}
               disabled={loading}
               timezone="UTC"
+              slotProps={{ field: { clearable: true } }}
             />
           </LocalizationProvider>
 

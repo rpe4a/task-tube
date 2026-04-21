@@ -8,6 +8,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import TasksPageResponse from './models/TasksPageResponse';
+import { useSearchParams } from 'react-router';
 dayjs.extend(utc);
 
 interface FetchTasksParams {
@@ -48,17 +49,35 @@ const fetchTasks = async (params: FetchTasksParams): Promise<TasksPageResponse> 
 };
 
 function TasksPage(): React.JSX.Element {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const queryparameterPage = searchParams.get('page')
+    ? parseInt(searchParams.get('page') as string, 10)
+    : 0;
+  const queryparameterSize = searchParams.get('size')
+    ? parseInt(searchParams.get('size') as string, 10)
+    : 10;
+  const queryparameterCreatedFrom = searchParams.get('from')
+    ? dayjs.utc(searchParams.get('from') as string)
+    : null;
+  const queryparameterCreatedTo = searchParams.get('to')
+    ? dayjs.utc(searchParams.get('to') as string)
+    : null;
+  const queryparameterId = searchParams.get('id') || '';
+  const queryparameterName = searchParams.get('name') || '';
+  const queryparameterTube = searchParams.get('tube') || '';
+  const queryparameterStatus = searchParams.get('status') || '';
+
   const [tasks, setTasks] = useState<TasksPageTaskDto[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [createdFrom, setCreatedFrom] = useState<Dayjs | null>(null);
-  const [createdTo, setCreatedTo] = useState<Dayjs | null>(null);
-  const [searchId, setSearchId] = useState<string>('');
-  const [searchName, setSearchName] = useState<string>('');
-  const [searchTube, setSearchTube] = useState<string>('');
-  const [searchStatus, setSearchStatus] = useState<string>('');
+  const [page, setPage] = useState<number>(queryparameterPage);
+  const [rowsPerPage, setRowsPerPage] = useState<number>(queryparameterSize);
+  const [createdFrom, setCreatedFrom] = useState<Dayjs | null>(queryparameterCreatedFrom);
+  const [createdTo, setCreatedTo] = useState<Dayjs | null>(queryparameterCreatedTo);
+  const [searchId, setSearchId] = useState<string>(queryparameterId);
+  const [searchName, setSearchName] = useState<string>(queryparameterName);
+  const [searchTube, setSearchTube] = useState<string>(queryparameterTube);
+  const [searchStatus, setSearchStatus] = useState<string>(queryparameterStatus);
 
   const { isPending, isFetching, isError, data, error, isPlaceholderData, refetch } = useQuery({
     queryKey: ['tasks', page],
@@ -81,6 +100,23 @@ function TasksPage(): React.JSX.Element {
     handleResponse(isPending, isError, data, error);
   }, [isPending, isError, data, error]);
 
+  const setSearchParamsToUrl = (key: string, value: string) => {
+    return setSearchParamsToUrlObj({ [key]: value });
+  };
+
+  const setSearchParamsToUrlObj = (params: { [key: string]: string }) => {
+    setSearchParams((searchParams) => {
+      for (const [key, value] of Object.entries(params)) {
+        if (value) {
+          searchParams.set(key, value);
+        } else {
+          searchParams.delete(key);
+        }
+      }
+      return searchParams;
+    });
+  };
+
   const handleResponse = (
     isPending: boolean,
     isError: boolean,
@@ -100,42 +136,61 @@ function TasksPage(): React.JSX.Element {
   };
 
   const handleCreatedFromChange = (value: Dayjs | null) => {
-    setCreatedFrom(dayjs.utc(value));
+    setCreatedFrom(value ? dayjs.utc(value) : null);
+    setSearchParamsToUrl('from', value ? value.toISOString() : '');
   };
 
   const handleCreatedToChange = (value: Dayjs | null) => {
-    setCreatedTo(dayjs.utc(value));
+    setCreatedTo(value ? dayjs.utc(value) : null);
+    setSearchParamsToUrl('to', value ? value.toISOString() : '');
   };
 
   const handleSearchIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     event.preventDefault();
+
     setSearchId(event.target.value);
+    setSearchParamsToUrl('id', event.target.value);
   };
 
   const handleSearchNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
+
     setSearchName(event.target.value);
+    setSearchParamsToUrl('name', event.target.value);
   };
 
   const handleSearchTubeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
+
     setSearchTube(event.target.value);
+    setSearchParamsToUrl('tube', event.target.value);
   };
 
   const handleSearchStatusChange = (event: SelectChangeEvent<string>) => {
+    event.preventDefault();
+
     setSearchStatus(event.target.value as string);
+    setSearchParamsToUrl('status', event.target.value as string);
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
     if (!isPlaceholderData) {
       setPage(newPage);
+      setSearchParamsToUrl('page', newPage.toString());
     }
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
+
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+
+    setSearchParamsToUrlObj({ size: event.target.value, page: '0' });
   };
 
-  const handleFetchTasks = async () => {
+  const handleFetchTasks = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
     refetch();
   };
 
