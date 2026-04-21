@@ -38,7 +38,9 @@ public final class TasksController extends AbstractController {
             @RequestParam(required = false, name = "tube") final String tube,
             @RequestParam(required = false, name = "status") final String status,
             @RequestParam(required = false, name = "createdFrom") final Instant createdFrom,
-            @RequestParam(required = false, name = "createdTo") final Instant createdTo
+            @RequestParam(required = false, name = "createdTo") final Instant createdTo,
+            @RequestParam(required = false, name = "sort", defaultValue = "created_at") final String sort,
+            @RequestParam(required = false, name = "by", defaultValue = "DESC") final String by
     ) {
         final List<ParentTaskView> tasks = queryHandler.handle(
                 new ParentTasksQuery(
@@ -48,6 +50,8 @@ public final class TasksController extends AbstractController {
                         status != null ? Task.Status.valueOf(status) : null,
                         createdFrom,
                         createdTo,
+                        sort,
+                        by,
                         page,
                         size
                 )

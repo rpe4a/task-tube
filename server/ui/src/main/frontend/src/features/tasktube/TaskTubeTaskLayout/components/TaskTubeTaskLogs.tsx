@@ -167,11 +167,11 @@ function TaskTubeTaskLogs(props: TaskTubeTaskLogsProps): JSX.Element {
             <Table>
               <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                 <TableRow>
-                  <TableCell sx={{ fontWeight: 600 }}>Timestamp</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Level</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Type</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Message</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Exception</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>timestamp</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>level</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>type</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>message</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>exception</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

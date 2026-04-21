@@ -56,7 +56,7 @@ SELECT id,
        COUNT(*) OVER() AS total_count
 FROM tasks
 WHERE parent_id IS NULL
-  AND name like '%.ParentTaskReturnString0String%' ORDER BY created_at DESC LIMIT 10 OFFSET 0
+ORDER BY created_at DESC LIMIT 10 OFFSET 0
 
 
 SELECT

@@ -13,6 +13,8 @@ public record ParentTasksQuery(
         @Nullable Task.Status status,
         @Nullable Instant createdFrom,
         @Nullable Instant createdTo,
+        @Nullable String sort,
+        @Nullable String by,
         int page,
         int size
 ) {

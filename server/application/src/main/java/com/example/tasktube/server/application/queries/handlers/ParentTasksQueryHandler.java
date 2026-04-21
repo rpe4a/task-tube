@@ -2,7 +2,6 @@ package com.example.tasktube.server.application.queries.handlers;
 
 import com.example.tasktube.server.application.queries.ParentTasksQuery;
 import com.example.tasktube.server.application.queries.repositories.ITaskViewRepository;
-import com.example.tasktube.server.application.queries.results.ParentTasksResult;
 import com.example.tasktube.server.application.queries.views.ParentTaskView;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +27,8 @@ public final class ParentTasksQueryHandler {
                 query.status(),
                 query.createdFrom(),
                 query.createdTo(),
+                query.sort(),
+                query.by(),
                 query.page(),
                 query.size()
         );

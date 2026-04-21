@@ -21,6 +21,8 @@ public interface ITaskViewRepository {
             @Nullable Task.Status status,
             @Nullable Instant createdFrom,
             @Nullable Instant createdTo,
+            @Nullable final String sort,
+            @Nullable final String by,
             int page,
             int size
     );

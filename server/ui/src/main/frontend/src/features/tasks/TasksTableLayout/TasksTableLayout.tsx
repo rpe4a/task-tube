@@ -32,8 +32,11 @@ interface TaskTableLayoutProps {
   totalCount: number;
   page: number;
   rowsPerPage: number;
+  sort: string;
+  by: 'asc' | 'desc';
   onChangePage: (event: unknown, newPage: number) => void;
   onChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onSortChange: (sort: string, by: 'asc' | 'desc') => void;
 }
 
 function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
@@ -44,9 +47,24 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
     totalCount,
     page,
     rowsPerPage,
+    sort,
+    by,
     onChangePage,
     onChangeRowsPerPage,
+    onSortChange,
   } = props;
+
+  const handleSortClick = (columnName: string) => {
+    const newDirection = sort === columnName && by === 'asc' ? 'desc' : 'asc';
+    onSortChange(columnName, newDirection);
+  };
+
+  const renderSortIcon = (columnName: string) => {
+    if (sort === columnName) {
+      return by === 'asc' ? ' ▲' : ' ▼';
+    }
+    return '';
+  };
 
   const handleCellClick = (event: React.MouseEvent<HTMLTableCellElement>) => {
     const cellText = event.currentTarget.textContent;
@@ -89,16 +107,112 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
               <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
                 <TableRow>
                   <TableCell sx={{ fontWeight: 600, width: '100px' }}></TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Id</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Name</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Tube</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Status</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Created At</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Updated At</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Completed At</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Aborted At</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Duration</TableCell>
-                  <TableCell sx={{ fontWeight: 600 }}>Handled By</TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      '&:hover': { backgroundColor: '#e0e0e0' },
+                    }}
+                    onClick={() => handleSortClick('id')}
+                  >
+                    id{renderSortIcon('id')}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      '&:hover': { backgroundColor: '#e0e0e0' },
+                    }}
+                    onClick={() => handleSortClick('name')}
+                  >
+                    name{renderSortIcon('name')}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      '&:hover': { backgroundColor: '#e0e0e0' },
+                    }}
+                    onClick={() => handleSortClick('tube')}
+                  >
+                    tube{renderSortIcon('tube')}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      '&:hover': { backgroundColor: '#e0e0e0' },
+                    }}
+                    onClick={() => handleSortClick('status')}
+                  >
+                    status{renderSortIcon('status')}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      '&:hover': { backgroundColor: '#e0e0e0' },
+                    }}
+                    onClick={() => handleSortClick('created_at')}
+                  >
+                    created_at{renderSortIcon('created_at')}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      '&:hover': { backgroundColor: '#e0e0e0' },
+                    }}
+                    onClick={() => handleSortClick('updated_at')}
+                  >
+                    updated_at{renderSortIcon('updated_at')}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      '&:hover': { backgroundColor: '#e0e0e0' },
+                    }}
+                    onClick={() => handleSortClick('completed_at')}
+                  >
+                    completed_at{renderSortIcon('completed_at')}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      '&:hover': { backgroundColor: '#e0e0e0' },
+                    }}
+                    onClick={() => handleSortClick('aborted_at')}
+                  >
+                    aborted_at{renderSortIcon('aborted_at')}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                    }}
+                  >
+                    duration
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontWeight: 600,
+                      cursor: 'pointer',
+                      userSelect: 'none',
+                      '&:hover': { backgroundColor: '#e0e0e0' },
+                    }}
+                    onClick={() => handleSortClick('handled_by')}
+                  >
+                    handled_by{renderSortIcon('handled_by')}
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

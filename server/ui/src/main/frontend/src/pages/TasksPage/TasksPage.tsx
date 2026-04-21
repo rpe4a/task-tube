@@ -20,6 +20,8 @@ interface FetchTasksParams {
   searchName: string;
   searchTube: string;
   searchStatus: string;
+  sort: string;
+  by: string;
 }
 
 const fetchTasks = async (params: FetchTasksParams): Promise<TasksPageResponse> => {
@@ -32,6 +34,8 @@ const fetchTasks = async (params: FetchTasksParams): Promise<TasksPageResponse> 
     searchName,
     searchTube,
     searchStatus,
+    sort,
+    by,
   } = params;
 
   let searchParams = new URLSearchParams();
@@ -43,6 +47,8 @@ const fetchTasks = async (params: FetchTasksParams): Promise<TasksPageResponse> 
   if (searchName) searchParams.append('name', searchName);
   if (searchTube) searchParams.append('tube', searchTube);
   if (searchStatus) searchParams.append('status', searchStatus);
+  if (sort) searchParams.append('sort', sort);
+  if (by) searchParams.append('by', by);
 
   const response = await fetch(`/api/v1/tasks?${searchParams.toString()}`);
   return response.json();
@@ -66,6 +72,8 @@ function TasksPage(): React.JSX.Element {
   const queryparameterName = searchParams.get('name') || '';
   const queryparameterTube = searchParams.get('tube') || '';
   const queryparameterStatus = searchParams.get('status') || '';
+  const queryparameterSort = searchParams.get('sort') || 'created_at';
+  const queryparameterBy = searchParams.get('by') || 'desc';
 
   const [tasks, setTasks] = useState<TasksPageTaskDto[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -78,9 +86,11 @@ function TasksPage(): React.JSX.Element {
   const [searchName, setSearchName] = useState<string>(queryparameterName);
   const [searchTube, setSearchTube] = useState<string>(queryparameterTube);
   const [searchStatus, setSearchStatus] = useState<string>(queryparameterStatus);
+  const [sort, setSort] = useState<string>(queryparameterSort);
+  const [by, setBy] = useState<'asc' | 'desc'>((queryparameterBy as 'asc' | 'desc') || 'desc');
 
   const { isPending, isFetching, isError, data, error, isPlaceholderData, refetch } = useQuery({
-    queryKey: ['tasks', page],
+    queryKey: ['tasks', page, rowsPerPage, sort, by],
     queryFn: () =>
       fetchTasks({
         page,
@@ -91,6 +101,8 @@ function TasksPage(): React.JSX.Element {
         searchName,
         searchTube,
         searchStatus,
+        sort,
+        by,
       }),
     refetchOnWindowFocus: false,
     placeholderData: keepPreviousData,
@@ -185,8 +197,13 @@ function TasksPage(): React.JSX.Element {
 
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-
     setSearchParamsToUrlObj({ size: event.target.value, page: '0' });
+  };
+
+  const handleSortChange = (sort: string, by: 'asc' | 'desc') => {
+    setSort(sort);
+    setBy(by);
+    setSearchParamsToUrlObj({ sort: sort, by: by });
   };
 
   const handleFetchTasks = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -221,6 +238,9 @@ function TasksPage(): React.JSX.Element {
         totalCount={totalCount}
         onChangePage={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
+        sort={sort}
+        by={by}
+        onSortChange={handleSortChange}
       />
     </Container>
   );

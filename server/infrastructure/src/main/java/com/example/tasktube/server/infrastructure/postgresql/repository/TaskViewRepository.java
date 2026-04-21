@@ -2,8 +2,8 @@ package com.example.tasktube.server.infrastructure.postgresql.repository;
 
 import com.example.tasktube.server.application.queries.repositories.ITaskViewRepository;
 import com.example.tasktube.server.application.queries.views.ParentTaskView;
-import com.example.tasktube.server.application.queries.views.TaskTubeTreeNodeView;
 import com.example.tasktube.server.application.queries.views.TaskTubeTaskView;
+import com.example.tasktube.server.application.queries.views.TaskTubeTreeNodeView;
 import com.example.tasktube.server.application.queries.views.TaskTubeView;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskViewMapper;
@@ -48,6 +48,8 @@ public class TaskViewRepository implements ITaskViewRepository {
             @Nullable final Task.Status status,
             @Nullable final Instant createdFrom,
             @Nullable final Instant createdTo,
+            @Nullable final String sort,
+            @Nullable final String by,
             final int page,
             final int size
     ) {
@@ -94,7 +96,20 @@ public class TaskViewRepository implements ITaskViewRepository {
                 params.put("created_to", Timestamp.from(createdTo));
             }
         }
-        sbQuery.append(" ORDER BY created_at DESC");
+
+        final String orderBy = switch (sort) {
+            case "id" -> "id";
+            case "name" -> "name";
+            case "tube" -> "tube";
+            case "status" -> "status";
+            case "updated_at" -> "updated_at";
+            case "completed_at" -> "completed_at";
+            case "aborted_at" -> "aborted_at";
+            case "handled_by" -> "handled_by";
+            case null, default -> "created_at";
+        };
+
+        sbQuery.append(" ORDER BY %s".formatted(orderBy)).append(by != null && by.equalsIgnoreCase("ASC") ? " ASC" : " DESC");
 
         sbQuery.append(" LIMIT :size OFFSET :skip");
         params.put("size", size);
