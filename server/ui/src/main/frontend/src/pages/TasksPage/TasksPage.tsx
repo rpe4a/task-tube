@@ -206,6 +206,26 @@ function TasksPage(): React.JSX.Element {
     [setSearchParamsToUrlObj],
   );
 
+  const resetSearchTasksParams = useCallback(() => {
+    setPage(0);
+    setSearchId('');
+    setSearchName('');
+    setSearchTube('');
+    setSearchStatus('');
+    setCreatedFrom(null);
+    setCreatedTo(null);
+
+    setSearchParamsToUrlObj({
+      id: '',
+      name: '',
+      tube: '',
+      status: '',
+      from: '',
+      to: '',
+      page: '0',
+    });
+  }, [setSearchParamsToUrlObj]);
+
   useEffect(() => {
     if (isError) {
       console.error('Error fetching tasks:', error);
@@ -227,6 +247,7 @@ function TasksPage(): React.JSX.Element {
         searchCreatedTo={createdTo}
         isLoading={isPending || isFetching}
         searchTasks={searchTasks}
+        resetSearchTasksParams={resetSearchTasksParams}
       />
       <TaskTableLayout
         isPending={isPending}

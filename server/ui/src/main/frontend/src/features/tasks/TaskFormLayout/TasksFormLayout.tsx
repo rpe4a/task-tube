@@ -28,6 +28,7 @@ interface TasksFormLayoutProps {
   searchStatus: string;
   isLoading: boolean;
   searchTasks: (search: SearchTasksParams) => void;
+  resetSearchTasksParams: () => void;
 }
 
 function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
@@ -40,6 +41,7 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
     searchStatus,
     isLoading,
     searchTasks,
+    resetSearchTasksParams,
   } = props;
 
   const [idError, setIdError] = useState<string>('');
@@ -90,6 +92,23 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
       searchTasks({ id, name, tube, status, createdFrom, createdTo });
     },
     [searchTasks, id, name, tube, status, createdFrom, createdTo],
+  );
+
+  const handleResetClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      setIdError('');
+      setId('');
+      setName('');
+      setTube('');
+      setStatus('');
+      setCreatedFromValue(null);
+      setCreatedToValue(null);
+      setIdError('');
+
+      resetSearchTasksParams();
+    },
+    [resetSearchTasksParams],
   );
 
   return (
@@ -188,6 +207,15 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
             title="Search tasktube"
           >
             SEARCH
+          </Button>
+          <Button
+            variant="contained"
+            size="large"
+            onClick={handleResetClick}
+            disabled={isLoading}
+            title="Reset search form"
+          >
+            RESET FORM
           </Button>
         </Box>
       </Paper>
