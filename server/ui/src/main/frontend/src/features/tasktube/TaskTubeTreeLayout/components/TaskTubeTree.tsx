@@ -8,6 +8,7 @@ import * as DateTimeUtils from '../../../../shared/utils/DateTimeUtils';
 import SchemaIcon from '@mui/icons-material/Schema';
 import TaskTubeTreeNode from '../model/TaskTubeTreeNode';
 import dayjs from 'dayjs';
+import api from '../../../../shared/api';
 
 interface TaskTubeTreeProps {
   correlationId: string;
@@ -35,8 +36,10 @@ const fetchTaskTubeTaskChildren = async (
   correlationId: string | undefined,
   taskId: string | undefined,
 ): Promise<TaskTubeTreeNodeResponse> => {
-  const response = await fetch(`/api/v1/tasktube/${correlationId}/task/${taskId}/treenode`);
-  return response.json();
+  const response = await api.get<TaskTubeTreeNodeResponse>(
+    `/api/v1/tasktube/${correlationId}/task/${taskId}/treenode`,
+  );
+  return response.data;
 };
 
 const isTaskTerminated = (task: TaskTubeTreeNode): boolean => {

@@ -21,11 +21,13 @@
     "axios": "^1.13.6",
     "dayjs": "^1.11.19",
     "http-proxy-middleware": "^3.0.5",
+    "notistack": "^3.0.2",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router": "^7.13.0",
     "react-scripts": "5.0.1",
     "typescript": "^4.9.5",
+    "use-debounce": "^10.1.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

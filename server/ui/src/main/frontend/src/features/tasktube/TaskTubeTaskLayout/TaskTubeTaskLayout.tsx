@@ -7,6 +7,7 @@ import { lightTheme } from '@uiw/react-json-view/light';
 import JsonView from '@uiw/react-json-view';
 import { getStatusColor } from '../../../shared/utils/ColorUtils';
 import TaskTubeTaskLogs from './components/TaskTubeTaskLogs';
+import api from '../../../shared/api';
 
 interface TaskTubeTaskLayoutProps {
   correlationId: string;
@@ -17,8 +18,10 @@ const fetchTaskTubeTask = async (
   correlationId: string,
   taskId: string,
 ): Promise<TaskTubeTaskResponse> => {
-  const response = await fetch(`/api/v1/tasktube/${correlationId}/task/${taskId}`);
-  return response.json();
+  const response = await api.get<TaskTubeTaskResponse>(
+    `/api/v1/tasktube/${correlationId}/task/${taskId}`,
+  );
+  return response.data;
 };
 
 // helper components for accessibility and panels
@@ -92,7 +95,7 @@ function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
     if (isPending) {
       setLoading(true);
     } else if (isError) {
-      console.error('Error fetching tasks:', error);
+      console.error('Error fetching task:', error);
       setLoading(false);
     } else if (data) {
       setTask(data);

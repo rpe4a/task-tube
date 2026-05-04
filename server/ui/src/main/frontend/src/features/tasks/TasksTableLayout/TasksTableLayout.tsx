@@ -1,7 +1,6 @@
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import {
   Box,
-  CircularProgress,
   TableContainer,
   Paper,
   Table,
@@ -10,12 +9,12 @@ import {
   TableCell,
   TableBody,
   Chip,
-  Typography,
   TablePagination,
   Tooltip,
   Button,
+  Alert,
 } from '@mui/material';
-import { JSX } from 'react';
+import { JSX, memo } from 'react';
 import TasksPageTaskDto from '../../../pages/TasksPage/models/TasksPageTaskDto';
 import * as DateTimeUtils from '../../../shared/utils/DateTimeUtils';
 import dayjs from 'dayjs';
@@ -23,19 +22,21 @@ import utc from 'dayjs/plugin/utc';
 import { Link } from 'react-router';
 import { getStatusColor } from '../../../shared/utils/ColorUtils';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import TableSkeleton from '../../../shared/component/TableSkeleton';
 dayjs.extend(utc);
 
 interface TaskTableLayoutProps {
   loading: boolean;
   isFetching: boolean;
+  isError: boolean;
   tasks: TasksPageTaskDto[];
   totalCount: number;
   page: number;
   rowsPerPage: number;
   sort: string;
   by: 'asc' | 'desc';
-  onChangePage: (event: unknown, newPage: number) => void;
-  onChangeRowsPerPage: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onChangePage: (value: number) => void;
+  onChangeRowsPerPage: (value: string) => void;
   onSortChange: (sort: string, by: 'asc' | 'desc') => void;
 }
 
@@ -43,6 +44,7 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
   const {
     loading,
     isFetching,
+    isError,
     tasks,
     totalCount,
     page,
@@ -77,340 +79,351 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
 
   return (
     <>
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
-          <CircularProgress />
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          mb: 1,
+        }}
+      >
+        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <Link to={`/tasktube/push`} title="Push tasktube" target="_blank">
+            <Button variant="text" size="large" sx={{ textTransform: 'none' }}>
+              PUSH TASK
+            </Button>
+          </Link>
         </Box>
-      ) : tasks.length > 0 ? (
-        <>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-            <Box sx={{ display: 'flex', alignItems: 'center' }}>
-              <Link to={`/tasktube/push`} title="Push tasktube" target="_blank">
-                <Button variant="contained" size="large" sx={{ textTransform: 'none' }}>
-                  PUSH
-                </Button>
-              </Link>
-              {isFetching && <CircularProgress size="1.5rem" sx={{ ml: 1 }} />}
-            </Box>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25, 50]}
-              component="div"
-              count={totalCount}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={onChangePage}
-              onRowsPerPageChange={onChangeRowsPerPage}
-            />
-          </Box>
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-                <TableRow>
-                  <TableCell sx={{ fontWeight: 600, width: '100px' }}></TableCell>
-                  <TableCell
-                    sx={{
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                      '&:hover': { backgroundColor: '#e0e0e0' },
-                    }}
-                    onClick={() => handleSortClick('id')}
-                  >
-                    id{renderSortIcon('id')}
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25, 50]}
+          component="div"
+          count={totalCount}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={(_, newPage) => onChangePage(newPage)}
+          onRowsPerPageChange={(e) => onChangeRowsPerPage(e.target.value as string)}
+        />
+      </Box>
+      <TableContainer
+        component={Paper}
+        sx={{ opacity: isFetching ? 0.5 : 1, transition: 'opacity 0.25s' }}
+      >
+        <Table>
+          <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+            <TableRow>
+              <TableCell sx={{ fontWeight: 600, width: '100px' }}></TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  '&:hover': { backgroundColor: '#e0e0e0' },
+                  minWidth: 100,
+                }}
+                onClick={() => handleSortClick('id')}
+              >
+                ID{renderSortIcon('id')}
+              </TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  '&:hover': { backgroundColor: '#e0e0e0' },
+                  minWidth: 150,
+                }}
+                onClick={() => handleSortClick('name')}
+              >
+                Name{renderSortIcon('name')}
+              </TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  '&:hover': { backgroundColor: '#e0e0e0' },
+                }}
+                onClick={() => handleSortClick('tube')}
+              >
+                Tube{renderSortIcon('tube')}
+              </TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  '&:hover': { backgroundColor: '#e0e0e0' },
+                  minWidth: 100,
+                }}
+                onClick={() => handleSortClick('status')}
+              >
+                Status{renderSortIcon('status')}
+              </TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  '&:hover': { backgroundColor: '#e0e0e0' },
+                }}
+                onClick={() => handleSortClick('created_at')}
+              >
+                Created At{renderSortIcon('created_at')}
+              </TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  '&:hover': { backgroundColor: '#e0e0e0' },
+                }}
+                onClick={() => handleSortClick('updated_at')}
+              >
+                Updated At{renderSortIcon('updated_at')}
+              </TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  '&:hover': { backgroundColor: '#e0e0e0' },
+                }}
+                onClick={() => handleSortClick('completed_at')}
+              >
+                Completed At{renderSortIcon('completed_at')}
+              </TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  '&:hover': { backgroundColor: '#e0e0e0' },
+                }}
+                onClick={() => handleSortClick('aborted_at')}
+              >
+                Aborted At{renderSortIcon('aborted_at')}
+              </TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: 600,
+                }}
+              >
+                Duration
+              </TableCell>
+              <TableCell
+                sx={{
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  '&:hover': { backgroundColor: '#e0e0e0' },
+                }}
+                onClick={() => handleSortClick('handled_by')}
+              >
+                Handled By{renderSortIcon('handled_by')}
+              </TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {loading ? (
+              <TableSkeleton rowsNum={rowsPerPage} colsNum={11} />
+            ) : isError ? (
+              <TableRow>
+                <TableCell colSpan={11} sx={{ padding: 0 }}>
+                  <Alert severity="error" sx={{ borderRadius: 0 }}>
+                    Something went wrong while fetching tasks from server. Please try again later.
+                  </Alert>
+                </TableCell>
+              </TableRow>
+            ) : !isFetching && tasks.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={11} align="center">
+                  No tasks found. Use the form above to fetch tasks.
+                </TableCell>
+              </TableRow>
+            ) : (
+              tasks.map((task) => (
+                <TableRow key={task.id} hover>
+                  <TableCell>
+                    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5 }}>
+                      <Link
+                        to={`/tasktube/push?correlationId=${task.correlationId}&taskId=${task.id}`}
+                        title="Push"
+                        target="_blank"
+                      >
+                        <PlaylistAddIcon color="primary" />
+                      </Link>
+                      <Link
+                        to={`/tasktube/${task.correlationId}/tasks/${task.id}`}
+                        title="Show"
+                        target="_blank"
+                      >
+                        <AccountTreeIcon color="primary" />
+                      </Link>
+                    </Box>
                   </TableCell>
-                  <TableCell
-                    sx={{
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                      '&:hover': { backgroundColor: '#e0e0e0' },
-                    }}
-                    onClick={() => handleSortClick('name')}
-                  >
-                    name{renderSortIcon('name')}
+                  <TableCell onClick={handleCellClick}>
+                    <Tooltip
+                      disableFocusListener
+                      placement="right"
+                      arrow
+                      disableInteractive
+                      title="Copy to clipboard"
+                    >
+                      <span style={{ cursor: 'pointer', wordBreak: 'break-all' }}>{task.id}</span>
+                    </Tooltip>
                   </TableCell>
-                  <TableCell
-                    sx={{
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                      '&:hover': { backgroundColor: '#e0e0e0' },
-                    }}
-                    onClick={() => handleSortClick('tube')}
-                  >
-                    tube{renderSortIcon('tube')}
+                  <TableCell onClick={handleCellClick}>
+                    <Tooltip
+                      disableFocusListener
+                      placement="right"
+                      arrow
+                      disableInteractive
+                      title="Copy to clipboard"
+                    >
+                      <span style={{ cursor: 'pointer', wordBreak: 'break-all' }}>{task.name}</span>
+                    </Tooltip>
                   </TableCell>
-                  <TableCell
-                    sx={{
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                      '&:hover': { backgroundColor: '#e0e0e0' },
-                    }}
-                    onClick={() => handleSortClick('status')}
-                  >
-                    status{renderSortIcon('status')}
+                  <TableCell onClick={handleCellClick}>
+                    <Tooltip
+                      disableFocusListener
+                      placement="right"
+                      arrow
+                      disableInteractive
+                      title="Copy to clipboard"
+                    >
+                      <span style={{ cursor: 'pointer', wordBreak: 'break-all' }}>{task.tube}</span>
+                    </Tooltip>
                   </TableCell>
-                  <TableCell
-                    sx={{
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                      '&:hover': { backgroundColor: '#e0e0e0' },
-                    }}
-                    onClick={() => handleSortClick('created_at')}
-                  >
-                    created_at{renderSortIcon('created_at')}
+                  <TableCell onClick={handleCellClick}>
+                    <Tooltip
+                      disableFocusListener
+                      placement="right"
+                      arrow
+                      disableInteractive
+                      title="Copy to clipboard"
+                    >
+                      <span style={{ cursor: 'pointer' }}>
+                        <Chip
+                          label={task.status}
+                          color={getStatusColor(task.status)}
+                          size="small"
+                        />
+                      </span>
+                    </Tooltip>
                   </TableCell>
-                  <TableCell
-                    sx={{
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                      '&:hover': { backgroundColor: '#e0e0e0' },
-                    }}
-                    onClick={() => handleSortClick('updated_at')}
-                  >
-                    updated_at{renderSortIcon('updated_at')}
+                  <TableCell onClick={handleCellClick}>
+                    <Tooltip
+                      disableFocusListener
+                      placement="right"
+                      arrow
+                      disableInteractive
+                      title="Copy to clipboard"
+                    >
+                      <span style={{ cursor: 'pointer' }}>
+                        {DateTimeUtils.formatDateTime(
+                          task.createdAt,
+                          DateTimeUtils.DateTimeFormater.CALENDAR,
+                        )}
+                      </span>
+                    </Tooltip>
                   </TableCell>
-                  <TableCell
-                    sx={{
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                      '&:hover': { backgroundColor: '#e0e0e0' },
-                    }}
-                    onClick={() => handleSortClick('completed_at')}
-                  >
-                    completed_at{renderSortIcon('completed_at')}
+                  <TableCell onClick={handleCellClick}>
+                    <Tooltip
+                      disableFocusListener
+                      placement="right"
+                      arrow
+                      disableInteractive
+                      title="Copy to clipboard"
+                    >
+                      <span style={{ cursor: 'pointer' }}>
+                        {DateTimeUtils.formatDateTime(
+                          task.updatedAt,
+                          DateTimeUtils.DateTimeFormater.CALENDAR,
+                        )}
+                      </span>
+                    </Tooltip>
                   </TableCell>
-                  <TableCell
-                    sx={{
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                      '&:hover': { backgroundColor: '#e0e0e0' },
-                    }}
-                    onClick={() => handleSortClick('aborted_at')}
-                  >
-                    aborted_at{renderSortIcon('aborted_at')}
+                  <TableCell onClick={handleCellClick}>
+                    <Tooltip
+                      disableFocusListener
+                      placement="right"
+                      arrow
+                      disableInteractive
+                      title="Copy to clipboard"
+                    >
+                      <span style={{ cursor: 'pointer' }}>
+                        {DateTimeUtils.formatDateTime(
+                          task.completedAt,
+                          DateTimeUtils.DateTimeFormater.CALENDAR,
+                        )}
+                      </span>
+                    </Tooltip>
                   </TableCell>
-                  <TableCell
-                    sx={{
-                      fontWeight: 600,
-                    }}
-                  >
-                    duration
+                  <TableCell onClick={handleCellClick}>
+                    <Tooltip
+                      disableFocusListener
+                      placement="right"
+                      arrow
+                      disableInteractive
+                      title="Copy to clipboard"
+                    >
+                      <span style={{ cursor: 'pointer' }}>
+                        {DateTimeUtils.formatDateTime(
+                          task.abortedAt,
+                          DateTimeUtils.DateTimeFormater.CALENDAR,
+                        )}
+                      </span>
+                    </Tooltip>
                   </TableCell>
-                  <TableCell
-                    sx={{
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      userSelect: 'none',
-                      '&:hover': { backgroundColor: '#e0e0e0' },
-                    }}
-                    onClick={() => handleSortClick('handled_by')}
-                  >
-                    handled_by{renderSortIcon('handled_by')}
+                  <TableCell onClick={handleCellClick}>
+                    <Tooltip
+                      disableFocusListener
+                      placement="right"
+                      arrow
+                      disableInteractive
+                      title="Copy to clipboard"
+                    >
+                      <span style={{ cursor: 'pointer' }}>
+                        {DateTimeUtils.calculateDuration(
+                          task.createdAt,
+                          task.completedAt,
+                          task.abortedAt,
+                          task.canceledAt,
+                        )}
+                      </span>
+                    </Tooltip>
+                  </TableCell>
+                  <TableCell onClick={handleCellClick}>
+                    <Tooltip
+                      disableFocusListener
+                      placement="right"
+                      arrow
+                      disableInteractive
+                      title="Copy to clipboard"
+                    >
+                      <span style={{ cursor: 'pointer', wordBreak: 'break-all' }}>
+                        {task.handledBy}
+                      </span>
+                    </Tooltip>
                   </TableCell>
                 </TableRow>
-              </TableHead>
-              <TableBody>
-                {tasks.map((task) => (
-                  <TableRow key={task.id} hover>
-                    <TableCell>
-                      <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5 }}>
-                        <Link
-                          to={`/tasktube/push?correlationId=${task.correlationId}&taskId=${task.id}`}
-                          title="Push"
-                          target="_blank"
-                        >
-                          <PlaylistAddIcon color="primary" />
-                        </Link>
-                        <Link
-                          to={`/tasktube/${task.correlationId}/tasks/${task.id}`}
-                          title="Show"
-                          target="_blank"
-                        >
-                          <AccountTreeIcon color="primary" />
-                        </Link>
-                      </Box>
-                    </TableCell>
-                    <TableCell onClick={handleCellClick}>
-                      <Tooltip
-                        disableFocusListener
-                        placement="right"
-                        arrow
-                        disableInteractive
-                        title="Copy to clipboard"
-                      >
-                        <span style={{ cursor: 'pointer', wordBreak: 'break-all' }}>{task.id}</span>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell onClick={handleCellClick}>
-                      <Tooltip
-                        disableFocusListener
-                        placement="right"
-                        arrow
-                        disableInteractive
-                        title="Copy to clipboard"
-                      >
-                        <span style={{ cursor: 'pointer', wordBreak: 'break-all' }}>
-                          {task.name}
-                        </span>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell onClick={handleCellClick}>
-                      <Tooltip
-                        disableFocusListener
-                        placement="right"
-                        arrow
-                        disableInteractive
-                        title="Copy to clipboard"
-                      >
-                        <span style={{ cursor: 'pointer', wordBreak: 'break-all' }}>
-                          {task.tube}
-                        </span>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell onClick={handleCellClick}>
-                      <Tooltip
-                        disableFocusListener
-                        placement="right"
-                        arrow
-                        disableInteractive
-                        title="Copy to clipboard"
-                      >
-                        <span style={{ cursor: 'pointer' }}>
-                          <Chip
-                            label={task.status}
-                            color={getStatusColor(task.status)}
-                            size="small"
-                          />
-                        </span>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell onClick={handleCellClick}>
-                      <Tooltip
-                        disableFocusListener
-                        placement="right"
-                        arrow
-                        disableInteractive
-                        title="Copy to clipboard"
-                      >
-                        <span style={{ cursor: 'pointer' }}>
-                          {DateTimeUtils.formatDateTime(
-                            task.createdAt,
-                            DateTimeUtils.DateTimeFormater.CALENDAR,
-                          )}
-                        </span>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell onClick={handleCellClick}>
-                      <Tooltip
-                        disableFocusListener
-                        placement="right"
-                        arrow
-                        disableInteractive
-                        title="Copy to clipboard"
-                      >
-                        <span style={{ cursor: 'pointer' }}>
-                          {DateTimeUtils.formatDateTime(
-                            task.updatedAt,
-                            DateTimeUtils.DateTimeFormater.CALENDAR,
-                          )}
-                        </span>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell onClick={handleCellClick}>
-                      <Tooltip
-                        disableFocusListener
-                        placement="right"
-                        arrow
-                        disableInteractive
-                        title="Copy to clipboard"
-                      >
-                        <span style={{ cursor: 'pointer' }}>
-                          {DateTimeUtils.formatDateTime(
-                            task.completedAt,
-                            DateTimeUtils.DateTimeFormater.CALENDAR,
-                          )}
-                        </span>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell onClick={handleCellClick}>
-                      <Tooltip
-                        disableFocusListener
-                        placement="right"
-                        arrow
-                        disableInteractive
-                        title="Copy to clipboard"
-                      >
-                        <span style={{ cursor: 'pointer' }}>
-                          {DateTimeUtils.formatDateTime(
-                            task.abortedAt,
-                            DateTimeUtils.DateTimeFormater.CALENDAR,
-                          )}
-                        </span>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell onClick={handleCellClick}>
-                      <Tooltip
-                        disableFocusListener
-                        placement="right"
-                        arrow
-                        disableInteractive
-                        title="Copy to clipboard"
-                      >
-                        <span style={{ cursor: 'pointer' }}>
-                          {DateTimeUtils.calculateDuration(
-                            task.createdAt,
-                            task.completedAt,
-                            task.abortedAt,
-                            task.canceledAt,
-                          )}
-                        </span>
-                      </Tooltip>
-                    </TableCell>
-                    <TableCell onClick={handleCellClick}>
-                      <Tooltip
-                        disableFocusListener
-                        placement="right"
-                        arrow
-                        disableInteractive
-                        title="Copy to clipboard"
-                      >
-                        <span style={{ cursor: 'pointer', wordBreak: 'break-all' }}>
-                          {task.handledBy}
-                        </span>
-                      </Tooltip>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <TablePagination
-              rowsPerPageOptions={[5, 10, 25, 50]}
-              component="div"
-              count={totalCount}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={onChangePage}
-              onRowsPerPageChange={onChangeRowsPerPage}
-            />
-          </Box>
-        </>
-      ) : (
-        <Paper sx={{ p: 3, textAlign: 'center' }}>
-          <Typography color="textSecondary">
-            No tasks found. Use the form above to fetch tasks.
-          </Typography>
-        </Paper>
-      )}
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25, 50]}
+          component="div"
+          count={totalCount}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={(_, newPage) => onChangePage(newPage)}
+          onRowsPerPageChange={(e) => onChangeRowsPerPage(e.target.value as string)}
+        />
+      </Box>
     </>
   );
 }
 
-export default TaskTableLayout;
+export default memo(TaskTableLayout);

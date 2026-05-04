@@ -22,6 +22,7 @@ import utc from 'dayjs/plugin/utc';
 import { OverridableStringUnion } from '@mui/types';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import TaskTubeTaskLogsResponse from '../model/TaskTubeTaskLogsResponse';
+import api from '../../../../shared/api';
 
 dayjs.extend(utc);
 
@@ -67,11 +68,11 @@ const fetchTaskLogs = async (params: FetchTaskLogsParams): Promise<TaskTubeTaskL
   searchParams.append('page', page.toString());
   searchParams.append('size', rowsPerPage.toString());
 
-  const response = await fetch(
+  const response = await api.get<TaskTubeTaskLogsResponse>(
     `/api/v1/tasktube/${correlationId}/task/${taskId}/logs?${searchParams.toString()}`,
   );
 
-  return response.json();
+  return response.data;
 };
 
 function TaskTubeTaskLogs(props: TaskTubeTaskLogsProps): JSX.Element {

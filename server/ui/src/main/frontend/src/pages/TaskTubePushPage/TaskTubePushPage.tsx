@@ -7,13 +7,16 @@ import { addPushedTask, getPushedTasks, PushedTask, removePushedTask } from './s
 import { useSearchParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { TaskTubeTaskResponse } from '../../features/tasktube/TaskTubeTaskLayout/model/TaskTubeTaskResponse';
+import api from '../../shared/api';
 
 const fetchTaskTubeTask = async (
   correlationId: string | null,
   taskId: string | null,
 ): Promise<TaskTubeTaskResponse> => {
-  const response = await fetch(`/api/v1/tasktube/${correlationId}/task/${taskId}`);
-  return response.json();
+  const response = await api.get<TaskTubeTaskResponse>(
+    `/api/v1/tasktube/${correlationId}/task/${taskId}`,
+  );
+  return response.data;
 };
 
 function TaskTubePushPage() {
@@ -46,7 +49,7 @@ function TaskTubePushPage() {
     if (isFetching) {
       setLoading(true);
     } else if (isError) {
-      console.error('Error fetching tasks:', error);
+      console.error('Error fetching task:', error);
       setLoading(false);
     } else if (data) {
       setTask(data);

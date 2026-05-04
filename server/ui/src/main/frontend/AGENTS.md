@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This is a React 19 + TypeScript frontend for the task-tube project. Built with Create React App, Material-UI components, and React Router for client-side routing. TanStack React Query is available for server state management and API data fetching.
+This is a React 19 + TypeScript frontend for the task-tube project. Built with Create React App, Material-UI components, and React Router for client-side routing. TanStack React Query and Axios are available for server state management and API data fetching. Use Day.js to manipulate date or time. All datetime has to belong to UTC Zone.
 
 **Key Stack:**
 
@@ -14,6 +14,8 @@ This is a React 19 + TypeScript frontend for the task-tube project. Built with C
 - Day.js 1.11.19
 - TanStack React Query 5.90.21
 - Jest + React Testing Library for tests
+- Axios 1.13.6
+- Notistack 3.0.2
 
 ## Dev Environment Tips
 

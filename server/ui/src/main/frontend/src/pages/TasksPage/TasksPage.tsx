@@ -1,5 +1,5 @@
-import { Container, SelectChangeEvent } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { Container } from '@mui/material';
+import React, { useCallback, useEffect, useState } from 'react';
 import TasksFormLayout from '../../features/tasks/TaskFormLayout/TasksFormLayout';
 import TasksPageTaskDto from './models/TasksPageTaskDto';
 import TaskTableLayout from '../../features/tasks/TasksTableLayout/TasksTableLayout';
@@ -9,6 +9,7 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import TasksPageResponse from './models/TasksPageResponse';
 import { useSearchParams } from 'react-router';
+import api from '../../shared/api';
 dayjs.extend(utc);
 
 interface FetchTasksParams {
@@ -50,8 +51,8 @@ const fetchTasks = async (params: FetchTasksParams): Promise<TasksPageResponse> 
   if (sort) searchParams.append('sort', sort);
   if (by) searchParams.append('by', by);
 
-  const response = await fetch(`/api/v1/tasks?${searchParams.toString()}`);
-  return response.json();
+  const response = await api.get<TasksPageResponse>(`/api/v1/tasks?${searchParams.toString()}`);
+  return response.data;
 };
 
 function TasksPage(): React.JSX.Element {
@@ -89,8 +90,20 @@ function TasksPage(): React.JSX.Element {
   const [sort, setSort] = useState<string>(queryparameterSort);
   const [by, setBy] = useState<'asc' | 'desc'>((queryparameterBy as 'asc' | 'desc') || 'desc');
 
-  const { isPending, isFetching, isError, data, error, isPlaceholderData, refetch } = useQuery({
-    queryKey: ['tasks', page, rowsPerPage, sort, by],
+  const { isPending, isFetching, isError, data, error, refetch } = useQuery({
+    queryKey: [
+      'tasks',
+      searchId,
+      searchName,
+      searchTube,
+      searchStatus,
+      createdFrom ? createdFrom.toISOString() : '',
+      createdTo ? createdTo.toISOString() : '',
+      page,
+      rowsPerPage,
+      sort,
+      by,
+    ],
     queryFn: () =>
       fetchTasks({
         page,
@@ -104,112 +117,143 @@ function TasksPage(): React.JSX.Element {
         sort,
         by,
       }),
-    refetchOnWindowFocus: false,
     placeholderData: keepPreviousData,
   });
 
-  useEffect(() => {
-    handleResponse(isPending, isError, data, error);
-  }, [isPending, isError, data, error]);
+  const setSearchParamsToUrlObj = useCallback(
+    (params: { [key: string]: string }) => {
+      setSearchParams((prev) => {
+        const searchParams = new URLSearchParams(prev);
 
-  const setSearchParamsToUrl = (key: string, value: string) => {
-    return setSearchParamsToUrlObj({ [key]: value });
-  };
-
-  const setSearchParamsToUrlObj = (params: { [key: string]: string }) => {
-    setSearchParams((searchParams) => {
-      for (const [key, value] of Object.entries(params)) {
-        if (value) {
-          searchParams.set(key, value);
-        } else {
-          searchParams.delete(key);
+        for (const [key, value] of Object.entries(params)) {
+          if (value) {
+            searchParams.set(key, value);
+          } else {
+            searchParams.delete(key);
+          }
         }
-      }
-      return searchParams;
-    });
-  };
+        return searchParams;
+      });
+    },
+    [setSearchParams],
+  );
 
-  const handleResponse = (
-    isPending: boolean,
-    isError: boolean,
-    data: TasksPageResponse | undefined,
-    error: Error | null,
-  ) => {
+  const setSearchParamsToUrl = useCallback(
+    (key: string, value: string) => {
+      return setSearchParamsToUrlObj({ [key]: value });
+    },
+    [setSearchParamsToUrlObj],
+  );
+
+  const handleCreatedFromChange = useCallback(
+    (value: Dayjs | null) => {
+      setCreatedFrom(value ? dayjs.utc(value) : null);
+      setPage(0);
+
+      setSearchParamsToUrlObj({ from: value ? value.toISOString() : '', page: '0' });
+    },
+    [setSearchParamsToUrlObj],
+  );
+
+  const handleCreatedToChange = useCallback(
+    (value: Dayjs | null) => {
+      setCreatedTo(value ? dayjs.utc(value) : null);
+      setPage(0);
+
+      setSearchParamsToUrlObj({ to: value ? value.toISOString() : '', page: '0' });
+    },
+    [setSearchParamsToUrlObj],
+  );
+
+  const handleSearchIdChange = useCallback(
+    (value: string) => {
+      setSearchId(value);
+      setPage(0);
+
+      setSearchParamsToUrlObj({ id: value, page: '0' });
+    },
+    [setSearchParamsToUrlObj],
+  );
+
+  const handleSearchNameChange = useCallback(
+    (value: string) => {
+      setSearchName(value);
+      setPage(0);
+
+      setSearchParamsToUrlObj({ name: value, page: '0' });
+    },
+    [setSearchParamsToUrlObj],
+  );
+
+  const handleSearchTubeChange = useCallback(
+    (value: string) => {
+      setSearchTube(value);
+      setPage(0);
+
+      setSearchParamsToUrlObj({ tube: value, page: '0' });
+    },
+    [setSearchParamsToUrlObj],
+  );
+
+  const handleSearchStatusChange = useCallback(
+    (value: string) => {
+      setSearchStatus(value);
+      setPage(0);
+
+      setSearchParamsToUrlObj({ status: value, page: '0' });
+    },
+    [setSearchParamsToUrlObj],
+  );
+
+  const handleChangeRowsPerPage = useCallback(
+    (value: string) => {
+      setRowsPerPage(parseInt(value, 10));
+      setPage(0);
+
+      setSearchParamsToUrlObj({ size: value, page: '0' });
+    },
+    [setSearchParamsToUrlObj],
+  );
+
+  const handleChangePage = useCallback(
+    (value: number) => {
+      setPage(value);
+      setSearchParamsToUrl('page', value.toString());
+    },
+    [setSearchParamsToUrl],
+  );
+
+  const handleSortChange = useCallback(
+    (sort: string, by: 'asc' | 'desc') => {
+      setSort(sort);
+      setBy(by);
+
+      setSearchParamsToUrlObj({ sort: sort, by: by });
+    },
+    [setSearchParamsToUrlObj],
+  );
+
+  const handleFetchTasks = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+      refetch();
+    },
+    [refetch],
+  );
+
+  useEffect(() => {
     if (isPending) {
       setLoading(true);
     } else if (isError) {
       console.error('Error fetching tasks:', error);
       setLoading(false);
+      handleChangePage(0);
     } else if (data) {
       setTasks(data.tasks);
       setTotalCount(data.totalCount);
       setLoading(false);
     }
-  };
-
-  const handleCreatedFromChange = (value: Dayjs | null) => {
-    setCreatedFrom(value ? dayjs.utc(value) : null);
-    setSearchParamsToUrl('from', value ? value.toISOString() : '');
-  };
-
-  const handleCreatedToChange = (value: Dayjs | null) => {
-    setCreatedTo(value ? dayjs.utc(value) : null);
-    setSearchParamsToUrl('to', value ? value.toISOString() : '');
-  };
-
-  const handleSearchIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.preventDefault();
-
-    setSearchId(event.target.value);
-    setSearchParamsToUrl('id', event.target.value);
-  };
-
-  const handleSearchNameChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.preventDefault();
-
-    setSearchName(event.target.value);
-    setSearchParamsToUrl('name', event.target.value);
-  };
-
-  const handleSearchTubeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.preventDefault();
-
-    setSearchTube(event.target.value);
-    setSearchParamsToUrl('tube', event.target.value);
-  };
-
-  const handleSearchStatusChange = (event: SelectChangeEvent<string>) => {
-    event.preventDefault();
-
-    setSearchStatus(event.target.value as string);
-    setSearchParamsToUrl('status', event.target.value as string);
-  };
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    if (!isPlaceholderData) {
-      setPage(newPage);
-      setSearchParamsToUrl('page', newPage.toString());
-    }
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.preventDefault();
-
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-    setSearchParamsToUrlObj({ size: event.target.value, page: '0' });
-  };
-
-  const handleSortChange = (sort: string, by: 'asc' | 'desc') => {
-    setSort(sort);
-    setBy(by);
-    setSearchParamsToUrlObj({ sort: sort, by: by });
-  };
-
-  const handleFetchTasks = (event: React.MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    refetch();
-  };
+  }, [isPending, isError, data, error, handleChangePage]);
 
   return (
     <Container maxWidth="xl" sx={{ py: 1 }}>
@@ -232,6 +276,7 @@ function TasksPage(): React.JSX.Element {
       <TaskTableLayout
         loading={loading}
         isFetching={isFetching}
+        isError={isError}
         tasks={tasks}
         page={page}
         rowsPerPage={rowsPerPage}
