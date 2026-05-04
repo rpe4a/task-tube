@@ -1,7 +1,6 @@
 import {
   Box,
   Button,
-  CircularProgress,
   Paper,
   TextField,
   Typography,
@@ -11,68 +10,87 @@ import {
   InputLabel,
   Grid,
 } from '@mui/material';
-import { JSX, memo, useState } from 'react';
+import { JSX, memo, useCallback, useState } from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
 import 'dayjs/locale/en-gb';
 import { isUUID } from '../../../shared/utils/UuidUtils';
-import { useDebouncedCallback } from 'use-debounce';
+import { SearchTasksParams } from '../../../pages/TasksPage/TasksPage';
 
 interface TasksFormLayoutProps {
-  createdFrom: Dayjs | null;
-  createdTo: Dayjs | null;
+  searchCreatedFrom: Dayjs | null;
+  searchCreatedTo: Dayjs | null;
   searchId: string;
   searchName: string;
   searchTube: string;
   searchStatus: string;
-  loading: boolean;
-  handleCreatedFromChange: (value: Dayjs | null) => void;
-  handleCreatedToChange: (value: Dayjs | null) => void;
-  handleSearchIdChange: (value: string) => void;
-  handleSearchNameChange: (value: string) => void;
-  handleSearchTubeChange: (value: string) => void;
-  handleSearchStatusChange: (value: string) => void;
-  handleSearchTasks: (event: React.MouseEvent<HTMLButtonElement>) => void;
+  isLoading: boolean;
+  searchTasks: (search: SearchTasksParams) => void;
 }
 
 function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
   const {
-    createdFrom,
-    createdTo,
+    searchCreatedFrom,
+    searchCreatedTo,
     searchId,
+    searchName,
+    searchTube,
     searchStatus,
-    loading,
-    handleCreatedFromChange,
-    handleCreatedToChange,
-    handleSearchIdChange,
-    handleSearchNameChange,
-    handleSearchTubeChange,
-    handleSearchStatusChange,
-    handleSearchTasks,
+    isLoading,
+    searchTasks,
   } = props;
 
   const [idError, setIdError] = useState<string>('');
+  const [id, setId] = useState<string>(searchId || '');
+  const [name, setName] = useState<string>(searchName || '');
+  const [tube, setTube] = useState<string>(searchTube || '');
+  const [status, setStatus] = useState<string>(searchStatus || '');
+  const [createdFrom, setCreatedFromValue] = useState<Dayjs | null>(searchCreatedFrom);
+  const [createdTo, setCreatedToValue] = useState<Dayjs | null>(searchCreatedTo);
 
   const handleIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = event.target.value;
 
     if (!value || isUUID(value)) {
       setIdError('');
-      handleSearchIdChange(value);
+      setId(value);
     } else {
       setIdError('Invalid UUID format. Expected: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
     }
   };
 
-  const debouncedNameChange = useDebouncedCallback((value) => {
-    handleSearchNameChange(value);
-  }, 500);
+  const handleNameChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setName(value);
+  }, []);
 
-  const debouncedTubeChange = useDebouncedCallback((value) => {
-    handleSearchTubeChange(value);
-  }, 500);
+  const handleTubeChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setTube(value);
+  }, []);
+
+  const handleStatusChange = useCallback((value: string) => {
+    setStatus(value);
+  }, []);
+
+  const handleCreatedFromChange = useCallback((value: Dayjs | null) => {
+    setCreatedFromValue(value);
+  }, []);
+
+  const handleCreatedToChange = useCallback((value: Dayjs | null) => {
+    setCreatedToValue(value);
+  }, []);
+
+  const handleSearchClick = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>) => {
+      event.preventDefault();
+
+      searchTasks({ id, name, tube, status, createdFrom, createdTo });
+    },
+    [searchTasks, id, name, tube, status, createdFrom, createdTo],
+  );
 
   return (
     <>
@@ -82,16 +100,16 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
 
       <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
         <Grid container spacing={2} sx={{ mb: 3 }}>
-          <Grid size={{ xs: 12, md: 6, lg: 3, xl: 3 }}>
+          <Grid size={{ xs: 12, md: 6, lg: 3, xl: 3 }} component="form">
             <TextField
               fullWidth
               label="ID"
               name="id"
-              value={searchId}
+              value={id}
               onChange={handleIdChange}
               placeholder="e.g., c7a1b6f2-1234-5678-9abc-def012345678"
               sx={{ minWidth: 200 }}
-              disabled={loading}
+              disabled={isLoading}
               error={!!idError}
               helperText={idError}
             />
@@ -101,10 +119,11 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
               fullWidth
               label="Name"
               name="name"
-              onChange={(e) => debouncedNameChange(e.target.value)}
+              value={name}
+              onChange={handleNameChange}
               placeholder="e.g., simple.task"
               sx={{ minWidth: 200 }}
-              disabled={loading}
+              disabled={isLoading}
             />
           </Grid>
           <Grid size={{ xs: 12, md: 6, lg: 3, xl: 3 }}>
@@ -112,19 +131,20 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
               fullWidth
               label="Tube"
               name="tube"
-              onChange={(e) => debouncedTubeChange(e.target.value)}
+              value={tube}
+              onChange={handleTubeChange}
               placeholder="e.g., simple-tube"
               sx={{ minWidth: 200 }}
-              disabled={loading}
+              disabled={isLoading}
             />
           </Grid>
           <Grid size={{ xs: 12, md: 6, lg: 2, xl: 2 }}>
-            <FormControl fullWidth sx={{ minWidth: 150 }} disabled={loading}>
+            <FormControl fullWidth sx={{ minWidth: 150 }} disabled={isLoading}>
               <InputLabel>Status</InputLabel>
               <Select
-                value={searchStatus}
-                disabled={loading}
-                onChange={(e) => handleSearchStatusChange(e.target.value as string)}
+                value={status}
+                disabled={isLoading}
+                onChange={(e) => handleStatusChange(e.target.value as string)}
                 label="Status"
               >
                 <MenuItem value="">ALL</MenuItem>
@@ -146,7 +166,6 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
               name="createdFrom"
               value={createdFrom}
               onChange={handleCreatedFromChange}
-              disabled={loading}
               timezone="UTC"
               slotProps={{ field: { clearable: true } }}
             />
@@ -155,7 +174,6 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
               name="createdTo"
               value={createdTo}
               onChange={handleCreatedToChange}
-              disabled={loading}
               timezone="UTC"
               slotProps={{ field: { clearable: true } }}
             />
@@ -164,12 +182,12 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
           <Button
             variant="contained"
             size="large"
-            onClick={handleSearchTasks}
-            disabled={loading}
+            onClick={handleSearchClick}
+            loading={isLoading}
+            loadingPosition="start"
             title="Search tasktube"
-            sx={{ textTransform: 'none' }}
           >
-            {loading ? <CircularProgress size={24} /> : 'SEARCH'}
+            SEARCH
           </Button>
         </Box>
       </Paper>

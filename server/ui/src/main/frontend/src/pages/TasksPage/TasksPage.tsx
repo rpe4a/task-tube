@@ -12,6 +12,15 @@ import { useSearchParams } from 'react-router';
 import api from '../../shared/api';
 dayjs.extend(utc);
 
+export interface SearchTasksParams {
+  id: string;
+  name: string;
+  tube: string;
+  status: string;
+  createdFrom: Dayjs | null;
+  createdTo: Dayjs | null;
+}
+
 interface FetchTasksParams {
   page: number;
   rowsPerPage: number;
@@ -78,7 +87,6 @@ function TasksPage(): React.JSX.Element {
 
   const [tasks, setTasks] = useState<TasksPageTaskDto[]>([]);
   const [totalCount, setTotalCount] = useState(0);
-  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState<number>(queryparameterPage);
   const [rowsPerPage, setRowsPerPage] = useState<number>(queryparameterSize);
   const [createdFrom, setCreatedFrom] = useState<Dayjs | null>(queryparameterCreatedFrom);
@@ -90,7 +98,7 @@ function TasksPage(): React.JSX.Element {
   const [sort, setSort] = useState<string>(queryparameterSort);
   const [by, setBy] = useState<'asc' | 'desc'>((queryparameterBy as 'asc' | 'desc') || 'desc');
 
-  const { isPending, isFetching, isError, data, error, refetch } = useQuery({
+  const { isPending, isFetching, isError, data, error } = useQuery({
     queryKey: [
       'tasks',
       searchId,
@@ -145,66 +153,6 @@ function TasksPage(): React.JSX.Element {
     [setSearchParamsToUrlObj],
   );
 
-  const handleCreatedFromChange = useCallback(
-    (value: Dayjs | null) => {
-      setCreatedFrom(value ? dayjs.utc(value) : null);
-      setPage(0);
-
-      setSearchParamsToUrlObj({ from: value ? value.toISOString() : '', page: '0' });
-    },
-    [setSearchParamsToUrlObj],
-  );
-
-  const handleCreatedToChange = useCallback(
-    (value: Dayjs | null) => {
-      setCreatedTo(value ? dayjs.utc(value) : null);
-      setPage(0);
-
-      setSearchParamsToUrlObj({ to: value ? value.toISOString() : '', page: '0' });
-    },
-    [setSearchParamsToUrlObj],
-  );
-
-  const handleSearchIdChange = useCallback(
-    (value: string) => {
-      setSearchId(value);
-      setPage(0);
-
-      setSearchParamsToUrlObj({ id: value, page: '0' });
-    },
-    [setSearchParamsToUrlObj],
-  );
-
-  const handleSearchNameChange = useCallback(
-    (value: string) => {
-      setSearchName(value);
-      setPage(0);
-
-      setSearchParamsToUrlObj({ name: value, page: '0' });
-    },
-    [setSearchParamsToUrlObj],
-  );
-
-  const handleSearchTubeChange = useCallback(
-    (value: string) => {
-      setSearchTube(value);
-      setPage(0);
-
-      setSearchParamsToUrlObj({ tube: value, page: '0' });
-    },
-    [setSearchParamsToUrlObj],
-  );
-
-  const handleSearchStatusChange = useCallback(
-    (value: string) => {
-      setSearchStatus(value);
-      setPage(0);
-
-      setSearchParamsToUrlObj({ status: value, page: '0' });
-    },
-    [setSearchParamsToUrlObj],
-  );
-
   const handleChangeRowsPerPage = useCallback(
     (value: string) => {
       setRowsPerPage(parseInt(value, 10));
@@ -233,48 +181,55 @@ function TasksPage(): React.JSX.Element {
     [setSearchParamsToUrlObj],
   );
 
-  const handleFetchTasks = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement>) => {
-      event.preventDefault();
-      refetch();
+  const searchTasks = useCallback(
+    (searchParams: SearchTasksParams) => {
+      const { id, name, tube, status, createdFrom, createdTo } = searchParams;
+
+      setPage(0);
+      setSearchId(id);
+      setSearchName(name);
+      setSearchTube(tube);
+      setSearchStatus(status);
+      setCreatedFrom(createdFrom);
+      setCreatedTo(createdTo);
+
+      setSearchParamsToUrlObj({
+        id: id,
+        name: name,
+        tube: tube,
+        status: status,
+        from: createdFrom ? createdFrom.toISOString() : '',
+        to: createdTo ? createdTo.toISOString() : '',
+        page: '0',
+      });
     },
-    [refetch],
+    [setSearchParamsToUrlObj],
   );
 
   useEffect(() => {
-    if (isPending) {
-      setLoading(true);
-    } else if (isError) {
+    if (isError) {
       console.error('Error fetching tasks:', error);
-      setLoading(false);
       handleChangePage(0);
     } else if (data) {
       setTasks(data.tasks);
       setTotalCount(data.totalCount);
-      setLoading(false);
     }
   }, [isPending, isError, data, error, handleChangePage]);
 
   return (
     <Container maxWidth="xl" sx={{ py: 1 }}>
       <TasksFormLayout
-        createdFrom={createdFrom}
-        createdTo={createdTo}
         searchId={searchId}
         searchName={searchName}
         searchTube={searchTube}
         searchStatus={searchStatus}
-        loading={loading}
-        handleCreatedFromChange={handleCreatedFromChange}
-        handleCreatedToChange={handleCreatedToChange}
-        handleSearchIdChange={handleSearchIdChange}
-        handleSearchNameChange={handleSearchNameChange}
-        handleSearchTubeChange={handleSearchTubeChange}
-        handleSearchStatusChange={handleSearchStatusChange}
-        handleSearchTasks={handleFetchTasks}
+        searchCreatedFrom={createdFrom}
+        searchCreatedTo={createdTo}
+        isLoading={isPending || isFetching}
+        searchTasks={searchTasks}
       />
       <TaskTableLayout
-        loading={loading}
+        isPending={isPending}
         isFetching={isFetching}
         isError={isError}
         tasks={tasks}

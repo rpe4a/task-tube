@@ -26,7 +26,7 @@ import TableSkeleton from '../../../shared/component/TableSkeleton';
 dayjs.extend(utc);
 
 interface TaskTableLayoutProps {
-  loading: boolean;
+  isPending: boolean;
   isFetching: boolean;
   isError: boolean;
   tasks: TasksPageTaskDto[];
@@ -42,7 +42,7 @@ interface TaskTableLayoutProps {
 
 function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
   const {
-    loading,
+    isPending,
     isFetching,
     isError,
     tasks,
@@ -223,7 +223,7 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
             </TableRow>
           </TableHead>
           <TableBody>
-            {loading ? (
+            {isPending ? (
               <TableSkeleton rowsNum={rowsPerPage} colsNum={11} />
             ) : isError ? (
               <TableRow>
