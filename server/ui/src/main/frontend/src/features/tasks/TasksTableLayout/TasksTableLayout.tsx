@@ -13,6 +13,7 @@ import {
   Tooltip,
   Button,
   Alert,
+  LinearProgress,
 } from '@mui/material';
 import { JSX, memo } from 'react';
 import TasksPageTaskDto from '../../../pages/TasksPage/models/TasksPageTaskDto';
@@ -83,7 +84,6 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
         sx={{
           display: 'flex',
           justifyContent: 'space-between',
-          mb: 1,
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -103,10 +103,10 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
           onRowsPerPageChange={(e) => onChangeRowsPerPage(e.target.value as string)}
         />
       </Box>
-      <TableContainer
-        component={Paper}
-        sx={{ opacity: isFetching ? 0.5 : 1, transition: 'opacity 0.25s' }}
-      >
+      <Box sx={{ height: '4.444px', marginBottom: '-4.444px' }}>
+        {(isPending || isFetching) && <LinearProgress />}
+      </Box>
+      <TableContainer component={Paper}>
         <Table>
           <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
             <TableRow>
@@ -222,12 +222,12 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
               </TableCell>
             </TableRow>
           </TableHead>
-          <TableBody>
+          <TableBody sx={{ opacity: isFetching ? 0.5 : 1, transition: 'opacity 0.25s' }}>
             {isPending ? (
               <TableSkeleton rowsNum={rowsPerPage} colsNum={11} />
             ) : isError ? (
               <TableRow>
-                <TableCell colSpan={11} sx={{ padding: 0 }}>
+                <TableCell colSpan={11} sx={{ padding: 0, borderBottom: '0px' }}>
                   <Alert severity="error" sx={{ borderRadius: 0 }}>
                     Something went wrong while fetching tasks from server. Please try again later.
                   </Alert>

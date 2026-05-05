@@ -128,7 +128,6 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
               onChange={handleIdChange}
               placeholder="e.g., c7a1b6f2-1234-5678-9abc-def012345678"
               sx={{ minWidth: 200 }}
-              disabled={isLoading}
               error={!!idError}
               helperText={idError}
             />
@@ -142,7 +141,6 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
               onChange={handleNameChange}
               placeholder="e.g., simple.task"
               sx={{ minWidth: 200 }}
-              disabled={isLoading}
             />
           </Grid>
           <Grid size={{ xs: 12, md: 6, lg: 3, xl: 3 }}>
@@ -154,15 +152,13 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
               onChange={handleTubeChange}
               placeholder="e.g., simple-tube"
               sx={{ minWidth: 200 }}
-              disabled={isLoading}
             />
           </Grid>
           <Grid size={{ xs: 12, md: 6, lg: 2, xl: 2 }}>
-            <FormControl fullWidth sx={{ minWidth: 150 }} disabled={isLoading}>
+            <FormControl fullWidth sx={{ minWidth: 150 }}>
               <InputLabel>Status</InputLabel>
               <Select
                 value={status}
-                disabled={isLoading}
                 onChange={(e) => handleStatusChange(e.target.value as string)}
                 label="Status"
               >
@@ -203,16 +199,14 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
             size="large"
             onClick={handleSearchClick}
             loading={isLoading}
-            loadingPosition="start"
             title="Search tasktube"
           >
             SEARCH
           </Button>
           <Button
-            variant="contained"
+            variant="outlined"
             size="large"
             onClick={handleResetClick}
-            disabled={isLoading}
             title="Reset search form"
           >
             RESET FORM
