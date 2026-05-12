@@ -17,9 +17,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Dayjs } from 'dayjs';
 import 'dayjs/locale/en-gb';
 import { isUUID } from '../../../shared/utils/UuidUtils';
-import { SearchTasksParams } from '../../../pages/TasksPage/TasksPage';
+import { SearchTasksParams } from '../../../app/pages/TasksPage/TasksPage';
 
-interface TasksFormLayoutProps {
+interface TasksFormProps {
   searchCreatedFrom: Dayjs | null;
   searchCreatedTo: Dayjs | null;
   searchId: string;
@@ -31,7 +31,7 @@ interface TasksFormLayoutProps {
   resetSearchTasksParams: () => void;
 }
 
-function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
+function TaskForm(props: TasksFormProps): JSX.Element {
   const {
     searchCreatedFrom,
     searchCreatedTo,
@@ -59,7 +59,7 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
       setIdError('');
       setId(value);
     } else {
-      setIdError('Invalid UUID format. Expected: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx');
+      setIdError("The field 'id' is not valid.");
     }
   };
 
@@ -217,4 +217,4 @@ function TaskFormLayout(props: TasksFormLayoutProps): JSX.Element {
   );
 }
 
-export default memo(TaskFormLayout);
+export default memo(TaskForm);

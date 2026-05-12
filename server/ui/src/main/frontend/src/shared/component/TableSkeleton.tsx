@@ -1,4 +1,5 @@
 import { TableRow, TableCell, Skeleton } from '@mui/material';
+import { memo } from 'react';
 
 const TableSkeleton = ({ rowsNum = 5, colsNum = 4 }) => {
   return (
@@ -16,4 +17,4 @@ const TableSkeleton = ({ rowsNum = 5, colsNum = 4 }) => {
   );
 };
 
-export default TableSkeleton;
+export default memo(TableSkeleton);

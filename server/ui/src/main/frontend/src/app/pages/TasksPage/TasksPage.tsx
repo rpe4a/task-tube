@@ -1,15 +1,15 @@
 import { Container } from '@mui/material';
-import React, { useCallback, useEffect, useState } from 'react';
-import TasksFormLayout from '../../features/tasks/TaskFormLayout/TasksFormLayout';
+import React, { memo, useCallback, useEffect, useState } from 'react';
+import TasksForm from '../../../features/tasks/TaskForm/TasksForm';
 import TasksPageTaskDto from './models/TasksPageTaskDto';
-import TaskTableLayout from '../../features/tasks/TasksTableLayout/TasksTableLayout';
+import TaskTable from '../../../features/tasks/TasksTable/TasksTable';
 import { Dayjs } from 'dayjs';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import TasksPageResponse from './models/TasksPageResponse';
 import { useSearchParams } from 'react-router';
-import api from '../../shared/api';
+import api from '../../../shared/api';
 dayjs.extend(utc);
 
 export interface SearchTasksParams {
@@ -34,7 +34,7 @@ interface FetchTasksParams {
   by: string;
 }
 
-const fetchTasks = async (params: FetchTasksParams): Promise<TasksPageResponse> => {
+const fetchTasksAsync = async (params: FetchTasksParams): Promise<TasksPageResponse> => {
   const {
     page,
     rowsPerPage,
@@ -113,7 +113,7 @@ function TasksPage(): React.JSX.Element {
       by,
     ],
     queryFn: () =>
-      fetchTasks({
+      fetchTasksAsync({
         page,
         rowsPerPage,
         createdFrom,
@@ -229,16 +229,15 @@ function TasksPage(): React.JSX.Element {
   useEffect(() => {
     if (isError) {
       console.error('Error fetching tasks:', error);
-      handleChangePage(0);
     } else if (data) {
       setTasks(data.tasks);
       setTotalCount(data.totalCount);
     }
-  }, [isPending, isError, data, error, handleChangePage]);
+  }, [isPending, isError, data, error]);
 
   return (
     <Container maxWidth="xl" sx={{ py: 1 }}>
-      <TasksFormLayout
+      <TasksForm
         searchId={searchId}
         searchName={searchName}
         searchTube={searchTube}
@@ -249,7 +248,7 @@ function TasksPage(): React.JSX.Element {
         searchTasks={searchTasks}
         resetSearchTasksParams={resetSearchTasksParams}
       />
-      <TaskTableLayout
+      <TaskTable
         isPending={isPending}
         isFetching={isFetching}
         isError={isError}
@@ -267,4 +266,4 @@ function TasksPage(): React.JSX.Element {
   );
 }
 
-export default TasksPage;
+export default memo(TasksPage);

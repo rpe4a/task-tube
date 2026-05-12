@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { memo, useCallback, useState } from 'react';
 import { useParams } from 'react-router';
 import { Grid } from '@mui/material';
-import TaskTubeTaskLayout from '../../features/tasktube/TaskTubeTaskLayout/TaskTubeTaskLayout';
-import TaskTubeTreeLayout from '../../features/tasktube/TaskTubeTreeLayout/TaskTubeTreeLayout';
+import TaskTubeTask from '../../../features/tasktube/TaskTubeTaskLayout/TaskTubeTask';
+import TaskTubeTreeLayout from '../../../features/tasktube/TaskTubeTreeLayout/TaskTubeTreeLayout';
 
 function TaskTubePage() {
   const { correlationIdParam, taskIdParam } = useParams();
@@ -10,10 +10,10 @@ function TaskTubePage() {
   const [correlationId, setCorrelationId] = useState<string>(correlationIdParam || '');
   const [taskId, setTaskId] = useState<string>(taskIdParam || '');
 
-  const updateTaskTubeTaskLayout = (correlationId: string, taskId: string) => {
+  const updateTaskTubeTaskLayout = useCallback((correlationId: string, taskId: string) => {
     setCorrelationId(correlationId);
     setTaskId(taskId);
-  };
+  }, []);
 
   return (
     <Grid container>
@@ -35,10 +35,10 @@ function TaskTubePage() {
         size={7}
         sx={{ borderLeft: '1px solid #ccc', height: '100vh', overflowX: 'auto', overflowY: 'auto' }}
       >
-        <TaskTubeTaskLayout correlationId={correlationId} taskId={taskId} />
+        <TaskTubeTask correlationId={correlationId} taskId={taskId} />
       </Grid>
     </Grid>
   );
 }
 
-export default TaskTubePage;
+export default memo(TaskTubePage);

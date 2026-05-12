@@ -1,4 +1,4 @@
-import { TaskStatus } from '../../../shared/models/TaskStatus';
+import { TaskStatus } from '../../../../shared/models/TaskStatus';
 
 interface TasksPageTaskDto {
   id: string;

@@ -1,19 +1,19 @@
 import { IconButton } from '@mui/material';
 import { closeSnackbar, SnackbarProvider } from 'notistack';
 import DeleteIcon from '@mui/icons-material/Delete';
+import { memo } from 'react';
 
-export const NotificationProvider = (props: React.PropsWithChildren<unknown>) => {
+function NotificationProvider(props: React.PropsWithChildren<unknown>): React.JSX.Element {
   return (
     <SnackbarProvider
       maxSnack={3}
-      autoHideDuration={1000 * 1 * 30}
+      autoHideDuration={1000 * 1 * 15}
       anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
       action={(snackbarId) => (
         <IconButton
           onClick={() => closeSnackbar(snackbarId)}
           color="inherit"
-          aria-label="delete"
-          size="large"
+          size="medium"
           title="Delete"
         >
           <DeleteIcon />
@@ -23,4 +23,6 @@ export const NotificationProvider = (props: React.PropsWithChildren<unknown>) =>
       {props.children}
     </SnackbarProvider>
   );
-};
+}
+
+export default memo(NotificationProvider);

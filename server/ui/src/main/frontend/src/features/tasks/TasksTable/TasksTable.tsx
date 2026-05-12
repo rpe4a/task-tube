@@ -15,8 +15,8 @@ import {
   Alert,
   LinearProgress,
 } from '@mui/material';
-import { JSX, memo } from 'react';
-import TasksPageTaskDto from '../../../pages/TasksPage/models/TasksPageTaskDto';
+import { JSX, memo, useCallback } from 'react';
+import TasksPageTaskDto from '../../../app/pages/TasksPage/models/TasksPageTaskDto';
 import * as DateTimeUtils from '../../../shared/utils/DateTimeUtils';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -24,9 +24,10 @@ import { Link } from 'react-router';
 import { getStatusColor } from '../../../shared/utils/ColorUtils';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import TableSkeleton from '../../../shared/component/TableSkeleton';
+import IconLink from '../../../shared/component/IconLink';
 dayjs.extend(utc);
 
-interface TaskTableLayoutProps {
+interface TaskTableProps {
   isPending: boolean;
   isFetching: boolean;
   isError: boolean;
@@ -41,7 +42,7 @@ interface TaskTableLayoutProps {
   onSortChange: (sort: string, by: 'asc' | 'desc') => void;
 }
 
-function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
+function TaskTable(props: TaskTableProps): JSX.Element {
   const {
     isPending,
     isFetching,
@@ -57,26 +58,32 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
     onSortChange,
   } = props;
 
-  const handleSortClick = (columnName: string) => {
-    const newDirection = sort === columnName && by === 'asc' ? 'desc' : 'asc';
-    onSortChange(columnName, newDirection);
-  };
+  const handleSortClick = useCallback(
+    (columnName: string) => {
+      const newDirection = sort === columnName && by === 'asc' ? 'desc' : 'asc';
+      onSortChange(columnName, newDirection);
+    },
+    [onSortChange, sort, by],
+  );
 
-  const renderSortIcon = (columnName: string) => {
-    if (sort === columnName) {
-      return by === 'asc' ? ' ▲' : ' ▼';
-    }
-    return '';
-  };
+  const renderSortIcon = useCallback(
+    (columnName: string) => {
+      if (sort === columnName) {
+        return by === 'asc' ? ' ▲' : ' ▼';
+      }
+      return '';
+    },
+    [sort, by],
+  );
 
-  const handleCellClick = (event: React.MouseEvent<HTMLTableCellElement>) => {
+  const handleCellClick = useCallback((event: React.MouseEvent<HTMLTableCellElement>) => {
     const cellText = event.currentTarget.textContent;
     if (cellText) {
       navigator.clipboard.writeText(cellText).catch((err) => {
         console.error('Failed to copy to clipboard:', err);
       });
     }
-  };
+  }, []);
 
   return (
     <>
@@ -87,11 +94,16 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
         }}
       >
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
-          <Link to={`/tasktube/push`} title="Push tasktube" target="_blank">
-            <Button variant="text" size="large" sx={{ textTransform: 'none' }}>
-              PUSH TASK
-            </Button>
-          </Link>
+          <Button
+            component={Link}
+            to={`/tasktube/push`}
+            title="Push tasktube"
+            target="_blank"
+            variant="text"
+            size="large"
+          >
+            PUSH TASK
+          </Button>
         </Box>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25, 50]}
@@ -243,21 +255,21 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
               tasks.map((task) => (
                 <TableRow key={task.id} hover>
                   <TableCell>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5 }}>
-                      <Link
+                    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+                      <IconLink
                         to={`/tasktube/push?correlationId=${task.correlationId}&taskId=${task.id}`}
-                        title="Push"
-                        target="_blank"
+                        size="small"
+                        title="Push the same task"
                       >
-                        <PlaylistAddIcon color="primary" />
-                      </Link>
-                      <Link
+                        <PlaylistAddIcon fontSize="medium" />
+                      </IconLink>
+                      <IconLink
                         to={`/tasktube/${task.correlationId}/tasks/${task.id}`}
-                        title="Show"
-                        target="_blank"
+                        size="small"
+                        title="View the task"
                       >
-                        <AccountTreeIcon color="primary" />
-                      </Link>
+                        <AccountTreeIcon fontSize="medium" />
+                      </IconLink>
                     </Box>
                   </TableCell>
                   <TableCell onClick={handleCellClick}>
@@ -426,4 +438,4 @@ function TaskTableLayout(props: TaskTableLayoutProps): JSX.Element {
   );
 }
 
-export default memo(TaskTableLayout);
+export default memo(TaskTable);

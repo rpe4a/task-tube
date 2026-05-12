@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { TaskTubeTaskResponse } from './model/TaskTubeTaskResponse';
 import { Box, Tabs, Tab, Typography, CircularProgress, Grid, Chip } from '@mui/material';
@@ -9,12 +9,12 @@ import { getStatusColor } from '../../../shared/utils/ColorUtils';
 import TaskTubeTaskLogs from './components/TaskTubeTaskLogs';
 import api from '../../../shared/api';
 
-interface TaskTubeTaskLayoutProps {
+interface TaskTubeTaskProps {
   correlationId: string;
   taskId: string;
 }
 
-const fetchTaskTubeTask = async (
+const fetchTaskTubeTaskAsync = async (
   correlationId: string,
   taskId: string,
 ): Promise<TaskTubeTaskResponse> => {
@@ -57,7 +57,7 @@ const isTaskTerminated = (task: TaskTubeTaskResponse): boolean => {
   return task.status === 'COMPLETED' || task.status === 'ABORTED' || task.status === 'CANCELED';
 };
 
-function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
+function TaskTubeTask(props: TaskTubeTaskProps) {
   const { correlationId, taskId } = props;
 
   const [task, setTask] = useState<TaskTubeTaskResponse | null>(null);
@@ -67,8 +67,7 @@ function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
 
   const { isPending, isError, isFetching, data, error } = useQuery({
     queryKey: ['tasktube', correlationId, taskId],
-    queryFn: () => fetchTaskTubeTask(correlationId, taskId),
-    refetchOnWindowFocus: false,
+    queryFn: () => fetchTaskTubeTaskAsync(correlationId, taskId),
     refetchIntervalInBackground: true,
     refetchInterval: () => {
       if (task && isTaskTerminated(task)) {
@@ -79,47 +78,41 @@ function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
   });
 
   useEffect(() => {
-    handleResponse(isPending, isError, data, error);
-  }, [isPending, isError, isFetching, data, error]);
+    if (isError) {
+      console.error('Error fetching task:', error);
+    } else if (data) {
+      setTask(data);
+    }
+  }, [isError, data, error]);
 
   useEffect(() => {
     setTabIndex(0);
   }, [correlationId, taskId]);
 
-  const handleResponse = (
-    isPending: boolean,
-    isError: boolean,
-    data: TaskTubeTaskResponse | undefined,
-    error: Error | null,
-  ) => {
-    if (isPending) {
-      setLoading(true);
-    } else if (isError) {
-      console.error('Error fetching task:', error);
-      setLoading(false);
-    } else if (data) {
-      setTask(data);
-      setLoading(false);
-    }
-  };
-
-  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+  const handleTabChange = useCallback((_: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
 
     if (newValue === 1) {
       setShowLog(true);
     }
-  };
+  }, []);
 
-  // render
   return (
-    <Box sx={{ width: '100%' }}>
-      {loading && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', p: 2 }}>
+    <Box sx={{ width: 1, height: 1 }}>
+      {(isPending || isFetching) && (
+        <Box
+          sx={{
+            display: 'flex',
+            mx: 'auto',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: 1,
+          }}
+        >
           <CircularProgress />
         </Box>
       )}
-      {!loading && task && (
+      {!isFetching && task && (
         <>
           <Tabs
             value={tabIndex}
@@ -292,4 +285,4 @@ function TaskTubeTaskLayout(props: TaskTubeTaskLayoutProps) {
   );
 }
 
-export default TaskTubeTaskLayout;
+export default memo(TaskTubeTask);
