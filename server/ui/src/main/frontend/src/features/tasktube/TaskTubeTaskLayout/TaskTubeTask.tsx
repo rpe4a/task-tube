@@ -1,11 +1,13 @@
 import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { TaskTubeTaskResponse } from './model/TaskTubeTaskResponse';
-import { Box, Tabs, Tab, Typography, CircularProgress, Grid, Chip } from '@mui/material';
+import { Box, Tabs, Tab, Typography, CircularProgress } from '@mui/material';
 import TaskTubeTaskLogs from './components/TaskTubeTaskLogs';
 import TaskTubeTaskSummary from './components/TaskTubeTaskSummary';
 import api from '../../../shared/api';
 import TaskTubeTaskInputOutput from './components/TaskTubeTaskInputOutput';
+import TaskTubeTaskSettings from './components/TaskTubeTaskSettings';
+import TaskTubeTaskArguments from './components/TaskTubeTaskArguments';
 
 interface TaskTubeTaskProps {
   correlationId: string;
@@ -60,6 +62,7 @@ function TaskTubeTask(props: TaskTubeTaskProps) {
 
   const [task, setTask] = useState<TaskTubeTaskResponse | null>(null);
   const [showLog, setShowLog] = useState(false);
+  const [showArguments, setShowArguments] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
 
   const { isPending, isError, isFetching, data, error } = useQuery({
@@ -88,6 +91,10 @@ function TaskTubeTask(props: TaskTubeTaskProps) {
 
   const handleTabChange = useCallback((_: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
+
+    if (newValue === 1) {
+      setShowArguments(true);
+    }
 
     if (newValue === 2) {
       setShowLog(true);
@@ -133,7 +140,11 @@ function TaskTubeTask(props: TaskTubeTaskProps) {
           </TabPanel>
 
           <TabPanel value={tabIndex} index={1}>
-            <Typography>Arguments are not ready yet</Typography>
+            {showArguments ? (
+              <TaskTubeTaskArguments correlationId={correlationId} taskId={taskId} />
+            ) : (
+              <Typography>No arguments available</Typography>
+            )}
           </TabPanel>
 
           <TabPanel value={tabIndex} index={2}>
@@ -149,24 +160,7 @@ function TaskTubeTask(props: TaskTubeTaskProps) {
           </TabPanel>
 
           <TabPanel value={tabIndex} index={4}>
-            <Grid container spacing={2}>
-              <Grid size={6}>
-                <Typography variant="subtitle2">Max Failures</Typography>
-                <Typography>{task.settings.maxFailures}</Typography>
-              </Grid>
-              <Grid size={6}>
-                <Typography variant="subtitle2">Failure Retry (s)</Typography>
-                <Typography>{task.settings.failureRetryTimeoutSeconds}</Typography>
-              </Grid>
-              <Grid size={6}>
-                <Typography variant="subtitle2">Timeout (s)</Typography>
-                <Typography>{task.settings.timeoutSeconds}</Typography>
-              </Grid>
-              <Grid size={6}>
-                <Typography variant="subtitle2">Heartbeat Timeout (s)</Typography>
-                <Typography>{task.settings.heartbeatTimeoutSeconds}</Typography>
-              </Grid>
-            </Grid>
+            <TaskTubeTaskSettings task={task} />
           </TabPanel>
 
           <TabPanel value={tabIndex} index={5}>
