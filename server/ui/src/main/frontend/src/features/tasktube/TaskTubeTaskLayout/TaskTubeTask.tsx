@@ -2,12 +2,10 @@ import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { TaskTubeTaskResponse } from './model/TaskTubeTaskResponse';
 import { Box, Tabs, Tab, Typography, CircularProgress, Grid, Chip } from '@mui/material';
-import { formatDateTime, calculateDuration } from '../../../shared/utils/DateTimeUtils';
-import { lightTheme } from '@uiw/react-json-view/light';
-import JsonView from '@uiw/react-json-view';
-import { getStatusColor } from '../../../shared/utils/ColorUtils';
 import TaskTubeTaskLogs from './components/TaskTubeTaskLogs';
+import TaskTubeTaskSummary from './components/TaskTubeTaskSummary';
 import api from '../../../shared/api';
+import TaskTubeTaskInputOutput from './components/TaskTubeTaskInputOutput';
 
 interface TaskTubeTaskProps {
   correlationId: string;
@@ -61,7 +59,6 @@ function TaskTubeTask(props: TaskTubeTaskProps) {
   const { correlationId, taskId } = props;
 
   const [task, setTask] = useState<TaskTubeTaskResponse | null>(null);
-  const [loading, setLoading] = useState(false);
   const [showLog, setShowLog] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
 
@@ -92,7 +89,7 @@ function TaskTubeTask(props: TaskTubeTaskProps) {
   const handleTabChange = useCallback((_: React.SyntheticEvent, newValue: number) => {
     setTabIndex(newValue);
 
-    if (newValue === 1) {
+    if (newValue === 2) {
       setShowLog(true);
     }
   }, []);
@@ -124,113 +121,22 @@ function TaskTubeTask(props: TaskTubeTaskProps) {
             sx={{ borderBottom: 1, borderColor: 'divider' }}
           >
             <Tab label="Summary" {...a11yProps(0)} />
-            <Tab label="Logs" {...a11yProps(1)} />
-            <Tab label="Input" {...a11yProps(2)} />
-            <Tab label="Output" {...a11yProps(3)} />
+            <Tab label="Arguments" {...a11yProps(1)} />
+            <Tab label="Logs" {...a11yProps(2)} />
+            <Tab label="Input / Output" {...a11yProps(3)} />
             <Tab label="Settings" {...a11yProps(4)} />
             <Tab label="Children" {...a11yProps(5)} />
           </Tabs>
 
           <TabPanel value={tabIndex} index={0}>
-            <Grid container spacing={2}>
-              <Grid size={12}>
-                <Typography variant="h5">{task.name}</Typography>
-              </Grid>
-              <Grid size={6}>
-                <Typography variant="subtitle2">ID</Typography>
-                <Typography>{task.id}</Typography>
-              </Grid>
-              <Grid size={6}>
-                <Typography variant="subtitle2">Correlation</Typography>
-                <Typography>{task.correlationId}</Typography>
-              </Grid>
-              <Grid size={12}>
-                <Typography variant="subtitle2">Tube</Typography>
-                <Typography>{task.tube}</Typography>
-              </Grid>
-              <Grid size={12}>
-                <Typography variant="subtitle2">Status</Typography>
-                <Chip color={getStatusColor(task.status)} label={task.status} />
-              </Grid>
-              <Grid container direction={'column'} size={6}>
-                <Typography variant="h6">Server processing time</Typography>
-                <Grid size={12}>
-                  <Typography variant="subtitle2">Created At</Typography>
-                  <Typography>{formatDateTime(task.createdAt)}</Typography>
-                </Grid>
-                <Grid size={12}>
-                  <Typography variant="subtitle2">Scheduled At</Typography>
-                  <Typography>{formatDateTime(task.scheduledAt)}</Typography>
-                </Grid>
-                <Grid size={12}>
-                  <Typography variant="subtitle2">Aborted At</Typography>
-                  <Typography>{formatDateTime(task.abortedAt)}</Typography>
-                </Grid>
-                <Grid size={12}>
-                  <Typography variant="subtitle2">Canceled At</Typography>
-                  <Typography>{formatDateTime(task.canceledAt)}</Typography>
-                </Grid>
-                <Grid size={12}>
-                  <Typography variant="subtitle2">Completed At</Typography>
-                  <Typography>{formatDateTime(task.completedAt)}</Typography>
-                </Grid>
-                <Grid size={12}>
-                  <Typography variant="subtitle2">Duration</Typography>
-                  <Typography>
-                    {calculateDuration(
-                      task.createdAt,
-                      task.completedAt,
-                      task.abortedAt,
-                      task.canceledAt,
-                    )}
-                  </Typography>
-                </Grid>
-              </Grid>
-              <Grid container direction={'column'} size={6}>
-                <Typography variant="h6">Client processing time</Typography>
-                <Grid size={12}>
-                  <Typography variant="subtitle2">Started At</Typography>
-                  <Typography>{formatDateTime(task.startedAt)}</Typography>
-                </Grid>
-                <Grid size={12}>
-                  <Typography variant="subtitle2">Hearthbeat At</Typography>
-                  <Typography>{formatDateTime(task.heartbeatAt)}</Typography>
-                </Grid>
-                <Grid size={12}>
-                  <Typography variant="subtitle2">Finished At</Typography>
-                  <Typography>{formatDateTime(task.finishedAt)}</Typography>
-                </Grid>
-                <Grid size={12}>
-                  <Typography variant="subtitle2">Duration</Typography>
-                  <Typography>
-                    {calculateDuration(task.startedAt, task.finishedAt, null, null)}
-                  </Typography>
-                </Grid>
-                <Grid size={12}>
-                  <Typography variant="subtitle2">Handled By</Typography>
-                  <Typography>{task.handledBy}</Typography>
-                </Grid>
-              </Grid>
-              {task.failures > 0 && (
-                <>
-                  <Grid size={12}>
-                    <Typography variant="subtitle2">Failed At</Typography>
-                    <Typography>{formatDateTime(task.failedAt)}</Typography>
-                  </Grid>
-                  <Grid size={12}>
-                    <Typography variant="subtitle2">Failure Reason</Typography>
-                    <Typography>{task.failureReason}</Typography>
-                  </Grid>
-                  <Grid size={12}>
-                    <Typography variant="subtitle2">Failures Count</Typography>
-                    <Typography>{task.failures}</Typography>
-                  </Grid>
-                </>
-              )}
-            </Grid>
+            <TaskTubeTaskSummary task={task} />
           </TabPanel>
 
           <TabPanel value={tabIndex} index={1}>
+            <Typography>Arguments are not ready yet</Typography>
+          </TabPanel>
+
+          <TabPanel value={tabIndex} index={2}>
             {showLog ? (
               <TaskTubeTaskLogs correlationId={correlationId} taskId={taskId} />
             ) : (
@@ -238,20 +144,8 @@ function TaskTubeTask(props: TaskTubeTaskProps) {
             )}
           </TabPanel>
 
-          <TabPanel value={tabIndex} index={2}>
-            {task.input ? (
-              <JsonView value={task.input} style={lightTheme} collapsed={2} />
-            ) : (
-              <Typography>No input data yet</Typography>
-            )}
-          </TabPanel>
-
           <TabPanel value={tabIndex} index={3}>
-            {task.output ? (
-              <JsonView value={task.output} style={lightTheme} collapsed={2} />
-            ) : (
-              <Typography>No output data yet</Typography>
-            )}
+            <TaskTubeTaskInputOutput task={task} />
           </TabPanel>
 
           <TabPanel value={tabIndex} index={4}>
