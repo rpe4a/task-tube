@@ -24,7 +24,6 @@ const fetchTaskTubeTaskAsync = async (
   return response.data;
 };
 
-// helper components for accessibility and panels
 interface TabPanelProps {
   children?: React.ReactNode;
   index: number;

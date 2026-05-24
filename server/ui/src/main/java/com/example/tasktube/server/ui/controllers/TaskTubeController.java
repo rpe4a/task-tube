@@ -1,10 +1,12 @@
 package com.example.tasktube.server.ui.controllers;
 
 import com.example.tasktube.server.application.port.in.ITubeService;
+import com.example.tasktube.server.application.queries.TaskArgumentsQuery;
 import com.example.tasktube.server.application.queries.TaskLogsQuery;
 import com.example.tasktube.server.application.queries.TaskTubeQuery;
 import com.example.tasktube.server.application.queries.TaskTubeTaskQuery;
 import com.example.tasktube.server.application.queries.TaskTubeTreeNodeQuery;
+import com.example.tasktube.server.application.queries.handlers.TaskArgumentsQueryHandler;
 import com.example.tasktube.server.application.queries.handlers.TaskLogsQueryHandler;
 import com.example.tasktube.server.application.queries.handlers.TaskTubeQueryHandler;
 import com.example.tasktube.server.application.queries.handlers.TaskTubeTaskQueryHandler;
@@ -13,6 +15,7 @@ import com.example.tasktube.server.application.queries.views.TaskLogView;
 import com.example.tasktube.server.application.queries.views.TaskTubeTaskView;
 import com.example.tasktube.server.application.queries.views.TaskTubeTreeNodeView;
 import com.example.tasktube.server.application.queries.views.TaskTubeView;
+import com.example.tasktube.server.domain.values.argument.Argument;
 import com.example.tasktube.server.infrastructure.configuration.InstanceIdProvider;
 import com.example.tasktube.server.ui.responses.TaskPushRequest;
 import com.example.tasktube.server.ui.responses.TaskTubePageDto;
@@ -46,6 +49,7 @@ public final class TaskTubeController extends AbstractController {
     private final TaskTubeTaskQueryHandler taskTubeTaskQueryHandler;
     private final TaskTubeTreeNodeQueryHandler taskTubeTreeNodeQueryHandler;
     private final TaskLogsQueryHandler taskLogsQueryHandler;
+    private final TaskArgumentsQueryHandler taskArgumentsQueryHandler;
     private final ITubeService tubeService;
     private final InstanceIdProvider instanceId;
 
@@ -54,13 +58,15 @@ public final class TaskTubeController extends AbstractController {
             final TaskTubeTaskQueryHandler taskTubeTaskQueryHandler,
             final TaskTubeTreeNodeQueryHandler taskTubeTreeNodeQueryHandler,
             final TaskLogsQueryHandler taskLogsQueryHandler,
+            final TaskArgumentsQueryHandler taskArgumentsQueryHandler,
             final ITubeService tubeService,
             final InstanceIdProvider instanceId
-            ) {
+    ) {
         this.queryHandler = Objects.requireNonNull(queryHandler);
         this.taskTubeTaskQueryHandler = Objects.requireNonNull(taskTubeTaskQueryHandler);
         this.taskTubeTreeNodeQueryHandler = Objects.requireNonNull(taskTubeTreeNodeQueryHandler);
         this.taskLogsQueryHandler = Objects.requireNonNull(taskLogsQueryHandler);
+        this.taskArgumentsQueryHandler = Objects.requireNonNull(taskArgumentsQueryHandler);
         this.tubeService = Objects.requireNonNull(tubeService);
         this.instanceId = Objects.requireNonNull(instanceId);
     }
@@ -137,7 +143,7 @@ public final class TaskTubeController extends AbstractController {
             method = RequestMethod.GET,
             path = "/{correlationId}/task/{taskId}/treenode"
     )
-    public ResponseEntity<TaskTubeTreeNodeResponse> getTaskTubeTaskChildren(
+    public ResponseEntity<TaskTubeTreeNodeResponse> getTaskTubeTreeNode(
             @PathVariable(name = "correlationId") final String correlationId,
             @PathVariable(name = "taskId") final UUID taskId
     ) {
@@ -196,7 +202,7 @@ public final class TaskTubeController extends AbstractController {
             method = RequestMethod.GET,
             path = "/{correlationId}/task/{taskId}/logs"
     )
-    public ResponseEntity<TaskTubeTaskLogsResponse> getTaskTubeTaskChildren(
+    public ResponseEntity<TaskTubeTaskLogsResponse> getTaskTubeTaskLogs(
             @PathVariable(name = "correlationId") final String correlationId,
             @PathVariable(name = "taskId") final UUID taskId,
             @RequestParam(required = false, name = "page", defaultValue = "0") final int page,
@@ -228,6 +234,25 @@ public final class TaskTubeController extends AbstractController {
                                 : logs.getFirst().getTotalCount()
                 )
         );
+    }
+
+    @RequestMapping(
+            method = RequestMethod.GET,
+            path = "/{correlationId}/task/{taskId}/arguments"
+    )
+    public ResponseEntity<List<Argument>> getTaskTubeTaskArguments(
+            @PathVariable(name = "correlationId") final String correlationId,
+            @PathVariable(name = "taskId") final UUID taskId
+    ) {
+        final Optional<List<Argument>> arguments = taskArgumentsQueryHandler.handle(
+                new TaskArgumentsQuery(
+                        taskId
+                )
+        );
+
+        return arguments
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @RequestMapping(

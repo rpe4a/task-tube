@@ -14,6 +14,7 @@ import {
   ChipPropsColorOverrides,
   LinearProgress,
   Alert,
+  IconButton,
 } from '@mui/material';
 import { JSX, useState, useEffect, useCallback, memo } from 'react';
 import { LogLevel, TaskTubeTaskLog } from '../model/TaskTubeTaskLog';
@@ -25,6 +26,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import TaskTubeTaskLogsResponse from '../model/TaskTubeTaskLogsResponse';
 import api from '../../../../shared/api';
 import TableSkeleton from '../../../../shared/component/TableSkeleton';
+import SyncIcon from '@mui/icons-material/Sync';
 
 dayjs.extend(utc);
 
@@ -87,7 +89,7 @@ function TaskTubeTaskLogs(props: TaskTubeTaskLogsProps): JSX.Element {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const { isPending, isError, data, error, isFetching, isPlaceholderData } = useQuery({
+  const { isPending, isError, data, error, isFetching, isPlaceholderData, refetch } = useQuery({
     queryKey: ['taskLogs', correlationId, taskId, page, rowsPerPage],
     queryFn: () =>
       fetchTaskLogsAsync({
@@ -131,11 +133,31 @@ function TaskTubeTaskLogs(props: TaskTubeTaskLogsProps): JSX.Element {
     setPage(0);
   }, []);
 
+  const refreshTaskLogs = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
   return (
     <>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <Typography variant="h5">Logs</Typography>
+          <IconButton
+            onClick={() => refreshTaskLogs()}
+            size="small"
+            title="Sync task logs"
+            sx={{
+              marginLeft: 1,
+              color: 'primary.main',
+              '&:hover': {
+                bgcolor: 'primary.light',
+                color: 'white',
+                borderRadius: 1,
+              },
+            }}
+          >
+            <SyncIcon fontSize="medium" />
+          </IconButton>
         </Box>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25, 50, 100]}

@@ -1,12 +1,15 @@
 package com.example.tasktube.server.infrastructure.configuration;
 
 import com.example.tasktube.server.application.queries.handlers.ParentTasksQueryHandler;
+import com.example.tasktube.server.application.queries.handlers.TaskArgumentsQueryHandler;
 import com.example.tasktube.server.application.queries.handlers.TaskLogsQueryHandler;
 import com.example.tasktube.server.application.queries.handlers.TaskTubeTaskQueryHandler;
 import com.example.tasktube.server.application.queries.handlers.TaskTubeQueryHandler;
 import com.example.tasktube.server.application.queries.handlers.TaskTubeTreeNodeQueryHandler;
 import com.example.tasktube.server.application.queries.repositories.ITaskLogViewRepository;
 import com.example.tasktube.server.application.queries.repositories.ITaskViewRepository;
+import com.example.tasktube.server.domain.port.out.IArgumentFiller;
+import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,6 +46,12 @@ public class QueryHandlerConfiguration {
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
     public TaskLogsQueryHandler registerTaskLogsQueryHandler(final ITaskLogViewRepository repository) {
         return new TaskLogsQueryHandler(repository);
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public TaskArgumentsQueryHandler registerTaskArgumentsQueryHandler(final ITaskRepository repository, final IArgumentFiller argumentFiller) {
+        return new TaskArgumentsQueryHandler(repository, argumentFiller);
     }
 
 }

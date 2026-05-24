@@ -28,6 +28,7 @@ function TaskTubePage() {
         <TaskTubeTreeLayout
           correlationId={correlationIdParam || ''}
           taskId={taskIdParam || ''}
+          taskIdSummary={taskId}
           updateTaskTubeTaskLayout={updateTaskTubeTaskLayout}
         />
       </Grid>

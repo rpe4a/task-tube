@@ -1,7 +1,7 @@
 import { Alert, AlertColor, Badge, Box, Button, Chip, Typography } from '@mui/material';
 import { TaskStatus } from '../../../../shared/models/TaskStatus';
 import TaskTubeTreeNodeResponse from '../model/TaskTubeTreeNodeResponse';
-import { useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getStatusColor } from '../../../../shared/utils/ColorUtils';
 import * as DateTimeUtils from '../../../../shared/utils/DateTimeUtils';
@@ -13,6 +13,7 @@ import api from '../../../../shared/api';
 interface TaskTubeTreeProps {
   correlationId: string;
   taskId: string;
+  taskIdSummary: string;
   rootNode: TaskTubeTreeNode | null;
   isRefreshChildren: boolean;
   updateTaskTubeTaskLayout: (correlationId: string, taskId: string) => void;
@@ -50,6 +51,7 @@ function TaskTubeTree(props: TaskTubeTreeProps) {
   const {
     correlationId,
     taskId,
+    taskIdSummary,
     rootNode,
     isRefreshChildren: isRefreshChildrenProp,
     updateTaskTubeTaskLayout,
@@ -79,33 +81,29 @@ function TaskTubeTree(props: TaskTubeTreeProps) {
   }, [rootNode]);
 
   useEffect(() => {
-    handleResponse(isFetching, isError, data, error);
-  }, [isError, isFetching, data, error]);
-
-  const handleResponse = (
-    isFetching: boolean,
-    isError: boolean,
-    data: TaskTubeTreeNodeResponse | undefined,
-    error: Error | null,
-  ) => {
-    if (isFetching) {
-    } else if (isError) {
+    if (isError) {
       console.error('Error fetching task tree:', error);
     } else if (data) {
       setRoot(data.root);
       setChildren(data.children);
     }
-  };
+  }, [isError, isFetching, data, error]);
 
-  function handleChildrenLoad(event: React.MouseEvent<HTMLButtonElement>): void {
-    event.preventDefault();
-    setIsRefreshChildren(!isRefreshChildren);
-  }
+  const handleChildrenLoad = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement>): void => {
+      event.preventDefault();
+      setIsRefreshChildren(!isRefreshChildren);
+    },
+    [isRefreshChildren],
+  );
 
-  function handleTaskClick(event: React.MouseEvent<HTMLDivElement>): void {
-    event.preventDefault();
-    updateTaskTubeTaskLayout(correlationId, taskId);
-  }
+  const handleTaskClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement>): void => {
+      event.preventDefault();
+      updateTaskTubeTaskLayout(correlationId, taskId);
+    },
+    [correlationId, taskId, updateTaskTubeTaskLayout],
+  );
 
   return (
     <>
@@ -115,12 +113,20 @@ function TaskTubeTree(props: TaskTubeTreeProps) {
             mt: '-1px',
             borderTop: '1px solid #ccc',
             minWidth: '600px',
+            width: 'fit-content',
           }}
         >
           <Alert
             icon={false}
             severity={getSeveretyColor(root.status)}
-            sx={{ borderRadius: 0, borderBottom: '1px solid #ccc', borderLeft: '1px solid #ccc' }}
+            variant={root.id === taskIdSummary ? 'outlined' : 'standard'}
+            sx={{
+              borderRadius: 0,
+              borderBottom: '1px solid #ccc',
+              borderLeft: '1px solid #ccc',
+              borderRight: 'none',
+              borderTop: 'none',
+            }}
           >
             <Typography gutterBottom sx={{ color: 'text.main', fontSize: 14 }}>
               {root.id}{' '}
@@ -185,6 +191,7 @@ function TaskTubeTree(props: TaskTubeTreeProps) {
                     key={childNood.id}
                     correlationId={correlationId}
                     taskId={childNood.id}
+                    taskIdSummary={taskIdSummary}
                     isRefreshChildren={false}
                     rootNode={childNood}
                     updateTaskTubeTaskLayout={updateTaskTubeTaskLayout}
@@ -198,4 +205,4 @@ function TaskTubeTree(props: TaskTubeTreeProps) {
   );
 }
 
-export default TaskTubeTree;
+export default memo(TaskTubeTree);

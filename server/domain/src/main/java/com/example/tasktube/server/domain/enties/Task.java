@@ -498,6 +498,10 @@ public class Task extends Entity<UUID> {
         return Status.ABORTED.equals(getStatus()) || Status.CANCELED.equals(getStatus());
     }
 
+    public boolean isCreated() {
+        return Status.CREATED.equals(getStatus());
+    }
+
     public boolean isTerminated() {
         return isCompleted() || isFinalized();
     }
