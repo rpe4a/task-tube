@@ -1,5 +1,6 @@
 package com.example.tasktube.server.ui.controllers;
 
+import com.example.tasktube.server.application.port.in.ITaskTubeService;
 import com.example.tasktube.server.application.port.in.ITubeService;
 import com.example.tasktube.server.application.queries.TaskArgumentsQuery;
 import com.example.tasktube.server.application.queries.TaskLogsQuery;
@@ -52,6 +53,7 @@ public final class TaskTubeController extends AbstractController {
     private final TaskArgumentsQueryHandler taskArgumentsQueryHandler;
     private final ITubeService tubeService;
     private final InstanceIdProvider instanceId;
+    private final ITaskTubeService taskTubeService;
 
     public TaskTubeController(
             final TaskTubeQueryHandler queryHandler,
@@ -60,7 +62,8 @@ public final class TaskTubeController extends AbstractController {
             final TaskLogsQueryHandler taskLogsQueryHandler,
             final TaskArgumentsQueryHandler taskArgumentsQueryHandler,
             final ITubeService tubeService,
-            final InstanceIdProvider instanceId
+            final InstanceIdProvider instanceId,
+            final ITaskTubeService taskTubeService
     ) {
         this.queryHandler = Objects.requireNonNull(queryHandler);
         this.taskTubeTaskQueryHandler = Objects.requireNonNull(taskTubeTaskQueryHandler);
@@ -69,6 +72,7 @@ public final class TaskTubeController extends AbstractController {
         this.taskArgumentsQueryHandler = Objects.requireNonNull(taskArgumentsQueryHandler);
         this.tubeService = Objects.requireNonNull(tubeService);
         this.instanceId = Objects.requireNonNull(instanceId);
+        this.taskTubeService = Objects.requireNonNull(taskTubeService);
     }
 
     @RequestMapping(
@@ -270,5 +274,18 @@ public final class TaskTubeController extends AbstractController {
         return ResponseEntity.ok(
                 tubeService.push(request.to(), instanceId.get())
         );
+    }
+
+    @RequestMapping(
+            method = RequestMethod.POST,
+            path = "/{correlationId}/task/{taskId}/terminate"
+    )
+    public ResponseEntity<Void> terminateTaskTube(
+            @PathVariable(name = "correlationId") final String correlationId,
+            @PathVariable(name = "taskId") final UUID taskId
+    ) {
+        taskTubeService.add(correlationId, taskId);
+
+        return ResponseEntity.noContent().build();
     }
 }

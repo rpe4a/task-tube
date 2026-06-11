@@ -4,10 +4,10 @@ import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import { UUID } from 'crypto';
 import { PushedTask } from '../TaskTubePushedTasks/storage/PushedTasksHistory';
-import axios from 'axios';
 import { isUUID } from '../../../shared/utils/UuidUtils';
 import { TaskTubeTaskResponse } from '../TaskTubeTaskLayout/model/TaskTubeTaskResponse';
 import { enqueueSnackbar } from 'notistack';
+import api from '../../../shared/api';
 
 dayjs.extend(utc);
 
@@ -69,7 +69,7 @@ const getTaskOrDefaultFormData = (task: TaskTubeTaskResponse | null): TaskTubePu
 };
 
 const fetchPushTaskAsync = async (params: TaskTubePushFormData): Promise<UUID> => {
-  const response = await axios.post<UUID>(`/api/v1/tasktube/push`, {
+  const response = await api.post<UUID>(`/api/v1/tasktube/push`, {
     ...params,
     createdAt: dayjs().toISOString(),
     input: JSON.parse(params.input),

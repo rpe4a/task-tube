@@ -17,10 +17,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Service
-public class TaskDataMapper {
+public class TaskMapper {
     private final ObjectMapper objectMapper;
 
-    public TaskDataMapper(final ObjectMapper objectMapper) {
+    public TaskMapper(final ObjectMapper objectMapper) {
         this.objectMapper = Objects.requireNonNull(objectMapper);
     }
 

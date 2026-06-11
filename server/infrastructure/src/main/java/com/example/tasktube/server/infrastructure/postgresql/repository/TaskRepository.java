@@ -3,7 +3,7 @@ package com.example.tasktube.server.infrastructure.postgresql.repository;
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
-import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskDataMapper;
+import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -25,27 +25,38 @@ public class TaskRepository implements ITaskRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(TaskRepository.class);
 
     private final NamedParameterJdbcTemplate db;
-    private final TaskDataMapper mapper;
+    private final TaskMapper mapper;
 
     public TaskRepository(
             final NamedParameterJdbcTemplate db,
-            final TaskDataMapper mapper
+            final TaskMapper mapper
     ) {
         this.db = Objects.requireNonNull(db);
         this.mapper = Objects.requireNonNull(mapper);
     }
 
     @Override
+    public Optional<Task> getForUpdate(final UUID id) {
+        return getInternal(id, """
+                    SELECT * FROM tasks
+                    WHERE id = :id
+                    FOR UPDATE NOWAIT
+                """);
+    }
+
+    @Override
     public Optional<Task> get(final UUID id) {
+        return getInternal(id, """
+                    SELECT * FROM tasks
+                    WHERE id = :id
+                """);
+    }
+
+    private Optional<Task> getInternal(final UUID id, final String queryCommand) {
         if (Objects.isNull(id)) {
             throw new ApplicationException("Parameter taskId cannot be null.");
         }
         LOGGER.debug("Attempting to get task by ID: '{}'.", id);
-
-        final String queryCommand = """
-                    SELECT * FROM tasks
-                    WHERE id = :id
-                """;
 
         final ResultSetExtractor<Optional<Task>> rsExtractor = rs -> {
             if (rs.next()) {
@@ -64,7 +75,7 @@ public class TaskRepository implements ITaskRepository {
     }
 
     @Override
-    public Optional<Task> get(final UUID id, final String client) {
+    public Optional<Task> getForUpdate(final UUID id, final String client) {
         if (Objects.isNull(id)) {
             throw new ApplicationException("Parameter tube cannot be null or empty.");
         }
@@ -83,7 +94,7 @@ public class TaskRepository implements ITaskRepository {
                           AND locked_at is NULL
                           AND id = :id
                         ORDER BY scheduled_at
-                            FOR UPDATE SKIP LOCKED
+                        FOR UPDATE
                     )
                     UPDATE tasks
                     SET locked = true,

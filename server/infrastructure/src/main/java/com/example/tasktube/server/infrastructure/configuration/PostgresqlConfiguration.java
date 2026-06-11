@@ -6,17 +6,20 @@ import com.example.tasktube.server.domain.port.out.IBarrierRepository;
 import com.example.tasktube.server.domain.port.out.IJobRepository;
 import com.example.tasktube.server.domain.port.out.ILogRecordRepository;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
+import com.example.tasktube.server.domain.port.out.ITaskTubeRepository;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.BarrierDataMapper;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.LogRecordMapper;
-import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskDataMapper;
+import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskMapper;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskLogViewMapper;
+import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskTubeMapper;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskViewMapper;
 import com.example.tasktube.server.infrastructure.postgresql.repository.BarrierRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.JobRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.LogRecordRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.TaskLogViewRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.TaskRepository;
+import com.example.tasktube.server.infrastructure.postgresql.repository.TaskTubeRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.TaskViewRepository;
 import com.example.tasktube.server.infrastructure.postgresql.repository.TubeRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,8 +34,8 @@ public class PostgresqlConfiguration {
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public TaskDataMapper registerTaskMapper(final ObjectMapper objectMapper) {
-        return new TaskDataMapper(objectMapper);
+    public TaskMapper registerTaskMapper(final ObjectMapper objectMapper) {
+        return new TaskMapper(objectMapper);
     }
 
     @Bean
@@ -61,13 +64,19 @@ public class PostgresqlConfiguration {
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public ITaskRepository registerTaskRepository(final NamedParameterJdbcTemplate db, final TaskDataMapper mapper) {
+    public ITaskRepository registerTaskRepository(final NamedParameterJdbcTemplate db, final TaskMapper mapper) {
         return new TaskRepository(db, mapper);
     }
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public ITubeRepository registerTubeRepository(final NamedParameterJdbcTemplate db, final TaskDataMapper mapper) {
+    public ITaskTubeRepository registerTaskTubeRepository(final NamedParameterJdbcTemplate db, final TaskTubeMapper mapper) {
+        return new TaskTubeRepository(db, mapper);
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public ITubeRepository registerTubeRepository(final NamedParameterJdbcTemplate db, final TaskMapper mapper) {
         return new TubeRepository(db, mapper);
     }
 

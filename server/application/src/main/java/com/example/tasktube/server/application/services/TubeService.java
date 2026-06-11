@@ -44,6 +44,9 @@ public class TubeService implements ITubeService {
         if (StringUtils.isEmpty(client)) {
             throw new ApplicationException("Parameter client name cannot be null or empty.");
         }
+        if (StringUtils.isEmpty(client)) {
+            throw new ApplicationException("Parameter client name cannot be null or empty.");
+        }
         LOGGER.info("Push task: '{}' by client '{}'.", pushTaskDto, client);
 
         final Task task = Task.pushNew(

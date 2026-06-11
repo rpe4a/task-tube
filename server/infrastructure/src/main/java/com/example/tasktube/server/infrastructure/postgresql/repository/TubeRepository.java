@@ -3,7 +3,7 @@ package com.example.tasktube.server.infrastructure.postgresql.repository;
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
-import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskDataMapper;
+import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
@@ -27,11 +27,11 @@ public class TubeRepository implements ITubeRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(TubeRepository.class);
 
     private final NamedParameterJdbcTemplate db;
-    private final TaskDataMapper mapper;
+    private final TaskMapper mapper;
 
     public TubeRepository(
             final NamedParameterJdbcTemplate db,
-            final TaskDataMapper mapper
+            final TaskMapper mapper
     ) {
         this.db = Objects.requireNonNull(db);
         this.mapper = Objects.requireNonNull(mapper);

@@ -8,8 +8,8 @@ function TaskTubeTaskSummary(props: { task: TaskTubeTaskResponse }) {
   const { task } = props;
   return (
     <Grid container spacing={2}>
-      <Paper elevation={2} sx={{ p: 2 }}>
-        <Grid container spacing={2}>
+      <Paper elevation={2} sx={{ p: 2, width: 1 }}>
+        <Grid container spacing={2} size={12}>
           <Grid size={10} sx={{ overflowWrap: 'anywhere' }}>
             <Typography variant="h5">{task.name}</Typography>
           </Grid>

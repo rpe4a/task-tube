@@ -8,6 +8,7 @@ import api from '../../../shared/api';
 import TaskTubeTaskInputOutput from './components/TaskTubeTaskInputOutput';
 import TaskTubeTaskSettings from './components/TaskTubeTaskSettings';
 import TaskTubeTaskArguments from './components/TaskTubeTaskArguments';
+import { isTaskTerminal } from '../../../shared/models/TaskStatus';
 
 interface TaskTubeTaskProps {
   correlationId: string;
@@ -52,10 +53,6 @@ function a11yProps(index: number) {
   };
 }
 
-const isTaskTerminated = (task: TaskTubeTaskResponse): boolean => {
-  return task.status === 'COMPLETED' || task.status === 'ABORTED' || task.status === 'CANCELED';
-};
-
 function TaskTubeTask(props: TaskTubeTaskProps) {
   const { correlationId, taskId } = props;
 
@@ -69,7 +66,7 @@ function TaskTubeTask(props: TaskTubeTaskProps) {
     queryFn: () => fetchTaskTubeTaskAsync(correlationId, taskId),
     refetchIntervalInBackground: true,
     refetchInterval: () => {
-      if (task && isTaskTerminated(task)) {
+      if (task && isTaskTerminal(task)) {
         return false;
       }
       return 15000;

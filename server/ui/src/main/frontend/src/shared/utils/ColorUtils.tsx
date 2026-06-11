@@ -7,13 +7,13 @@ export const getStatusColor = (
     TaskStatus,
     'default' | 'primary' | 'secondary' | 'error' | 'warning' | 'info' | 'success'
   > = {
-    CREATED: 'default',
-    SCHEDULED: 'primary',
-    CANCELED: 'warning',
-    PROCESSING: 'info',
+    CREATED: 'primary',
+    SCHEDULED: 'default',
+    PROCESSING: 'warning',
+    FINISHED: 'primary',
     COMPLETED: 'success',
     ABORTED: 'error',
-    FINISHED: 'secondary',
+    TERMINATED: 'error',
   };
   return statusColorMap[status];
 };

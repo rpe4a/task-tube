@@ -14,6 +14,7 @@ import {
   Button,
   Alert,
   LinearProgress,
+  IconButton,
 } from '@mui/material';
 import { JSX, memo, useCallback } from 'react';
 import TasksPageTaskDto from '../../../app/pages/TasksPage/models/TasksPageTaskDto';
@@ -25,6 +26,10 @@ import { getStatusColor } from '../../../shared/utils/ColorUtils';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import TableSkeleton from '../../../shared/component/TableSkeleton';
 import IconLink from '../../../shared/component/IconLink';
+import StopCircleIcon from '@mui/icons-material/StopCircle';
+import { enqueueSnackbar } from 'notistack';
+import api from '../../../shared/api';
+import { UUID } from 'crypto';
 dayjs.extend(utc);
 
 interface TaskTableProps {
@@ -41,6 +46,13 @@ interface TaskTableProps {
   onChangeRowsPerPage: (value: string) => void;
   onSortChange: (sort: string, by: 'asc' | 'desc') => void;
 }
+
+const fetchTerminateTaskAsync = async (correlationId: string, taskId: string): Promise<UUID> => {
+  const response = await api.post<UUID>(
+    `/api/v1/tasktube/${correlationId}/task/${taskId}/terminate`,
+  );
+  return response.data;
+};
 
 function TaskTable(props: TaskTableProps): JSX.Element {
   const {
@@ -75,6 +87,24 @@ function TaskTable(props: TaskTableProps): JSX.Element {
     },
     [sort, by],
   );
+
+  const handleTerminateTask = useCallback(async (correlationId: string, taskId: string) => {
+    if (window.confirm('Are you sure that you want to terminate this task?')) {
+      try {
+        await fetchTerminateTaskAsync(correlationId, taskId);
+
+        enqueueSnackbar(`Task '${taskId}' has been terminated successfully.`, {
+          variant: 'success',
+        });
+      } catch (error) {
+        console.error(`Can't terminate task '${taskId}': `, error);
+
+        enqueueSnackbar(`Failed to terminate task '${taskId}'. Please, try again later.`, {
+          variant: 'error',
+        });
+      }
+    }
+  }, []);
 
   const handleCellClick = useCallback((event: React.MouseEvent<HTMLTableCellElement>) => {
     const cellText = event.currentTarget.textContent;
@@ -255,7 +285,27 @@ function TaskTable(props: TaskTableProps): JSX.Element {
               tasks.map((task) => (
                 <TableRow key={task.id} hover>
                   <TableCell>
-                    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 0.25 }}>
+                      {(task.status === 'CREATED' ||
+                        task.status === 'SCHEDULED' ||
+                        task.status === 'PROCESSING') && (
+                        <IconButton
+                          onClick={() => handleTerminateTask(task.correlationId, task.id)}
+                          size="small"
+                          title="Request to terminate the task"
+                          sx={{
+                            marginLeft: 1,
+                            color: 'error.main',
+                            '&:hover': {
+                              bgcolor: 'error.light',
+                              color: 'white',
+                              borderRadius: 1,
+                            },
+                          }}
+                        >
+                          <StopCircleIcon fontSize="medium" />
+                        </IconButton>
+                      )}
                       <IconLink
                         to={`/tasktube/push?correlationId=${task.correlationId}&taskId=${task.id}`}
                         size="small"

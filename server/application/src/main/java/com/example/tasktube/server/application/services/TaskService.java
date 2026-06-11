@@ -56,7 +56,7 @@ public class TaskService implements ITaskService {
         }
         LOGGER.info("Start task id: '{}'.", taskId);
 
-        final Task task = taskRepository.get(taskId).orElseThrow();
+        final Task task = taskRepository.getForUpdate(taskId).orElseThrow();
 
         task.start(startedAt, client);
 
@@ -80,7 +80,7 @@ public class TaskService implements ITaskService {
         }
         LOGGER.info("Process task id: '{}'.", taskId);
 
-        final Task task = taskRepository.get(taskId).orElseThrow();
+        final Task task = taskRepository.getForUpdate(taskId).orElseThrow();
         if (task.isProcessing()) {
             if (task.isExpired(client)) {
                 LOGGER.warn("Timeout of processing task id: '{}' has expired.", taskId);
@@ -102,7 +102,7 @@ public class TaskService implements ITaskService {
         }
         LOGGER.info("Finish task id: '{}'.", taskDto.taskId());
 
-        final Task task = taskRepository.get(taskDto.taskId()).orElseThrow();
+        final Task task = taskRepository.getForUpdate(taskDto.taskId()).orElseThrow();
 
         final List<Task> children =
                 taskDto.children() == null
@@ -156,7 +156,7 @@ public class TaskService implements ITaskService {
         }
         LOGGER.info("Fail task id: '{}'.", taskId);
 
-        final Task task = taskRepository.get(taskId).orElseThrow();
+        final Task task = taskRepository.getForUpdate(taskId).orElseThrow();
 
         task.fail(failedAt, failedReason, client);
 
@@ -175,7 +175,7 @@ public class TaskService implements ITaskService {
         }
         LOGGER.warn("Locked task id: '{}'.", taskId);
 
-        final Task task = taskRepository.get(taskId).orElseThrow();
+        final Task task = taskRepository.getForUpdate(taskId).orElseThrow();
         if (task.isLocked()) {
             task.unblock(lockedTimeoutSeconds);
 

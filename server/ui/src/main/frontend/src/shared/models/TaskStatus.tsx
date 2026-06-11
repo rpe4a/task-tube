@@ -5,4 +5,8 @@ export type TaskStatus =
   | 'FINISHED'
   | 'COMPLETED'
   | 'ABORTED'
-  | 'CANCELED';
+  | 'TERMINATED';
+
+export const isTaskTerminal = (task: { status: TaskStatus }): boolean => {
+  return task.status === 'COMPLETED' || task.status === 'ABORTED' || task.status === 'TERMINATED';
+};

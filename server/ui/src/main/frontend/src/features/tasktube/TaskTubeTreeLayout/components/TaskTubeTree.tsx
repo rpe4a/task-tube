@@ -1,5 +1,5 @@
 import { Alert, AlertColor, Badge, Box, Button, Chip, Typography } from '@mui/material';
-import { TaskStatus } from '../../../../shared/models/TaskStatus';
+import { isTaskTerminal, TaskStatus } from '../../../../shared/models/TaskStatus';
 import TaskTubeTreeNodeResponse from '../model/TaskTubeTreeNodeResponse';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
@@ -22,12 +22,12 @@ interface TaskTubeTreeProps {
 function getSeveretyColor(status: TaskStatus): AlertColor {
   const statusColorMap: Record<TaskStatus, AlertColor> = {
     CREATED: 'info',
-    SCHEDULED: 'warning',
-    CANCELED: 'error',
+    SCHEDULED: 'info',
+    FINISHED: 'info',
     PROCESSING: 'warning',
     COMPLETED: 'success',
     ABORTED: 'error',
-    FINISHED: 'info',
+    TERMINATED: 'error',
   };
 
   return statusColorMap[status];
@@ -41,10 +41,6 @@ const fetchTaskTubeTaskChildren = async (
     `/api/v1/tasktube/${correlationId}/task/${taskId}/treenode`,
   );
   return response.data;
-};
-
-const isTaskTerminated = (task: TaskTubeTreeNode): boolean => {
-  return task.status === 'COMPLETED' || task.status === 'ABORTED' || task.status === 'CANCELED';
 };
 
 function TaskTubeTree(props: TaskTubeTreeProps) {
@@ -67,7 +63,7 @@ function TaskTubeTree(props: TaskTubeTreeProps) {
     refetchOnWindowFocus: false,
     refetchIntervalInBackground: true,
     refetchInterval: () => {
-      if (root && isTaskTerminated(root)) {
+      if (root && isTaskTerminal(root)) {
         return false;
       }
 
@@ -112,8 +108,7 @@ function TaskTubeTree(props: TaskTubeTreeProps) {
           sx={{
             mt: '-1px',
             borderTop: '1px solid #ccc',
-            minWidth: '600px',
-            width: 'fit-content',
+            width: 1,
           }}
         >
           <Alert
@@ -154,7 +149,7 @@ function TaskTubeTree(props: TaskTubeTreeProps) {
                 root.canceledAt,
               )}
             </Typography>
-            {isFetching && (
+            {isFetching && root && root.childrenCount > 0 && (
               <Button loading variant="outlined" loadingPosition="start">
                 Load children
               </Button>

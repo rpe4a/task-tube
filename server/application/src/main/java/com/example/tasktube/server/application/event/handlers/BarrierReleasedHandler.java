@@ -14,11 +14,11 @@ import java.util.Objects;
 @Service
 public class BarrierReleasedHandler implements IEventHandler<BarrierReleasedEvent> {
 
-    private final ITaskRepository repository;
+    private final ITaskRepository taskRepository;
     private final IEventPublisher eventPublisher;
 
-    public BarrierReleasedHandler(final ITaskRepository repository, final IEventPublisher eventPublisher) {
-        this.repository = Objects.requireNonNull(repository);
+    public BarrierReleasedHandler(final ITaskRepository taskRepository, final IEventPublisher eventPublisher) {
+        this.taskRepository = Objects.requireNonNull(taskRepository);
         this.eventPublisher = Objects.requireNonNull(eventPublisher);
     }
 
@@ -33,11 +33,11 @@ public class BarrierReleasedHandler implements IEventHandler<BarrierReleasedEven
             final Barrier barrier = event.barrier();
             final String client = event.client();
 
-            final Task task = repository.get(barrier.getTaskId(), client).orElseThrow();
+            final Task task = taskRepository.getForUpdate(barrier.getTaskId(), client).orElseThrow();
 
             task.releaseBarrier(barrier, client);
 
-            repository.update(task);
+            taskRepository.update(task);
 
             eventPublisher.publish(task.pullEvents());
         });

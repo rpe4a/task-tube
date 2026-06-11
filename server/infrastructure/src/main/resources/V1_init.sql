@@ -1,3 +1,16 @@
+CREATE TABLE tasktubes
+(
+    id                    UUID PRIMARY KEY      DEFAULT gen_random_uuid(), -- уникальный идентификатор
+    task_id               UUID         NOT NULL,                           -- уникальный идентификатор задачи
+    correlation_id        varchar(256) NOT NULL,                           -- идентификатор корреляции
+    termination_requested BOOLEAN      NULL,                               -- запрос отмены
+    recovery_requested    BOOLEAN      NULL,                               -- запрос восстановления
+    updated_at            TIMESTAMPTZ  NOT NULL DEFAULT NOW(),             -- время последнего обновления
+    created_at            TIMESTAMPTZ  NOT NULL DEFAULT NOW(),             -- время создания
+    locked_at             TIMESTAMPTZ,                                     -- когда была заблокирована
+    locked                BOOLEAN      NULL,                               -- заблокирована ли
+    locked_by             varchar(256)                                     -- кем заблокирована
+);
 CREATE TABLE logs
 (
     id                  UUID PRIMARY KEY     DEFAULT gen_random_uuid(), -- уникальный идентификатор
@@ -19,7 +32,7 @@ CREATE TABLE barriers
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(), -- время последнего обновления
     created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(), -- время создания
     released_at TIMESTAMPTZ,                        -- время достижения барьера
-    locked_at   TIMESTAMPTZ,                        -- когда задача была заблокирована
+    locked_at   TIMESTAMPTZ,                        -- когда была заблокирована
     locked      BOOLEAN     NULL,                   -- заблокирована ли
     locked_by   varchar(256)                        -- кем заблокирована
 );
