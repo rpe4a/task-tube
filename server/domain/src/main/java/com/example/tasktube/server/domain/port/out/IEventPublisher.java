@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface IEventPublisher {
 
+    void publish(DomainEvent event);
+
     void publish(List<DomainEvent> events);
 
 }

@@ -14,6 +14,8 @@ public record TasksPageDto(
         Instant abortedAt,
         Instant canceledAt,
         Instant completedAt,
-        String handledBy
+        String handledBy,
+        boolean isTerminationRequested,
+        boolean isRecoveryRequested
 ) {
 }

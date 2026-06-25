@@ -1,5 +1,6 @@
 package com.example.tasktube.server.domain.enties;
 
+import com.example.tasktube.server.domain.exceptions.DomainException;
 import com.example.tasktube.server.domain.values.Lock;
 
 import java.time.Instant;
@@ -17,6 +18,13 @@ public class TaskTube extends Entity<UUID> {
 
     public TaskTube() {
         super(UUID.randomUUID());
+    }
+
+    public TaskTube(
+            final String correlationId,
+            final UUID taskId
+    ) {
+        this(correlationId, taskId, false, false);
     }
 
     public TaskTube(
@@ -92,5 +100,28 @@ public class TaskTube extends Entity<UUID> {
     public TaskTube setRecoveryRequested(final boolean recoveryRequested) {
         isRecoveryRequested = recoveryRequested;
         return this;
+    }
+
+    public void terminateRequested() {
+        if (isTerminationRequested) {
+            throw new DomainException("Termination has already been requested.");
+        }
+
+        if (isRecoveryRequested) {
+            throw new DomainException("Recovery has been requested.");
+        }
+
+        setTerminationRequested(true);
+        setUpdatedAt(Instant.now());
+    }
+
+    public void terminated() {
+        setTerminationRequested(false);
+        setUpdatedAt(Instant.now());
+    }
+
+    public void unlock() {
+        setLock(getLock().unlock());
+        setUpdatedAt(Instant.now());
     }
 }

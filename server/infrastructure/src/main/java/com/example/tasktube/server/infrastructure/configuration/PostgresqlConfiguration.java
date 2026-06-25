@@ -8,7 +8,7 @@ import com.example.tasktube.server.domain.port.out.ILogRecordRepository;
 import com.example.tasktube.server.domain.port.out.ITaskRepository;
 import com.example.tasktube.server.domain.port.out.ITaskTubeRepository;
 import com.example.tasktube.server.domain.port.out.ITubeRepository;
-import com.example.tasktube.server.infrastructure.postgresql.mapper.BarrierDataMapper;
+import com.example.tasktube.server.infrastructure.postgresql.mapper.BarrierMapper;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.LogRecordMapper;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskMapper;
 import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskLogViewMapper;
@@ -40,8 +40,14 @@ public class PostgresqlConfiguration {
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public BarrierDataMapper registerBarrierDataMapper() {
-        return new BarrierDataMapper();
+    public TaskTubeMapper registerTaskTubeMapper() {
+        return new TaskTubeMapper();
+    }
+
+    @Bean
+    @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
+    public BarrierMapper registerBarrierDataMapper() {
+        return new BarrierMapper();
     }
 
     @Bean
@@ -82,14 +88,14 @@ public class PostgresqlConfiguration {
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public IBarrierRepository registerBarrierRepository(final NamedParameterJdbcTemplate db, final BarrierDataMapper mapper) {
+    public IBarrierRepository registerBarrierRepository(final NamedParameterJdbcTemplate db, final BarrierMapper mapper) {
         return new BarrierRepository(db, mapper);
     }
 
     @Bean
     @Scope(value = ConfigurableBeanFactory.SCOPE_SINGLETON)
-    public IJobRepository registerJobRepository(final NamedParameterJdbcTemplate db, final BarrierDataMapper mapper) {
-        return new JobRepository(db, mapper);
+    public IJobRepository registerJobRepository(final NamedParameterJdbcTemplate db, final BarrierMapper barrierMapper, final TaskMapper taskMapper) {
+        return new JobRepository(db, barrierMapper, taskMapper);
     }
 
     @Bean

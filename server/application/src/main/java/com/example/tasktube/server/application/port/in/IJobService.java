@@ -1,5 +1,6 @@
 package com.example.tasktube.server.application.port.in;
 
+import com.example.tasktube.server.application.models.TaskTubeDto;
 import com.example.tasktube.server.domain.enties.Barrier;
 
 import java.util.List;
@@ -13,4 +14,5 @@ public interface IJobService {
 
     List<UUID> getLockedBarrierIdList(int count, final int lockedTimeoutSeconds);
 
+    List<UUID> getRequestTerminationTaskTube(int count, final String client);
 }

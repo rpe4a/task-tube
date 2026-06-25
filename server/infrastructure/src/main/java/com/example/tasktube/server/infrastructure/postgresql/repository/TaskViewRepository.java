@@ -67,6 +67,8 @@ public class TaskViewRepository implements ITaskViewRepository {
                                canceled_at,
                                completed_at,
                                handled_by,
+                               termination_requested,
+                               recovery_requested,
                                COUNT(*) OVER() AS total_count
                         FROM tasks
                         WHERE parent_id IS NULL

@@ -284,7 +284,7 @@ public final class TaskTubeController extends AbstractController {
             @PathVariable(name = "correlationId") final String correlationId,
             @PathVariable(name = "taskId") final UUID taskId
     ) {
-        taskTubeService.add(correlationId, taskId);
+        taskTubeService.requestTermination(correlationId, taskId);
 
         return ResponseEntity.noContent().build();
     }

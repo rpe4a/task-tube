@@ -11,6 +11,7 @@ where task_id = '2f9adc94-68ca-43b7-b7be-0a38fb141fb9'
 order by updated_at  asc LIMIT 10
 
 
+select * from tasktubes
 
 select * from logs
 where task_id = '6234fc28-6e1a-4490-aa1d-4554b6bb4948'
@@ -19,6 +20,7 @@ order by timestamp
 delete from tasks;
 delete from barriers;
 delete from logs;
+delete from tasktubes;
 
 UPDATE barriers
 SET locked_at = null,

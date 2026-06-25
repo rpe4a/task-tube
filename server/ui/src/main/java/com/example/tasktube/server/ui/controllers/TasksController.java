@@ -70,7 +70,9 @@ public final class TasksController extends AbstractController {
                                                 t.getAbortedAt(),
                                                 t.getCancelledAt(),
                                                 t.getCompletedAt(),
-                                                t.getHandledBy()
+                                                t.getHandledBy(),
+                                                t.isTerminationRequested(),
+                                                t.isRecoveryRequested()
                                         )
                                 ).toArray(TasksPageDto[]::new),
                         tasks.isEmpty()

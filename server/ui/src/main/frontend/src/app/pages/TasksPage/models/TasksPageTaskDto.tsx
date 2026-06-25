@@ -12,6 +12,8 @@ interface TasksPageTaskDto {
   canceledAt: string | null;
   completedAt: string | null;
   handledBy: string;
+  isTerminationRequested: boolean;
+  isRecoveryRequested: boolean;
 }
 
 export default TasksPageTaskDto;

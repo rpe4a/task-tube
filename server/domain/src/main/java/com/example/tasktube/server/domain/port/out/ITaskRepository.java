@@ -12,7 +12,7 @@ public interface ITaskRepository {
 
     Optional<Task> getForUpdate(UUID id);
 
-    Optional<Task> getForUpdate(UUID taskId, String client);
+    Optional<Task> getForUpdate(UUID id, String client);
 
     List<Task> get(List<UUID> taskIdList);
 

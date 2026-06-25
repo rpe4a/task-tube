@@ -2,7 +2,6 @@ package com.example.tasktube.server.domain.port.out;
 
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,4 +17,5 @@ public interface IJobRepository {
     
     List<UUID> getHeartbeatTimeoutTaskIdList(int count);
 
+    List<UUID> getTerminationRequestedTaskTubeList(int count, final String client);
 }

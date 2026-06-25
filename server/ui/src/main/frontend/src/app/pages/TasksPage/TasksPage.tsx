@@ -98,7 +98,7 @@ function TasksPage(): React.JSX.Element {
   const [sort, setSort] = useState<string>(queryparameterSort);
   const [by, setBy] = useState<'asc' | 'desc'>((queryparameterBy as 'asc' | 'desc') || 'desc');
 
-  const { isPending, isFetching, isError, data, error } = useQuery({
+  const { isPending, isFetching, isError, data, error, refetch } = useQuery({
     queryKey: [
       'tasks',
       searchId,
@@ -171,6 +171,10 @@ function TasksPage(): React.JSX.Element {
     [setSearchParamsToUrl],
   );
 
+  const handleRefresh = useCallback(() => {
+    refetch();
+  }, [refetch]);
+
   const handleSortChange = useCallback(
     (sort: string, by: 'asc' | 'desc') => {
       setSort(sort);
@@ -202,8 +206,10 @@ function TasksPage(): React.JSX.Element {
         to: createdTo ? createdTo.toISOString() : '',
         page: '0',
       });
+
+      refetch();
     },
-    [setSearchParamsToUrlObj],
+    [setSearchParamsToUrlObj, refetch],
   );
 
   const resetSearchTasksParams = useCallback(() => {
@@ -258,6 +264,7 @@ function TasksPage(): React.JSX.Element {
         totalCount={totalCount}
         onChangePage={handleChangePage}
         onChangeRowsPerPage={handleChangeRowsPerPage}
+        onRefresh={handleRefresh}
         sort={sort}
         by={by}
         onSortChange={handleSortChange}

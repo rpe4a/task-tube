@@ -4,9 +4,10 @@ import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.port.out.IJobRepository;
-import com.example.tasktube.server.infrastructure.postgresql.mapper.BarrierDataMapper;
+import com.example.tasktube.server.infrastructure.postgresql.mapper.BarrierMapper;
+import com.example.tasktube.server.infrastructure.postgresql.mapper.TaskMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -24,14 +25,17 @@ public class JobRepository implements IJobRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(JobRepository.class);
 
     private final NamedParameterJdbcTemplate db;
-    private final BarrierDataMapper mapper;
+    private final BarrierMapper barrierMapper;
+    private final TaskMapper taskMapper;
 
     public JobRepository(
             final NamedParameterJdbcTemplate db,
-            final BarrierDataMapper mapper
-    ) {
+            final BarrierMapper barrierMapper,
+            final TaskMapper taskMapper
+            ) {
         this.db = Objects.requireNonNull(db);
-        this.mapper = mapper;
+        this.barrierMapper = Objects.requireNonNull(barrierMapper);
+        this.taskMapper = Objects.requireNonNull(taskMapper);
     }
 
     @Override
@@ -67,7 +71,7 @@ public class JobRepository implements IJobRepository {
                     RETURNING *
                 """;
 
-        final RowMapper<Barrier> rsMapper = (rs, rowNum) -> mapper.getBarrier(rs);
+        final RowMapper<Barrier> rsMapper = (rs, rowNum) -> barrierMapper.getBarrier(rs);
 
         final List<Barrier> lockedBarriers = db.query(
                 queryCommand,
@@ -93,7 +97,7 @@ public class JobRepository implements IJobRepository {
         LOGGER.debug("Attempting to lock '{}' task IDs with status '{}' by client '{}'.", count, status, client);
 
         final String queryCommand = """
-                    WITH locked_task
+                    WITH locked_tasks
                     AS (
                         SELECT id
                         FROM tasks
@@ -102,7 +106,7 @@ public class JobRepository implements IJobRepository {
                           AND locked_at is NULL
                           AND status = :status
                         ORDER BY updated_at
-                            FOR UPDATE SKIP LOCKED
+                        FOR UPDATE SKIP LOCKED
                         LIMIT :count
                     )
                     UPDATE tasks
@@ -110,7 +114,7 @@ public class JobRepository implements IJobRepository {
                         locked_by = :locked_by,
                         locked_at = current_timestamp,
                         updated_at = current_timestamp
-                    WHERE id IN (SELECT id FROM locked_task)
+                    WHERE id IN (SELECT id FROM locked_tasks)
                     RETURNING id
                 """;
 
@@ -224,5 +228,53 @@ public class JobRepository implements IJobRepository {
         LOGGER.debug("Got '{}' heartbeat timeout task IDs.", taskIds.size());
 
         return taskIds;
+    }
+
+    @Override
+    public List<UUID> getTerminationRequestedTaskTubeList(final int count, final String client) {
+        if (count <= 0) {
+            throw new ApplicationException("Parameter count must be more than zero.");
+        }
+        if (StringUtils.isEmpty(client)) {
+            throw new ApplicationException("Parameter client cannot be null or empty.");
+        }
+        LOGGER.debug("Try to get '{}' request termination tasktubes by client '{}'.", count, client);
+
+        final String queryCommand = """
+                    WITH locked_tasktubes
+                    AS (
+                        SELECT id
+                        FROM tasktubes
+                        WHERE locked = false
+                          AND locked_by is NULL
+                          AND locked_at is NULL
+                          AND termination_requested = true
+                        ORDER BY updated_at
+                        FOR UPDATE SKIP LOCKED
+                        LIMIT :count
+                    )
+                    UPDATE tasktubes
+                    SET locked = true,
+                        locked_by = :locked_by,
+                        locked_at = current_timestamp,
+                        updated_at = current_timestamp
+                    WHERE id IN (SELECT id FROM tasktubes)
+                    RETURNING *
+                """;
+
+        final RowMapper<UUID> rsMapper = (rs, rowNum) -> rs.getObject("id", UUID.class);
+
+        final List<UUID> lockedIds = db.query(
+                queryCommand,
+                Map.of(
+                        "locked_by", client,
+                        "count", count
+                ),
+                rsMapper
+        );
+        LOGGER.debug("Locked '{}' tasktube IDs by client '{}'.", lockedIds.size(), client);
+
+        return lockedIds;
+
     }
 }

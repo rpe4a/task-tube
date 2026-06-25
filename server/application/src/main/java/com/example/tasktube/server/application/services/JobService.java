@@ -1,11 +1,11 @@
 package com.example.tasktube.server.application.services;
 
 import com.example.tasktube.server.application.exceptions.ApplicationException;
+import com.example.tasktube.server.application.models.TaskTubeDto;
 import com.example.tasktube.server.application.port.in.IJobService;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.port.out.IJobRepository;
 import com.google.common.base.Strings;
-import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -72,5 +72,19 @@ public class JobService implements IJobService {
         LOGGER.info("Try get '{}' locked barriers.", count);
 
         return jobRepository.getLockedBarrierIdList(count, lockedTimeoutSeconds);
+    }
+
+    @Override
+    @Transactional
+    public List<UUID> getRequestTerminationTaskTube(final int count, final String client) {
+        if (count <= 0) {
+            throw new ApplicationException("Parameter count must be more than zero.");
+        }
+        if (Strings.isNullOrEmpty(client)) {
+            throw new ApplicationException("Parameter client cannot be null or empty.");
+        }
+        LOGGER.info("Try get '{}' request termination tasktubes.", count);
+
+        return jobRepository.getTerminationRequestedTaskTubeList(count, client);
     }
 }

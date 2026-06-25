@@ -44,6 +44,7 @@ interface TaskTableProps {
   by: 'asc' | 'desc';
   onChangePage: (value: number) => void;
   onChangeRowsPerPage: (value: string) => void;
+  onRefresh: () => void;
   onSortChange: (sort: string, by: 'asc' | 'desc') => void;
 }
 
@@ -68,6 +69,7 @@ function TaskTable(props: TaskTableProps): JSX.Element {
     onChangePage,
     onChangeRowsPerPage,
     onSortChange,
+    onRefresh,
   } = props;
 
   const handleSortClick = useCallback(
@@ -88,23 +90,28 @@ function TaskTable(props: TaskTableProps): JSX.Element {
     [sort, by],
   );
 
-  const handleTerminateTask = useCallback(async (correlationId: string, taskId: string) => {
-    if (window.confirm('Are you sure that you want to terminate this task?')) {
-      try {
-        await fetchTerminateTaskAsync(correlationId, taskId);
+  const handleTerminateTask = useCallback(
+    async (correlationId: string, taskId: string) => {
+      if (window.confirm('Are you sure that you want to terminate this task?')) {
+        try {
+          await fetchTerminateTaskAsync(correlationId, taskId);
 
-        enqueueSnackbar(`Task '${taskId}' has been terminated successfully.`, {
-          variant: 'success',
-        });
-      } catch (error) {
-        console.error(`Can't terminate task '${taskId}': `, error);
+          enqueueSnackbar(`Task '${taskId}' has been terminated successfully.`, {
+            variant: 'success',
+          });
 
-        enqueueSnackbar(`Failed to terminate task '${taskId}'. Please, try again later.`, {
-          variant: 'error',
-        });
+          onRefresh();
+        } catch (error) {
+          console.error(`Can't terminate task '${taskId}': `, error);
+
+          enqueueSnackbar(`Failed to terminate task '${taskId}'. Please, try again later.`, {
+            variant: 'error',
+          });
+        }
       }
-    }
-  }, []);
+    },
+    [onRefresh],
+  );
 
   const handleCellClick = useCallback((event: React.MouseEvent<HTMLTableCellElement>) => {
     const cellText = event.currentTarget.textContent;
@@ -292,7 +299,12 @@ function TaskTable(props: TaskTableProps): JSX.Element {
                         <IconButton
                           onClick={() => handleTerminateTask(task.correlationId, task.id)}
                           size="small"
-                          title="Request to terminate the task"
+                          title={
+                            task.isTerminationRequested
+                              ? 'Termination requested'
+                              : 'Request task termination'
+                          }
+                          disabled={task.isTerminationRequested}
                           sx={{
                             marginLeft: 1,
                             color: 'error.main',

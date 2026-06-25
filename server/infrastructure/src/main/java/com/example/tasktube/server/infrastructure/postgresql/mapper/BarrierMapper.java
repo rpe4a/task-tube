@@ -1,28 +1,22 @@
 package com.example.tasktube.server.infrastructure.postgresql.mapper;
 
 import com.example.tasktube.server.domain.enties.Barrier;
-import com.example.tasktube.server.domain.enties.Task;
 import com.example.tasktube.server.domain.values.Lock;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcOperations;
 import org.springframework.stereotype.Service;
 
-import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 @Service
-public class BarrierDataMapper {
+public class BarrierMapper {
 
     public Map<String, Object> getDataDto(final Barrier barrier, final JdbcOperations ps) {
         final Map<String, Object> map = new HashMap<>();

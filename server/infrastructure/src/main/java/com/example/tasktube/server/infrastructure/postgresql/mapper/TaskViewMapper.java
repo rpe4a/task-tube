@@ -1,8 +1,8 @@
 package com.example.tasktube.server.infrastructure.postgresql.mapper;
 
 import com.example.tasktube.server.application.queries.views.ParentTaskView;
-import com.example.tasktube.server.application.queries.views.TaskTubeTreeNodeView;
 import com.example.tasktube.server.application.queries.views.TaskTubeTaskView;
+import com.example.tasktube.server.application.queries.views.TaskTubeTreeNodeView;
 import com.example.tasktube.server.application.queries.views.TaskTubeView;
 import com.example.tasktube.server.domain.enties.Task;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -43,6 +43,8 @@ public class TaskViewMapper {
                 ? Instant.ofEpochMilli(rs.getTimestamp("completed_at").getTime())
                 : null);
         taskView.setHandledBy(rs.getString("handled_by"));
+        taskView.setTerminationRequested(rs.getBoolean("termination_requested"));
+        taskView.setRecoveryRequested(rs.getBoolean("recovery_requested"));
         taskView.setTotalCount(rs.getInt("total_count"));
 
         return taskView;

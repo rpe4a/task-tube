@@ -15,16 +15,17 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public class Task extends Entity<UUID> {
 
     public static final String BARRIER_IS_FAILED = "Barrier '%s' has FAILED state.";
+
     private final List<LogRecord> logs = new LinkedList<>();
     private String name;
     private String tube;
@@ -43,11 +44,14 @@ public class Task extends Entity<UUID> {
     private Instant failedAt;
     private Instant abortedAt;
     private Instant completedAt;
+    private Instant terminatedAt;
     private int failures;
     private String failedReason;
     private Lock lock;
     private TaskSettings settings;
     private String handledBy;
+    private boolean isTerminationRequested;
+    private boolean isRecoveryRequested;
 
     private Task(final UUID id,
                  final String name,
@@ -67,6 +71,7 @@ public class Task extends Entity<UUID> {
                  final Instant failedAt,
                  final Instant abortedAt,
                  final Instant completedAt,
+                 final Instant terminatedAt,
                  final int failures,
                  final String failedReason,
                  final Lock lock,
@@ -91,6 +96,7 @@ public class Task extends Entity<UUID> {
         this.failedAt = failedAt;
         this.abortedAt = abortedAt;
         this.completedAt = completedAt;
+        this.terminatedAt = terminatedAt;
         this.failures = failures;
         this.failedReason = failedReason;
         this.lock = lock;
@@ -128,6 +134,7 @@ public class Task extends Entity<UUID> {
                 null,
                 Instant.now(),
                 createdAt,
+                null,
                 null,
                 null,
                 null,
@@ -255,41 +262,45 @@ public class Task extends Entity<UUID> {
     }
 
     private void checkSchedule(final String client) {
-        checkHandleBy(Collections.singletonList(Status.CREATED), client);
+        checkHandleBy(Status.CREATED, client);
     }
 
     private void checkCancel(final String client) {
-        checkHandleBy(Collections.singletonList(Status.CREATED), client);
+        checkHandleBy(Status.CREATED, client);
     }
 
     private void checkStart(final String client) {
-        checkHandleBy(Collections.singletonList(Status.SCHEDULED), client);
+        checkHandleBy(Status.SCHEDULED, client);
     }
 
     private void checkProcess(final String client) {
-        checkHandleBy(Collections.singletonList(Status.PROCESSING), client);
+        checkHandleBy(Status.PROCESSING, client);
     }
 
     private void checkFinish(final Slot output, final String client) {
-        checkHandleBy(Collections.singletonList(Status.PROCESSING), client);
+        checkHandleBy(Status.PROCESSING, client);
         if (Objects.isNull(output)) {
             throw new ValidationDomainException("Parameter output cannot be null.");
         }
     }
 
     private void checkFail(final String client) {
-        checkHandleBy(Collections.singletonList(Status.PROCESSING), client);
+        checkHandleBy(Status.PROCESSING, client);
     }
 
     private void checkAbort(final String client) {
-        checkHandleBy(List.of(Status.PROCESSING, Status.FINISHED), client);
+        checkHandleBy(Set.of(Status.PROCESSING, Status.FINISHED), client);
     }
 
     private void checkComplete(final String client) {
-        checkHandleBy(Collections.singletonList(Status.FINISHED), client);
+        checkHandleBy(Status.FINISHED, client);
     }
 
-    private void checkHandleBy(final List<Status> expectedStatuses, final String client) {
+    private void checkHandleBy(final Status status, final String client) {
+        checkHandleBy(Set.of(status), client);
+    }
+
+    private void checkHandleBy(final Set<Status> expectedStatuses, final String client) {
         if (Objects.isNull(client)) {
             throw new ValidationDomainException("Parameter client cannot be null.");
         }
@@ -495,7 +506,7 @@ public class Task extends Entity<UUID> {
     }
 
     public boolean isFinalized() {
-        return Status.ABORTED.equals(getStatus()) || Status.CANCELED.equals(getStatus());
+        return Status.ABORTED.equals(getStatus()) || Status.CANCELED.equals(getStatus()) || Status.TERMINATED.equals(getStatus());
     }
 
     public boolean isCreated() {
@@ -571,6 +582,15 @@ public class Task extends Entity<UUID> {
         }
     }
 
+    public void requestTermination(final String client) {
+        checkHandleBy(Set.of(Status.SCHEDULED, Status.PROCESSING), client);
+
+        setTerminationRequested(true);
+        addLog(String.format("Termination has been requested by client '%s'.", client));
+
+        unlock();
+    }
+
     public void releaseBarrier(final Barrier barrier, final String client) {
         if (Objects.isNull(barrier)) {
             throw new ValidationDomainException("Parameter barrier cannot be null.");
@@ -643,6 +663,30 @@ public class Task extends Entity<UUID> {
         return getLock().locked();
     }
 
+    public boolean isTerminationRequested() {
+        return isTerminationRequested;
+    }
+
+    public void setTerminationRequested(final boolean terminationRequested) {
+        isTerminationRequested = terminationRequested;
+    }
+
+    public boolean isRecoveryRequested() {
+        return isRecoveryRequested;
+    }
+
+    public void setRecoveryRequested(final boolean recoveryRequested) {
+        isRecoveryRequested = recoveryRequested;
+    }
+
+    public Instant getTerminatedAt() {
+        return terminatedAt;
+    }
+
+    public void setTerminatedAt(final Instant terminatedAt) {
+        this.terminatedAt = terminatedAt;
+    }
+
     public enum Status {
         CREATED,
         SCHEDULED,
@@ -650,7 +694,8 @@ public class Task extends Entity<UUID> {
         FINISHED,
         ABORTED,
         CANCELED,
-        COMPLETED;
+        COMPLETED,
+        TERMINATED;
 
         public boolean isNotEqual(final Status other) {
             return !this.equals(other);

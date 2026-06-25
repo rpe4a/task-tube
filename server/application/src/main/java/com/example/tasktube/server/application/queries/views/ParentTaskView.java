@@ -7,6 +7,8 @@ import java.util.UUID;
 
 public class ParentTaskView {
 
+    private boolean isTerminationRequested;
+    private boolean isRecoveryRequested;
     private UUID id;
     private String name;
     private String tube;
@@ -19,6 +21,22 @@ public class ParentTaskView {
     private Instant completedAt;
     private String handledBy;
     private int totalCount;
+
+    public boolean isTerminationRequested() {
+        return isTerminationRequested;
+    }
+
+    public void setTerminationRequested(final boolean terminationRequested) {
+        isTerminationRequested = terminationRequested;
+    }
+
+    public boolean isRecoveryRequested() {
+        return isRecoveryRequested;
+    }
+
+    public void setRecoveryRequested(final boolean recoveryRequested) {
+        isRecoveryRequested = recoveryRequested;
+    }
 
     public UUID getId() {
         return id;

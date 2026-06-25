@@ -3,7 +3,7 @@ package com.example.tasktube.server.infrastructure.postgresql.repository;
 import com.example.tasktube.server.application.exceptions.ApplicationException;
 import com.example.tasktube.server.domain.enties.Barrier;
 import com.example.tasktube.server.domain.port.out.IBarrierRepository;
-import com.example.tasktube.server.infrastructure.postgresql.mapper.BarrierDataMapper;
+import com.example.tasktube.server.infrastructure.postgresql.mapper.BarrierMapper;
 import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,11 +27,11 @@ public class BarrierRepository implements IBarrierRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(BarrierRepository.class);
 
     private final NamedParameterJdbcTemplate db;
-    private final BarrierDataMapper mapper;
+    private final BarrierMapper mapper;
 
     public BarrierRepository(
             final NamedParameterJdbcTemplate db,
-            final BarrierDataMapper mapper
+            final BarrierMapper mapper
     ) {
         this.db = Objects.requireNonNull(db);
         this.mapper = Objects.requireNonNull(mapper);

@@ -25,6 +25,11 @@ public class ApplicationEventPublisher implements IEventPublisher {
     }
 
     @Override
+    public void publish(final DomainEvent event) {
+        publish(List.of(event));
+    }
+
+    @Override
     public void publish(final List<DomainEvent> events) {
         Objects.requireNonNull(events);
         if (events.isEmpty()) {

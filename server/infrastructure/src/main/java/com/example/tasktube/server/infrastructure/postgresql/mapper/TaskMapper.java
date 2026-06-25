@@ -44,8 +44,11 @@ public class TaskMapper {
         map.put("failed_at", task.getFailedAt() != null ? Timestamp.from(task.getFailedAt()) : null);
         map.put("aborted_at", task.getAbortedAt() != null ? Timestamp.from(task.getAbortedAt()) : null);
         map.put("completed_at", task.getCompletedAt() != null ? Timestamp.from(task.getCompletedAt()) : null);
+        map.put("terminated_at", task.getTerminatedAt() != null ? Timestamp.from(task.getTerminatedAt()) : null);
         map.put("failures", task.getFailures());
         map.put("failed_reason", task.getFailedReason());
+        map.put("termination_requested", task.isTerminationRequested());
+        map.put("recovery_requested", task.isRecoveryRequested());
         if (task.getLock() != null) {
             map.put("locked_at", task.getLock().lockedAt() != null ? Timestamp.from(task.getLock().lockedAt()) : null);
             map.put("locked", task.getLock().locked());
@@ -103,8 +106,13 @@ public class TaskMapper {
         task.setCompletedAt(rs.getTimestamp("completed_at") != null
                 ? Instant.ofEpochMilli(rs.getTimestamp("completed_at").getTime())
                 : null);
+        task.setTerminatedAt(rs.getTimestamp("terminated_at") != null
+                ? Instant.ofEpochMilli(rs.getTimestamp("terminated_at").getTime())
+                : null);
         task.setFailures(rs.getInt("failures"));
         task.setFailedReason(rs.getString("failed_reason"));
+        task.setTerminationRequested(rs.getBoolean("termination_requested"));
+        task.setRecoveryRequested(rs.getBoolean("recovery_requested"));
         task.setLock(
                 new Lock(
                         rs.getTimestamp("locked_at") != null
